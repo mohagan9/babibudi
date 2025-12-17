@@ -20,9 +20,5 @@ export type ContextMap = {
     oauthClient: OAuth2Client
     clients: Record<string, GoogleSpreadsheet>
   }
-  featureFlagCache?: {
-    [key: string]: Record<string, boolean>
-  }
-  featureFlagOverrides?: Record<string, boolean>
   viewToTableCache?: Record<string, Table>
 }

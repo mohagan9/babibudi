@@ -9,7 +9,6 @@ import {
   User,
   UserSSO,
 } from "../documents"
-import { FeatureFlag } from "../sdk"
 import { Files } from "formidable"
 import { EventType } from "../core"
 import { UserAgentContext } from "koa-useragent"
@@ -26,7 +25,6 @@ export interface ContextUser extends Omit<User & Partial<UserSSO>, "roles"> {
   role?: Role
   roles?: UserRoles
   csrfToken?: string
-  featureFlags?: FeatureFlag[]
   accountPortalAccess?: boolean
   account?: Account
 }

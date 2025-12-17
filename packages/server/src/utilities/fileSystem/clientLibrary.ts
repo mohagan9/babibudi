@@ -1,6 +1,5 @@
-import { features, objectStore } from "@budibase/backend-core"
+import { objectStore } from "@budibase/backend-core"
 import { sdk, utils } from "@budibase/shared-core"
-import { FeatureFlag } from "@budibase/types"
 import fs from "fs"
 import path, { join } from "path"
 import { ObjectStoreBuckets } from "../../constants"
@@ -275,9 +274,6 @@ const forEachObject = (
 
 export async function shouldServeLocally() {
   if (env.isDev()) {
-    if (await features.isEnabled(FeatureFlag.DEV_USE_CLIENT_FROM_STORAGE)) {
-      return false
-    }
     return true
   }
 

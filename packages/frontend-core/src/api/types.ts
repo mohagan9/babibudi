@@ -5,7 +5,6 @@ import { BackupEndpoints } from "./backups"
 import { ConfigEndpoints } from "./configs"
 import { DatasourceEndpoints } from "./datasources"
 import { EnvironmentVariableEndpoints } from "./environmentVariables"
-import { FeatureFlagEndpoints } from "./features"
 import { FlagEndpoints } from "./flags"
 import { LayoutEndpoints } from "./layouts"
 import { LogEndpoints } from "./logs"
@@ -125,7 +124,6 @@ export type APIClient = BaseAPIClient &
   TableEndpoints &
   TemplateEndpoints &
   UserEndpoints &
-  FeatureFlagEndpoints &
   ViewEndpoints & {
     resource: ResourceEndpoints
     rowActions: RowActionEndpoints

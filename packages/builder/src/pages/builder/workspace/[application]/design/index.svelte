@@ -16,7 +16,6 @@
     workspaceAppStore,
     workspaceFavouriteStore,
   } from "@/stores/builder"
-  import { featureFlags } from "@/stores/portal"
   import {
     AbsTooltip,
     ActionButton,
@@ -51,8 +50,6 @@
     $appStore.upgradableVersion &&
     $appStore.version &&
     $appStore.upgradableVersion !== $appStore.version
-
-  $: canDuplicate = $featureFlags.DUPLICATE_APP
 
   const filters: {
     label: string
@@ -176,14 +173,6 @@
         name: "Delete",
         visible: true,
         callback: () => confirmDeleteDialog.show(),
-      },
-      {
-        icon: "copy",
-        name: "Duplicate",
-        visible: canDuplicate,
-        disabled: isDuplicating,
-        callback: () =>
-          !isDuplicating && duplicateWorkspaceApp(workspaceApp._id as string),
       },
     ]
 

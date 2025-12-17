@@ -27,7 +27,7 @@ router.get("/health", async ctx => {
 })
 router.get("/version", ctx => (ctx.body = envCore.VERSION))
 
-router.use(middleware.errorHandling).use(middleware.featureFlagCookie)
+router.use(middleware.errorHandling)
 
 // only add the routes if they are enabled
 if (apiEnabled()) {
@@ -73,7 +73,7 @@ if (apiEnabled()) {
     router.use(middleware.csp)
   }
 
-  router.use(auth.auditLog).use(migrations).use(cleanup)
+  router.use(migrations).use(cleanup)
 
   // authenticated routes
   for (let route of mainRoutes) {

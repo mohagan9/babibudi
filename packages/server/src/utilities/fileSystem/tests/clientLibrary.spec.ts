@@ -365,9 +365,6 @@ describe("clientLibrary", () => {
     beforeEach(() => {
       mockedEnv.isDev.mockReturnValue(false)
       mockedEnv.isTest.mockReturnValue(false)
-      features.testutils.setFeatureFlags("", {
-        DEV_USE_CLIENT_FROM_STORAGE: false,
-      })
     })
 
     async function getShouldServeLocally() {
@@ -381,19 +378,6 @@ describe("clientLibrary", () => {
       mockedEnv.isDev.mockReturnValueOnce(true)
       const result = await getShouldServeLocally()
       expect(result).toBe(true)
-    })
-
-    it("should not serve locally in dev mode if DEV_USE_CLIENT_FROM_STORAGE is true", async () => {
-      mockedEnv.isDev.mockReturnValue(true)
-      const result = await features.testutils.withFeatureFlags(
-        "tenantId",
-        {
-          DEV_USE_CLIENT_FROM_STORAGE: true,
-        },
-        async () => getShouldServeLocally()
-      )
-
-      expect(result).toBe(false)
     })
 
     it("should serve locally in test mode", async () => {

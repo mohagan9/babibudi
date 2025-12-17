@@ -20,10 +20,9 @@
     views,
     viewsV2,
   } from "@/stores/builder"
-  import { themeStore, featureFlags } from "@/stores/portal"
+  import { themeStore } from "@/stores/portal"
   import { getContext } from "svelte"
   import { ThemeOptions, BUILDER_URLS } from "@budibase/shared-core"
-  import { FeatureFlag } from "@budibase/types"
   import { IntegrationTypes } from "@/constants/backend"
 
   $goto
@@ -94,7 +93,6 @@
     ...queryCommands($queries?.list || []),
     ...screenCommands($sortedScreens),
     ...themeCommands(),
-    ...featureFlagCommands($featureFlags),
   ]
   $: enrichedCommands = commands.map(cmd => ({
     ...cmd,
@@ -255,22 +253,6 @@
           return state
         }),
     }))
-  }
-
-  const featureFlagCommands = flags => {
-    if (!flags.DEBUG_UI) {
-      return []
-    }
-    return Object.entries(flags)
-      .filter(([flag]) => flag !== FeatureFlag.DEBUG_UI)
-      .map(([flag, value]) => ({
-        type: "Feature Flag",
-        name: `${value ? "Disable" : "Enable"} <code>${flag}</code>`,
-        icon: "flag",
-        action: () => {
-          featureFlags.setFlag(flag, !value)
-        },
-      }))
   }
 
   const filterResults = (commands, search, inApp) => {

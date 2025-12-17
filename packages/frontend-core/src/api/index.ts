@@ -39,7 +39,6 @@ import { buildLogsEndpoints } from "./logs"
 import { buildMigrationEndpoints } from "./migrations"
 import { buildRowActionEndpoints } from "./rowActions"
 import { buildOAuth2Endpoints } from "./oauth2"
-import { buildFeatureFlagEndpoints } from "./features"
 import { buildNavigationEndpoints } from "./navigation"
 import { buildWorkspaceAppEndpoints } from "./workspaceApps"
 import { buildResourceEndpoints } from "./resource"
@@ -295,7 +294,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildEnvironmentVariableEndpoints(API),
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
-    ...buildFeatureFlagEndpoints(API),
     deployment: buildDeploymentEndpoints(API),
     viewV2: buildViewV2Endpoints(API),
     rowActions: buildRowActionEndpoints(API),
