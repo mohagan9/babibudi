@@ -9,15 +9,11 @@
     UISearchFilter,
     DataFetchDatasource,
     UserDatasource,
-    GroupUserDatasource,
     DataFetchOptions,
   } from "@budibase/types"
   import { LogicalOperator, EmptyFilterOption } from "@budibase/types"
 
-  type ProviderDatasource = Exclude<
-    DataFetchDatasource,
-    UserDatasource | GroupUserDatasource
-  >
+  type ProviderDatasource = Exclude<DataFetchDatasource, UserDatasource>
 
   export let dataSource: ProviderDatasource
   export let filter: UISearchFilter

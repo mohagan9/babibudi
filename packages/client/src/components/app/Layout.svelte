@@ -697,10 +697,6 @@
   .mobile:not(.layout--none) .main {
     padding: 16px;
   }
-  .mobile:not(.layout--none)
-    .main:not(.size--max):has(.screenslot-dom > .component > .grid) {
-    padding: 6px;
-  }
   .mobile .main.size--max {
     padding: 0;
   }
