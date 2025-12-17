@@ -1,6 +1,3 @@
-import { Hosting } from "../hosting"
-import { Group, Identity } from "./identification"
-
 export enum Event {
   // USER
   USER_CREATED = "user:created",
@@ -32,6 +29,10 @@ export enum Event {
   // EMAIL
   EMAIL_SMTP_CREATED = "email:smtp:created",
   EMAIL_SMTP_UPDATED = "email:smtp:updated",
+
+  // AI
+  AI_CONFIG_CREATED = "ai:config:created",
+  AI_CONFIG_UPDATED = "ai:config:updated",
 
   // AUTH
   AUTH_SSO_CREATED = "auth:sso:created",
@@ -273,6 +274,10 @@ export const AuditedEventFriendlyName: Record<Event, string | undefined> = {
   [Event.EMAIL_SMTP_CREATED]: `Email configuration created`,
   [Event.EMAIL_SMTP_UPDATED]: `Email configuration updated`,
 
+  // AI
+  [Event.AI_CONFIG_CREATED]: `AI configuration created`,
+  [Event.AI_CONFIG_UPDATED]: `AI configuration updated`,
+
   // AUTH
   [Event.AUTH_SSO_CREATED]: `SSO configuration created`,
   [Event.AUTH_SSO_UPDATED]: `SSO configuration updated`,
@@ -435,22 +440,6 @@ export const AuditedEventFriendlyName: Record<Event, string | undefined> = {
   [Event.RESOURCE_COPIED_TO_WORKSPACE]: `{{ resource.type }} copied to workspace`,
 }
 
-// properties added at the final stage of the event pipeline
-export interface BaseEvent {
-  version?: string
-  service?: string
-  environment?: string
-  appId?: string
-  installationId?: string
-  tenantId?: string
-  hosting?: Hosting
-  // any props in the audited section will be removed before passing events
-  // up out of system (purely for use with auditing)
-  audited?: {
-    [key: string]: any
-  }
-}
-
 export type TableExportFormat = "json" | "csv"
 
 export type DocUpdateEvent = {
@@ -458,16 +447,4 @@ export type DocUpdateEvent = {
   tenantId: string
   appId?: string
   properties: any
-}
-
-export interface EventProcessor {
-  processEvent(
-    event: Event,
-    identity: Identity,
-    properties: any,
-    timestamp?: string | number
-  ): Promise<void>
-  identify?(identity: Identity, timestamp?: string | number): Promise<void>
-  identifyGroup?(group: Group, timestamp?: string | number): Promise<void>
-  shutdown?(): Promise<void>
 }

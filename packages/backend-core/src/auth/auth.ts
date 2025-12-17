@@ -14,7 +14,6 @@ import { invalidateUser } from "../cache/user"
 import * as configs from "../configs"
 import { Cookie } from "../constants"
 import { getGlobalDB } from "../context"
-import * as events from "../events"
 import {
   authenticated,
   csrf,
@@ -31,7 +30,6 @@ const refresh = require("passport-oauth2-refresh")
 
 export {
   adminOnly,
-  auditLog,
   authError,
   builderOnly,
   builderOrAdmin,
@@ -206,6 +204,5 @@ export async function platformLogout(opts: PlatformLogoutOpts) {
 
   const sessionIds = sessions.map(({ sessionId }) => sessionId)
   await invalidateSessions(userId, { sessionIds, reason: "logout" })
-  await events.auth.logout(ctx.user?.email)
   await userCache.invalidateUser(userId)
 }

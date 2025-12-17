@@ -1,10 +1,5 @@
 import { Command } from "../structures/Command"
-import {
-  CommandWord,
-  AnalyticsEvent,
-  InitType,
-  GENERATED_USER_EMAIL,
-} from "../constants"
+import { CommandWord, InitType, GENERATED_USER_EMAIL } from "../constants"
 import { getSkeleton, fleshOutSkeleton } from "./skeleton"
 import * as questions from "../questions"
 import fs from "fs"
@@ -13,7 +8,6 @@ import { plugins } from "@budibase/backend-core"
 import { runPkgCommand } from "../exec"
 import { join } from "path"
 import { success, error, info, moveDirectory } from "../utils"
-import { captureEvent } from "../events"
 import { init as hostingInit } from "../hosting/init"
 import { start as hostingStart } from "../hosting/start"
 import { analysePluginForSvelte5, runSvelte5Migration } from "./migrate"
@@ -93,12 +87,6 @@ async function init(opts: PluginOpts | PluginType) {
   } else {
     console.log(info(`Plugin created in directory "${name}"`))
   }
-  captureEvent(AnalyticsEvent.PluginInit, {
-    type,
-    name,
-    description,
-    version,
-  })
 }
 
 async function verify() {

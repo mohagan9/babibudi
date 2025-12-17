@@ -22,7 +22,6 @@ import * as platform from "../platform"
 import { validatePassword } from "../security"
 import * as sessions from "../security/sessions"
 import { hash } from "../utils"
-import * as eventHelpers from "./events"
 import {
   getFirstPlatformUser,
   getPlatformUsers,
@@ -58,7 +57,6 @@ type FeatureFns = { isSSOEnforced: FeatureFn; isAppBuildersEnabled: FeatureFn }
 const bulkDeleteProcessing = async (dbUser: User) => {
   const userId = dbUser._id as string
   await platform.users.removeUser(dbUser)
-  await eventHelpers.handleDeleteEvents(dbUser)
   await cache.user.invalidateUser(userId)
   await sessions.invalidateSessions(userId, { reason: "bulk-deletion" })
 }
@@ -284,8 +282,6 @@ export class UserDB {
         // save the user to db
         let response = await db.put(builtUser)
         builtUser._rev = response.rev
-
-        await eventHelpers.handleSaveEvents(builtUser, dbUser)
         if (dbUser && builtUser.email !== dbUser.email) {
           // Remove the plaform email reference if the email changed
           await platform.users.removeUser({ email: dbUser.email } as User)
@@ -371,7 +367,6 @@ export class UserDB {
           // TODO: Refactor to bulk insert users into the info db
           // instead of relying on looping tenant creation
           await platform.users.addUser(tenantId, user._id!, user.email)
-          await eventHelpers.handleSaveEvents(user, undefined)
         }
 
         const saved = usersToBulkSave.map(user => {
@@ -507,7 +502,6 @@ export class UserDB {
 
     const creatorsToDelete = (await isCreatorAsync(dbUser)) ? 1 : 0
     await UserDB.quotas.removeUsers(1, creatorsToDelete)
-    await eventHelpers.handleDeleteEvents(dbUser)
     await cache.user.invalidateUser(userId)
     await sessions.invalidateSessions(userId, { reason: "deletion" })
   }

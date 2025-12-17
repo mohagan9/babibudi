@@ -1,9 +1,6 @@
 import { newid } from "./utils"
-import * as events from "./events"
 import { StaticDatabases, doWithDB } from "./db"
-import { Installation, IdentityType, Database } from "@budibase/types"
-import * as context from "./context"
-import semver from "semver"
+import { Installation, Database } from "@budibase/types"
 import { bustCache, withCache, TTL, CacheKey } from "./cache/generic"
 import environment from "./environment"
 import { logAlert } from "./logging"
@@ -83,27 +80,7 @@ export const checkInstallVersion = async (): Promise<void> => {
 
   try {
     if (currentVersion !== newVersion) {
-      const isUpgrade = semver.gt(newVersion, currentVersion)
-      const isDowngrade = semver.lt(newVersion, currentVersion)
-
-      const success = await updateVersion(newVersion)
-
-      if (success) {
-        await context.doInIdentityContext(
-          {
-            _id: install.installId,
-            type: IdentityType.INSTALLATION,
-          },
-          async () => {
-            if (isUpgrade) {
-              await events.installation.upgraded(currentVersion, newVersion)
-            } else if (isDowngrade) {
-              await events.installation.downgraded(currentVersion, newVersion)
-            }
-          }
-        )
-        await events.identification.identifyInstallationGroup(install.installId)
-      }
+      await updateVersion(newVersion)
     }
   } catch (err: any) {
     if (err?.message?.includes("Invalid Version")) {

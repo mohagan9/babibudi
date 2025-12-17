@@ -28,7 +28,6 @@ export enum ViewName {
   BY_API_KEY = "by_api_key",
   LINK = "by_link",
   ROUTING = "screen_routes_2",
-  AUTOMATION_LOGS = "automation_logs",
   ACCOUNT_BY_EMAIL = "account_by_email",
   PLATFORM_USERS_LOWERCASE = "platform_users_lowercase_2",
   USER_BY_GROUP = "user_by_group",

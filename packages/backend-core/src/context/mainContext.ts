@@ -121,22 +121,6 @@ async function newContext<T>(updates: ContextMap, task: () => T) {
   return Context.run(context, task)
 }
 
-export async function doInAutomationContext<T>(params: {
-  workspaceId: string
-  automationId: string
-  task: () => T
-}): Promise<T> {
-  await ensureSnippetContext()
-  return await newContext(
-    {
-      tenantId: getTenantIDFromWorkspaceID(params.workspaceId),
-      appId: params.workspaceId,
-      automationId: params.automationId,
-    },
-    params.task
-  )
-}
-
 export async function doInContext(
   workspaceId: string,
   task: any

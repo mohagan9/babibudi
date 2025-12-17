@@ -1,6 +1,5 @@
-import { InitType, AnalyticsEvent } from "../constants"
+import { InitType } from "../constants"
 import { confirmation } from "../questions"
-import { captureEvent } from "../events"
 import * as makeFiles from "./makeFiles"
 import { parseEnv } from "../utils"
 import { checkDockerConfigured, downloadDockerCompose } from "./utils"
@@ -56,9 +55,6 @@ export async function init(opts: any) {
       return
     }
   }
-  captureEvent(AnalyticsEvent.SelfHostInit, {
-    type,
-  })
   const config = await getInitConfig(type, isQuick, port)
   if (!isSingle) {
     await downloadDockerCompose()

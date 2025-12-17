@@ -5,4 +5,3 @@ export const accounts = jest.mocked(_accounts)
 
 export * as date from "./date"
 export * from "./alerts"
-import "./events"

@@ -1,6 +1,4 @@
 import { Checkbox, Select, RadioGroup, Stepper, Input } from "@budibase/bbui"
-import { licensing } from "@/stores/portal"
-import { get } from "svelte/store"
 import DataSourceSelect from "./controls/DataSourceSelect/DataSourceSelect.svelte"
 import S3DataSourceSelect from "./controls/S3DataSourceSelect.svelte"
 import DataProviderSelect from "./controls/DataProviderSelect.svelte"
@@ -33,7 +31,6 @@ import ComponentConfiguration from "./controls/ComponentConfiguration/ComponentC
 import RelationshipFilterEditor from "./controls/RelationshipFilterEditor.svelte"
 import FormStepConfiguration from "./controls/FormStepConfiguration.svelte"
 import FormStepControls from "./controls/FormStepControls.svelte"
-import PaywalledSetting from "./controls/PaywalledSetting.svelte"
 import TableConditionEditor from "./controls/TableConditionEditor.svelte"
 import ButtonConditionEditor from "./controls/ButtonConditionEditor.svelte"
 import MultilineDrawerBindableInput from "@/components/common/MultilineDrawerBindableInput.svelte"
@@ -112,14 +109,9 @@ const componentMap = {
 }
 
 export const getComponentForSetting = setting => {
-  const { type, showInBar, barStyle, license } = setting || {}
+  const { type, showInBar, barStyle } = setting || {}
   if (!type) {
     return null
-  }
-
-  // Check for paywalled settings
-  if (license && get(licensing).isFreePlan) {
-    return PaywalledSetting
   }
 
   // We can show a clone of the bar settings for certain select settings

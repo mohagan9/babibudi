@@ -35,7 +35,6 @@ import { buildViewV2Endpoints } from "./viewsV2"
 import { buildPluginEndpoints } from "./plugins"
 import { buildBackupEndpoints } from "./backups"
 import { buildEnvironmentVariableEndpoints } from "./environmentVariables"
-import { buildEventEndpoints } from "./events"
 import { buildLogsEndpoints } from "./logs"
 import { buildMigrationEndpoints } from "./migrations"
 import { buildRowActionEndpoints } from "./rowActions"
@@ -294,7 +293,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildPluginEndpoints(API),
     ...buildBackupEndpoints(API),
     ...buildEnvironmentVariableEndpoints(API),
-    ...buildEventEndpoints(API),
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
     ...buildFeatureFlagEndpoints(API),
