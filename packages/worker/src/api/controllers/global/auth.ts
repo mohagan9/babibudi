@@ -2,7 +2,6 @@ import {
   auth as authCore,
   constants,
   context,
-  events,
   utils as utilsCore,
   configs,
   cache,
@@ -146,9 +145,6 @@ export const login = async (
         `[auth] password auth success email=${normalizeEmail(user.email)}`
       )
       await passportCallback(ctx, user, err, info)
-      await context.identity.doInUserContext(user, ctx, async () => {
-        await events.auth.login("local", user.email)
-      })
       ctx.body = {
         message: "Login successful",
         userId: user.userId,
@@ -360,9 +356,6 @@ export const googleCallback = async (ctx: Ctx<void, void>, next: Next) => {
     },
     async (err: any, user: SSOUser, info: any) => {
       await passportCallback(ctx, user, err, info)
-      await context.identity.doInUserContext(user, ctx, async () => {
-        await events.auth.login("google-internal", user.email)
-      })
       ctx.redirect(env.PASSPORT_GOOGLEAUTH_SUCCESS_REDIRECT)
     }
   )(ctx, next)
@@ -427,9 +420,6 @@ export const oidcCallback = async (ctx: Ctx<void, void>, next: Next) => {
     },
     async (err: any, user: SSOUser, info: any) => {
       await passportCallback(ctx, user, err, info)
-      await context.identity.doInUserContext(user, ctx, async () => {
-        await events.auth.login("oidc", user.email)
-      })
       ctx.redirect(env.PASSPORT_OIDCAUTH_SUCCESS_REDIRECT)
     }
   )(ctx, next)

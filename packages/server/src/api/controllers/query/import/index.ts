@@ -4,8 +4,7 @@ import { ImportInfo, ImportSource } from "./sources/base"
 import { Curl } from "./sources/curl"
 import { OpenAPI2 } from "./sources/openapi2"
 import { OpenAPI3 } from "./sources/openapi3"
-// @ts-ignore
-import { context, events } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import { Datasource, Query } from "@budibase/types"
 
 interface ImportResult {
@@ -130,15 +129,6 @@ export class RestImporter {
     })
 
     const successQueries = Object.values(queryIndex)
-
-    // events
-    const count = successQueries.length
-    const importSource = this.source.getImportSource()
-    const datasource: Datasource = await db.get(datasourceId)
-    await events.query.imported(datasource, importSource, count)
-    for (let query of successQueries) {
-      await events.query.created(datasource, query)
-    }
 
     return {
       errorQueries,

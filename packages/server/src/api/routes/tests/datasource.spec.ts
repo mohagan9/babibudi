@@ -1,4 +1,4 @@
-import { context, events } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import sdk from "../../../sdk"
 import { getCachedVariable } from "../../../threads/utils"
 import * as setup from "./utilities"
@@ -54,7 +54,6 @@ describe("/datasources", () => {
         config: {},
       })
       expect(ds.name).toEqual("Test")
-      expect(events.datasource.created).toHaveBeenCalledTimes(1)
     })
 
     it("should fail if the datasource is invalid", async () => {
@@ -225,7 +224,6 @@ if (descriptions.length) {
           datasource.name = newName
           const updatedDs = await config.api.datasource.update(datasource)
           expect(updatedDs.name).toEqual(newName)
-          expect(events.datasource.updated).toHaveBeenCalledTimes(1)
         })
 
         it("should not overwrite database password with --secret-value--", async () => {
@@ -277,7 +275,6 @@ if (descriptions.length) {
           expect(datasources).not.toContainEqual(
             expect.objectContaining(datasource)
           )
-          expect(events.datasource.deleted).toHaveBeenCalledTimes(1)
         })
       })
 

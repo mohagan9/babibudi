@@ -1,4 +1,4 @@
-import { context, db, events } from "@budibase/backend-core"
+import { context, db } from "@budibase/backend-core"
 import {
   ClearBackupErrorRequest,
   ClearBackupErrorResponse,
@@ -6,9 +6,7 @@ import {
   ExportWorkspaceDumpRequest,
   ExportWorkspaceDumpResponse,
   UserCtx,
-  Workspace,
 } from "@budibase/types"
-import { DocumentType } from "../../db/utils"
 import sdk from "../../sdk"
 
 export async function exportAppDump(
@@ -30,12 +28,6 @@ export async function exportAppDump(
     appId,
     excludeRows,
     encryptPassword,
-  })
-
-  await context.doInWorkspaceContext(appId, async () => {
-    const appDb = context.getWorkspaceDB()
-    const app = await appDb.get<Workspace>(DocumentType.WORKSPACE_METADATA)
-    await events.app.exported(app)
   })
 }
 

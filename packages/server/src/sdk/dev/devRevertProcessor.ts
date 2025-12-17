@@ -1,10 +1,4 @@
-import {
-  cache,
-  context,
-  db as dbCore,
-  events,
-  queue,
-} from "@budibase/backend-core"
+import { cache, context, db as dbCore, queue } from "@budibase/backend-core"
 import {
   DeploymentDoc,
   DevRevertQueueData,
@@ -69,7 +63,6 @@ class DevRevertProcessor extends queue.QueuedProcessor<DevRevertQueueData> {
       appDoc.instance._id = appId
       await db.put(appDoc)
       await cache.workspace.invalidateWorkspaceMetadata(appId)
-      await events.app.reverted(appDoc)
 
       return { message: "Reverted changes successfully." }
     } catch (err) {

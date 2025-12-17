@@ -1,7 +1,6 @@
-import { context, events, permissions } from "@budibase/backend-core"
+import { permissions } from "@budibase/backend-core"
 import { BuilderSocketEvent } from "@budibase/shared-core"
 import {
-  Automation,
   ContextUser,
   Ctx,
   Datasource,
@@ -38,13 +37,6 @@ export default class BuilderSocket extends BaseSocket {
           userIdMap[session._id] = true
         }
       })
-
-      const tenantId = context.getTenantIDFromWorkspaceID(appId)
-      if (tenantId) {
-        await context.doInTenant(tenantId, async () => {
-          await events.user.dataCollaboration(Object.keys(userIdMap).length)
-        })
-      }
 
       // Reply with all current sessions
       callback({ users: sessions })
@@ -206,20 +198,6 @@ export default class BuilderSocket extends BaseSocket {
     this.emitToRoom(ctx, ctx.appId, BuilderSocketEvent.AppPublishChange, {
       published: false,
       user: ctx.user,
-    })
-  }
-
-  emitAutomationUpdate(ctx: Ctx, automation: Automation) {
-    this.emitToRoom(ctx, ctx.appId, BuilderSocketEvent.AutomationChange, {
-      id: automation._id,
-      automation,
-    })
-  }
-
-  emitAutomationDeletion(ctx: Ctx, id: string) {
-    this.emitToRoom(ctx, ctx.appId, BuilderSocketEvent.AutomationChange, {
-      id,
-      automation: null,
     })
   }
 }

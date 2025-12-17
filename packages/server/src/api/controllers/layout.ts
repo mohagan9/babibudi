@@ -1,4 +1,4 @@
-import { context, events } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import {
   DeleteLayoutResponse,
   SaveLayoutRequest,
@@ -25,7 +25,6 @@ export async function save(
 
   layout._id = layout._id || generateLayoutID()
   const response = await db.put(layout)
-  await events.layout.created(layout)
   layout._rev = response.rev
 
   ctx.body = layout
@@ -44,6 +43,5 @@ export async function destroy(ctx: UserCtx<void, DeleteLayoutResponse>) {
   }
 
   await db.remove(layoutId, layoutRev)
-  await events.layout.deleted(layoutId)
   ctx.body = { message: "Layout deleted successfully" }
 }

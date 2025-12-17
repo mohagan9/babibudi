@@ -1,4 +1,4 @@
-import { db as dbCore, events, roles } from "@budibase/backend-core"
+import { db as dbCore, roles } from "@budibase/backend-core"
 import { BuiltinPermissionID, PermissionLevel } from "@budibase/types"
 import * as setup from "./utilities"
 
@@ -25,12 +25,6 @@ describe("/roles", () => {
 
       expect(res._id).toBeDefined()
       expect(res._rev).toBeDefined()
-      expect(events.role.updated).not.toHaveBeenCalled()
-      expect(events.role.created).toHaveBeenCalledTimes(1)
-      expect(events.role.created).toHaveBeenCalledWith({
-        ...res,
-        _id: dbCore.prefixRoleID(res._id!),
-      })
     })
 
     it("handle a role with invalid inherits", async () => {
@@ -80,12 +74,6 @@ describe("/roles", () => {
 
       expect(res._id).toBeDefined()
       expect(res._rev).toBeDefined()
-      expect(events.role.created).not.toHaveBeenCalled()
-      expect(events.role.updated).toHaveBeenCalledTimes(1)
-      expect(events.role.updated).toHaveBeenCalledWith({
-        ...res,
-        _id: dbCore.prefixRoleID(res._id!),
-      })
     })
 
     it("disallow loops", async () => {
@@ -256,11 +244,6 @@ describe("/roles", () => {
       })
       await config.api.roles.find(customRole._id!, {
         status: 404,
-      })
-      expect(events.role.deleted).toHaveBeenCalledTimes(1)
-      expect(events.role.deleted).toHaveBeenCalledWith({
-        ...customRole,
-        _id: dbCore.prefixRoleID(customRole._id!),
       })
     })
 

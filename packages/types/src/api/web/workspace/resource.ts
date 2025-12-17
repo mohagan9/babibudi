@@ -8,7 +8,6 @@ export enum ResourceType {
   TABLE = "table",
   ROW_ACTION = "row_action",
   QUERY = "query",
-  AUTOMATION = "automation",
   WORKSPACE_APP = "workspace_app",
   SCREEN = "screen",
 }

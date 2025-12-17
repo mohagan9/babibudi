@@ -74,21 +74,6 @@ export function generateTableID() {
 }
 
 /**
- * Gets parameters for retrieving automations, this is a utility function for the getDocParams function.
- */
-export function getAutomationParams(automationId?: Optional, otherProps = {}) {
-  return getDocParams(DocumentType.AUTOMATION, automationId, otherProps)
-}
-
-/**
- * Generates a new automation ID.
- * @returns The new automation ID which the automation doc can be stored under.
- */
-export function generateAutomationID() {
-  return `${DocumentType.AUTOMATION}${SEPARATOR}${newid()}`
-}
-
-/**
  * Generates a new link doc ID. This is currently not usable with the alldocs call,
  * instead a view is built to make walking to tree easier.
  * @param tableId1 The ID of the linker table.

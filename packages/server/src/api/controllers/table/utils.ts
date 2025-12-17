@@ -1,4 +1,4 @@
-import { context, events, HTTPError } from "@budibase/backend-core"
+import { context, HTTPError } from "@budibase/backend-core"
 import {
   AutoFieldSubType,
   Database,
@@ -229,8 +229,6 @@ export async function handleDataImport(
   }
 
   await db.bulkDocs(finalData)
-
-  await events.rows.imported(table, finalData.length)
   return table
 }
 

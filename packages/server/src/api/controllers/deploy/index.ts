@@ -1,10 +1,4 @@
-import {
-  cache,
-  context,
-  db as dbCore,
-  errors,
-  events,
-} from "@budibase/backend-core"
+import { cache, context, db as dbCore, errors } from "@budibase/backend-core"
 import {
   DeploymentDoc,
   DeploymentProgressResponse,
@@ -19,7 +13,7 @@ import {
   UserCtx,
   Workspace,
 } from "@budibase/types"
-import { DocumentType, getAutomationParams } from "../../../db/utils"
+import { DocumentType } from "../../../db/utils"
 import env from "../../../environment"
 import sdk from "../../../sdk"
 import { builderSocket } from "../../../websockets"
@@ -412,8 +406,6 @@ export const publishWorkspace = async function (
 
   deployment.setStatus(DeploymentStatus.SUCCESS)
   await storeDeploymentHistory(deployment)
-
-  await events.app.published(migrationResult.app)
 
   ctx.body = deployment
   builderSocket?.emitAppPublish(ctx)

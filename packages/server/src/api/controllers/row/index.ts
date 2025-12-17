@@ -1,7 +1,7 @@
 import archiver from "archiver"
 import stream from "stream"
 
-import { context, events, objectStore } from "@budibase/backend-core"
+import { context, objectStore } from "@budibase/backend-core"
 import { dataFilters } from "@budibase/shared-core"
 import {
   Ctx,
@@ -68,10 +68,9 @@ export async function patch(
   try {
     const api = pickApi(tableId)
     const runQuery = async () => {
-          const response = await api.patch(ctx)
-          events.action.crudExecuted({ type: "update" })
-          return response
-        }
+      const response = await api.patch(ctx)
+      return response
+    }
     const { row, table, oldRow } = isExternalTableID(tableId)
       ? await api.patch(ctx)
       : await runQuery()
@@ -112,10 +111,13 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
     return patch(ctx as UserCtx<PatchRowRequest, PatchRowResponse>)
   }
   const saveQuery = async () => {
-        const response = await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
-        events.action.crudExecuted({ type: "create" })
-        return response
-      }
+    const response = await sdk.rows.save(
+      sourceId,
+      ctx.request.body,
+      ctx.user?._id
+    )
+    return response
+  }
   const { row, table, squashed } = tableId.includes("datasource_plus")
     ? await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
     : await saveQuery()
@@ -193,7 +195,6 @@ async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
   let deleteRequest = ctx.request.body as DeleteRows
 
   deleteRequest.rows = await processDeleteRowsRequest(ctx)
-
 
   const { rows } = await pickApi(tableId).bulkDestroy(ctx)
 

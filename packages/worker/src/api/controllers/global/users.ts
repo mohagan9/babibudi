@@ -3,8 +3,6 @@ import {
   cache,
   context,
   db,
-  events,
-  HTTPError,
   locks,
   platform,
   tenancy,
@@ -33,7 +31,6 @@ import {
   FetchUsersResponse,
   FindUserResponse,
   GetUserInvitesResponse,
-  Hosting,
   InviteUserRequest,
   InviteUserResponse,
   InviteUsersRequest,
@@ -183,13 +180,13 @@ const bulkDelete = async (
   return await userSdk.db.bulkDelete(users)
 }
 
-const bulkCreate = async (users: User[], groupIds: string[]) => {
+const bulkCreate = async (users: User[]) => {
   if (!env.SELF_HOSTED && users.length > MAX_USERS_UPLOAD_LIMIT) {
     throw new Error(
       "Max limit for upload is 1000 users. Please reduce file size and try again."
     )
   }
-  return await userSdk.db.bulkCreate(users, groupIds)
+  return await userSdk.db.bulkCreate(users)
 }
 
 export const bulkUpdate = async (
@@ -205,7 +202,7 @@ export const bulkUpdate = async (
         ...user,
         tenantId,
       }))
-      created = await bulkCreate(users, input.create.groups)
+      created = await bulkCreate(users)
     }
     if (input.delete) {
       deleted = await bulkDelete(input.delete.users, currentUserId)
@@ -249,12 +246,6 @@ export const adminUser = async (
         firstName: givenName,
         lastName: familyName,
       })
-
-      await events.identification.identifyTenantGroup(
-        tenantId,
-        env.SELF_HOSTED ? Hosting.SELF : Hosting.CLOUD,
-        Date.now()
-      )
 
       ctx.body = {
         _id: finalUser._id!,
@@ -593,7 +584,6 @@ export const inviteAccept = async (
           }
 
           const saved = await userSdk.db.save(request)
-          await events.user.inviteAccepted(saved)
           return saved
         })
 

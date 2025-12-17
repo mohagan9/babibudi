@@ -1,4 +1,4 @@
-import { context, db as dbCore, events } from "@budibase/backend-core"
+import { context, db as dbCore } from "@budibase/backend-core"
 import { helpers } from "@budibase/shared-core"
 import { findHBSBlocks, processObjectSync } from "@budibase/string-templates"
 import {
@@ -85,9 +85,8 @@ export async function fetch(opts?: {
 
   datasources = datasources.map(datasource => addDatasourceFlags(datasource))
   if (opts?.enriched) {
-    const envVars = await getEnvironmentVariables()
     const promises = datasources.map(datasource =>
-      enrichDatasourceWithValues(datasource, envVars)
+      enrichDatasourceWithValues(datasource)
     )
     const enriched = (await Promise.all(promises)).map(
       result => result.datasource
@@ -349,7 +348,6 @@ export async function save(
   const dbResp = await db.put(
     sdk.tables.populateExternalTableSchemas(datasource)
   )
-  await events.datasource.created(datasource)
   datasource._rev = dbResp.rev
 
   return { datasource, errors }

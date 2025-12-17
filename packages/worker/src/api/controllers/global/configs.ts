@@ -4,7 +4,6 @@ import {
   configs,
   env as coreEnv,
   db as dbCore,
-  events,
   objectStore,
   tenancy,
 } from "@budibase/backend-core"
@@ -38,99 +37,6 @@ import env from "../../../environment"
 import * as email from "../../../utilities/email"
 import { checkAnyUserExists } from "../../../utilities/users"
 import * as auth from "./auth"
-
-const getEventFns = async (config: Config, existing?: Config) => {
-  const fns = []
-
-  if (!existing) {
-    if (isSMTPConfig(config)) {
-      fns.push(events.email.SMTPCreated)
-    } else if (isGoogleConfig(config)) {
-      fns.push(() => events.auth.SSOCreated(ConfigType.GOOGLE))
-      if (config.config.activated) {
-        fns.push(() => events.auth.SSOActivated(ConfigType.GOOGLE))
-      }
-    } else if (isOIDCConfig(config)) {
-      fns.push(() => events.auth.SSOCreated(ConfigType.OIDC))
-      if (config.config.configs[0].activated) {
-        fns.push(() => events.auth.SSOActivated(ConfigType.OIDC))
-      }
-    } else if (isSettingsConfig(config)) {
-      // company
-      const company = config.config.company
-      if (company && company !== "Budibase") {
-        fns.push(events.org.nameUpdated)
-      }
-
-      // logo
-      const logoUrl = config.config.logoUrl
-      if (logoUrl) {
-        fns.push(events.org.logoUpdated)
-      }
-
-      // platform url
-      const platformUrl = config.config.platformUrl
-      if (
-        platformUrl &&
-        platformUrl !== "http://localhost:10000" &&
-        env.SELF_HOSTED
-      ) {
-        fns.push(events.org.platformURLUpdated)
-      }
-    }
-  } else {
-    if (isSMTPConfig(config)) {
-      fns.push(events.email.SMTPUpdated)
-    } else if (isGoogleConfig(config)) {
-      fns.push(() => events.auth.SSOUpdated(ConfigType.GOOGLE))
-      if (!existing.config.activated && config.config.activated) {
-        fns.push(() => events.auth.SSOActivated(ConfigType.GOOGLE))
-      } else if (existing.config.activated && !config.config.activated) {
-        fns.push(() => events.auth.SSODeactivated(ConfigType.GOOGLE))
-      }
-    } else if (isOIDCConfig(config)) {
-      fns.push(() => events.auth.SSOUpdated(ConfigType.OIDC))
-      if (
-        !existing.config.configs[0].activated &&
-        config.config.configs[0].activated
-      ) {
-        fns.push(() => events.auth.SSOActivated(ConfigType.OIDC))
-      } else if (
-        existing.config.configs[0].activated &&
-        !config.config.configs[0].activated
-      ) {
-        fns.push(() => events.auth.SSODeactivated(ConfigType.OIDC))
-      }
-    } else if (isSettingsConfig(config)) {
-      // company
-      const existingCompany = existing.config.company
-      const company = config.config.company
-      if (company && company !== "Budibase" && existingCompany !== company) {
-        fns.push(events.org.nameUpdated)
-      }
-
-      // logo
-      const existingLogoUrl = existing.config.logoUrl
-      const logoUrl = config.config.logoUrl
-      if (logoUrl && existingLogoUrl !== logoUrl) {
-        fns.push(events.org.logoUpdated)
-      }
-
-      // platform url
-      const existingPlatformUrl = existing.config.platformUrl
-      const platformUrl = config.config.platformUrl
-      if (
-        platformUrl &&
-        platformUrl !== "http://localhost:10000" &&
-        existingPlatformUrl !== platformUrl &&
-        env.SELF_HOSTED
-      ) {
-        fns.push(events.org.platformURLUpdated)
-      }
-    }
-  }
-  return fns
-}
 
 type SSOConfigs = { [key in SSOConfigType]: SSOConfig | undefined }
 
@@ -226,7 +132,6 @@ export async function save(
   const config = body.config
 
   const existingConfig = await configs.getConfig(type)
-  let eventFns = await getEventFns(ctx.request.body, existingConfig)
 
   if (existingConfig) {
     body._rev = existingConfig._rev
@@ -280,10 +185,6 @@ export async function save(
     const response = await configs.save(body)
     await cache.bustCache(cache.CacheKey.CHECKLIST)
     await cache.bustCache(cache.CacheKey.ANALYTICS_ENABLED)
-
-    for (const fn of eventFns) {
-      await fn()
-    }
 
     ctx.body = {
       type,

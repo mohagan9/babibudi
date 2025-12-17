@@ -1,4 +1,4 @@
-import { context, db as dbCore, events } from "@budibase/backend-core"
+import { context, db as dbCore } from "@budibase/backend-core"
 import {
   BuildSchemaFromSourceRequest,
   BuildSchemaFromSourceResponse,
@@ -198,7 +198,6 @@ export async function update(
   const response = await db.put(
     sdk.tables.populateExternalTableSchemas(datasource)
   )
-  await events.datasource.updated(datasource)
   datasource._rev = response.rev
 
   ctx.message = "Datasource saved successfully."
@@ -310,7 +309,6 @@ export async function destroy(ctx: UserCtx<void, DeleteDatasourceResponse>) {
 
   // delete the datasource
   await db.remove(datasourceId, ctx.params.revId)
-  await events.datasource.deleted(datasource)
 
   ctx.body = { message: `Datasource deleted.` }
   builderSocket?.emitDatasourceDeletion(ctx, datasourceId)

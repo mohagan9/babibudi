@@ -1,7 +1,6 @@
 import {
   auth as authCore,
   env as coreEnv,
-  events,
   HTTPError,
   sessions,
   tenancy,
@@ -76,7 +75,6 @@ export const reset = async (email: string) => {
     user,
     subject: "{{ company }} platform password reset",
   })
-  await events.user.passwordResetRequested(user)
 }
 
 /**
@@ -94,5 +92,4 @@ export const resetUpdate = async (resetCode: string, password: string) => {
 
   // remove password from the user before sending events
   delete user.password
-  await events.user.passwordReset(user)
 }

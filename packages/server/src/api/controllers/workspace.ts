@@ -1,12 +1,10 @@
 import {
   cache,
-  configs,
   context,
   db,
   db as dbCore,
   docIds,
   env as envCore,
-  events,
   objectStore,
   roles,
   tenancy,
@@ -18,7 +16,6 @@ import type { File, Files } from "formidable"
 import {
   AddWorkspaceSampleDataResponse,
   BBReferenceFieldSubType,
-  BBRequest,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
   Database,
@@ -333,11 +330,10 @@ export async function fetchAppPackage(
   ctx: UserCtx<void, FetchAppPackageResponse>
 ) {
   const appId = context.getWorkspaceId()
-  let [application, layouts, screens, recaptchaConfig] = await Promise.all([
+  let [application, layouts, screens] = await Promise.all([
     sdk.workspaces.metadata.get(),
     getLayouts(),
     sdk.screens.fetch(),
-    configs.getRecaptchaConfig(),
   ])
 
   // Enrich plugin URLs
@@ -402,7 +398,6 @@ export async function fetchAppPackage(
     layouts,
     clientLibPath,
     hasLock: await doesUserHaveLock(application.appId, ctx.user),
-    recaptchaKey: recaptchaConfig?.config.siteKey,
     clientCacheKey,
   }
 }
@@ -638,48 +633,10 @@ async function updateUserColumns(
   })
 }
 
-async function creationEvents(
-  request: BBRequest<CreateWorkspaceRequest>,
-  workspace: Workspace
-) {
-  let creationFns: ((workspace: Workspace) => Promise<void>)[] = []
-
-  const { useTemplate, templateKey, file } = request.body
-  if (useTemplate === "true") {
-    // from template
-    if (templateKey && templateKey !== "undefined") {
-      creationFns.push(a => events.app.templateImported(a, templateKey))
-    }
-    // from file
-    else if (request.files?.fileToImport) {
-      creationFns.push(a => events.app.fileImported(a))
-    }
-    // from server file path
-    else if (file) {
-      // explicitly pass in the newly created workspace id
-      creationFns.push(a => events.app.duplicated(a, workspace.appId))
-    }
-    // unknown
-    else {
-      console.error("Could not determine template creation event")
-    }
-  } else if (request.files?.fileToImport) {
-    creationFns.push(a => events.app.fileImported(a))
-  }
-
-  creationFns.push(a => events.app.created(a))
-
-  for (let fn of creationFns) {
-    await fn(workspace)
-  }
-}
-
 async function workspacePostCreate(
   ctx: UserCtx<CreateWorkspaceRequest, Workspace>,
   workspace: Workspace
 ) {
-  await creationEvents(ctx.request, workspace)
-
   // If the user is a creator, we need to give them access to the new app
   if (sharedCoreSDK.users.hasCreatorPermissions(ctx.user)) {
     const globalId = dbCore.getGlobalIDFromUserMetadataID(ctx.user._id!)
@@ -722,7 +679,6 @@ export async function update(
   }
 
   const app = await updateWorkspacePackage(ctx.request.body, ctx.params.appId)
-  await events.app.updated(app)
   ctx.body = app
   builderSocket?.emitAppMetadataUpdate(ctx, {
     theme: app.theme,
@@ -765,11 +721,6 @@ export async function updateClient(
     workspacePackageUpdates,
     ctx.params.appId
   )
-  await events.app.versionUpdated(
-    updatedWorkspace,
-    currentVersion,
-    updatedToVersion
-  )
   ctx.body = updatedWorkspace
 }
 
@@ -803,11 +754,6 @@ export async function revertClient(
     workspacePackageUpdates,
     ctx.params.appId
   )
-  await events.app.versionReverted(
-    updatedWorkspace,
-    currentVersion,
-    revertedToVersion
-  )
   ctx.body = updatedWorkspace
 }
 
@@ -830,8 +776,6 @@ async function unpublishWorkspace() {
   await context.doInWorkspaceContext(devWorkspaceId, async () => {
     await disableAllAppsAndAutomations()
   })
-
-  await events.app.unpublished({ appId: prodWorkspaceId } as Workspace)
 
   await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
 }
@@ -860,7 +804,6 @@ async function destroyWorkspace(ctx: UserCtx) {
     await sdk.workspaces.syncWorkspace(devWorkspaceId, {
       automationOnly: true,
     })
-    await events.app.unpublished({ appId: prodWorkspaceId } as Workspace)
     const prodDb = dbCore.getDB(prodWorkspaceId, { skip_setup: true })
     await prodDb.destroy()
     await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
@@ -869,7 +812,6 @@ async function destroyWorkspace(ctx: UserCtx) {
   const db = dbCore.getDB(devWorkspaceId)
   // standard app deletion flow
   const result = await db.destroy()
-  await events.app.deleted(app)
 
   await deleteAppFiles(prodWorkspaceId)
 

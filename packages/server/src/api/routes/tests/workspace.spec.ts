@@ -2,7 +2,7 @@ import { DEFAULT_TABLES } from "../../../db/defaultData/datasource_bb_default"
 import { USERS_TABLE_SCHEMA } from "../../../constants"
 import { setEnv, withEnv } from "../../../environment"
 
-import { Header, context, db, events, roles } from "@budibase/backend-core"
+import { Header, context, db, roles } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
 import {
   type Workspace,
@@ -131,7 +131,6 @@ describe("/applications", () => {
       })
       expect(newWorkspace.name).toBe(name)
       expect(newWorkspace._id).toBeDefined()
-      expect(events.app.created).toHaveBeenCalledTimes(1)
 
       // Ensure we created a blank app without sample data
       await checkScreenCount(0)
@@ -160,7 +159,6 @@ describe("/applications", () => {
       })
       expect(newWorkspace._id).toBeDefined()
       expect(newWorkspace.name).toBe("Default workspace")
-      expect(events.app.created).toHaveBeenCalledTimes(1)
 
       // Check sample resources in the newly created app context
       await config.withApp(newWorkspace, async () => {
@@ -192,8 +190,6 @@ describe("/applications", () => {
         templateKey: "app/expense-approval",
       })
       expect(newApp._id).toBeDefined()
-      expect(events.app.created).toHaveBeenCalledTimes(1)
-      expect(events.app.templateImported).toHaveBeenCalledTimes(1)
 
       // Check resources from template in the newly created app context
       await config.withApp(newApp, async () => {
@@ -212,8 +208,6 @@ describe("/applications", () => {
         fileToImport: "src/api/routes/tests/data/old-app.txt", // export.tx was empty
       })
       expect(newApp._id).toBeDefined()
-      expect(events.app.created).toHaveBeenCalledTimes(1)
-      expect(events.app.fileImported).toHaveBeenCalledTimes(1)
 
       // Check resources from import file in the newly created app context
       await config.withApp(newApp, async () => {
@@ -252,8 +246,6 @@ describe("/applications", () => {
       expect(app.navigation!.navTextColor).toBe(
         "var(--spectrum-global-color-gray-50)"
       )
-      expect(events.app.created).toHaveBeenCalledTimes(1)
-      expect(events.app.fileImported).toHaveBeenCalledTimes(1)
     })
 
     it("should reject with a known name", async () => {
@@ -277,8 +269,6 @@ describe("/applications", () => {
         encryptionPassword: "testtest",
       })
       expect(newApp._id).toBeDefined()
-      expect(events.app.created).toHaveBeenCalledTimes(1)
-      expect(events.app.fileImported).toHaveBeenCalledTimes(1)
 
       // Check resources from import file in the newly created app context
       await config.withApp(newApp, async () => {
@@ -307,8 +297,6 @@ describe("/applications", () => {
         ),
       })
       expect(newApp._id).toBeDefined()
-      expect(events.app.created).toHaveBeenCalledTimes(1)
-      expect(events.app.fileImported).toHaveBeenCalledTimes(1)
 
       // Check resources from import file in the newly created app context
       await config.withApp(newApp, async () => {
@@ -1051,19 +1039,16 @@ describe("/applications", () => {
         name: "TEST_APP",
       })
       expect(updatedApp._rev).toBeDefined()
-      expect(events.app.updated).toHaveBeenCalledTimes(1)
     })
   })
 
   describe("publish", () => {
     it("should publish app with dev app ID", async () => {
       await config.api.workspace.publish(workspace.appId)
-      expect(events.app.published).toHaveBeenCalledTimes(1)
     })
 
     it("should publish app with prod app ID", async () => {
       await config.api.workspace.publish(workspace.appId.replace("_dev", ""))
-      expect(events.app.published).toHaveBeenCalledTimes(1)
     })
 
     it("should publish table permissions for custom roles correctly", async () => {
@@ -1111,13 +1096,11 @@ describe("/applications", () => {
   describe("manage client library version", () => {
     it("should be able to update the app client library version", async () => {
       await config.api.workspace.updateClient(workspace.appId)
-      expect(events.app.versionUpdated).toHaveBeenCalledTimes(1)
     })
 
     it("should be able to revert the app client library version", async () => {
       await config.api.workspace.updateClient(workspace.appId)
       await config.api.workspace.revertClient(workspace.appId)
-      expect(events.app.versionReverted).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -1178,14 +1161,12 @@ describe("/applications", () => {
   describe("unpublish", () => {
     it("should unpublish app with dev app ID", async () => {
       await config.api.workspace.unpublish(workspace.appId)
-      expect(events.app.unpublished).toHaveBeenCalledTimes(1)
     })
 
     it("should unpublish app with prod app ID", async () => {
       await config.withProdApp(() =>
         config.api.workspace.unpublish(workspace.appId.replace("_dev", ""))
       )
-      expect(events.app.unpublished).toHaveBeenCalledTimes(1)
     })
 
     it("should not delete production data when unpublishing and republishing", async () => {
@@ -1220,8 +1201,6 @@ describe("/applications", () => {
         .reply(200, {})
 
       await config.api.workspace.delete(workspace.appId)
-      expect(events.app.deleted).toHaveBeenCalledTimes(1)
-      expect(events.app.unpublished).toHaveBeenCalledTimes(1)
     })
 
     it("should delete published app and dev app with prod app ID", async () => {
@@ -1231,8 +1210,6 @@ describe("/applications", () => {
         .reply(200, {})
 
       await config.withProdApp(() => config.api.workspace.delete(prodAppId))
-      expect(events.app.deleted).toHaveBeenCalledTimes(1)
-      expect(events.app.unpublished).toHaveBeenCalledTimes(1)
     })
 
     it("should remove MIGRATING_APP header if present during deletion", async () => {
@@ -1264,7 +1241,6 @@ describe("/applications", () => {
       )
 
       expect(migrationMock).toHaveBeenCalledTimes(2)
-      expect(events.app.deleted).toHaveBeenCalledTimes(1)
 
       migrationsModule.MIGRATIONS.pop()
     })
@@ -1283,7 +1259,6 @@ describe("/applications", () => {
         }
       )
 
-      expect(events.app.duplicated).toHaveBeenCalled()
       expect(resp.duplicateAppId).toBeDefined()
       expect(resp.sourceAppId).toEqual(workspace.appId)
       expect(resp.duplicateAppId).not.toEqual(workspace.appId)
@@ -1311,7 +1286,6 @@ describe("/applications", () => {
         },
         { body: { message: "Workspace name is already in use." }, status: 400 }
       )
-      expect(events.app.duplicated).not.toHaveBeenCalled()
     })
 
     it("should reject with a known url", async () => {
@@ -1323,7 +1297,6 @@ describe("/applications", () => {
         },
         { body: { message: "App URL is already in use." }, status: 400 }
       )
-      expect(events.app.duplicated).not.toHaveBeenCalled()
     })
   })
 

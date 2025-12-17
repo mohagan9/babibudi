@@ -1,10 +1,4 @@
-import {
-  context,
-  db as dbCore,
-  events,
-  roles,
-  tenancy,
-} from "@budibase/backend-core"
+import { context, db as dbCore, roles, tenancy } from "@budibase/backend-core"
 import { sdk as sharedSdk } from "@budibase/shared-core"
 import {
   DeleteScreenResponse,
@@ -98,10 +92,6 @@ export async function save(
     await sdk.screens.ensureHomepageUniqueness(screen)
   }
 
-  if (isCreation) {
-    await events.screen.created(screen)
-  }
-
   if (navigationLinkLabel && isCreation) {
     await sdk.navigation.addLink({
       label: navigationLinkLabel,
@@ -132,8 +122,6 @@ export async function destroy(ctx: UserCtx<void, DeleteScreenResponse>) {
   await db.remove(id, ctx.params.screenRev)
 
   await sdk.navigation.deleteLink(screen.routing.route, screen.workspaceAppId)
-
-  await events.screen.deleted(screen)
   ctx.body = {
     message: "Screen deleted successfully",
   }

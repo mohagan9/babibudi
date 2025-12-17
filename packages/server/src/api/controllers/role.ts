@@ -1,10 +1,4 @@
-import {
-  context,
-  db as dbCore,
-  events,
-  Header,
-  roles,
-} from "@budibase/backend-core"
+import { context, db as dbCore, Header, roles } from "@budibase/backend-core"
 import { helpers, RoleColor, sdk as sharedSdk } from "@budibase/shared-core"
 import {
   AccessibleRolesResponse,
@@ -168,11 +162,6 @@ export async function save(ctx: UserCtx<SaveRoleRequest, SaveRoleResponse>) {
     role._rev = foundRev
   }
   const result = await db.put(role)
-  if (isCreate) {
-    await events.role.created(role)
-  } else {
-    await events.role.updated(role)
-  }
   await updateRolesOnUserTable(
     db,
     _id,
@@ -223,7 +212,6 @@ export async function destroy(ctx: UserCtx<void, DeleteRoleResponse>) {
   }
 
   await db.remove(roleId, ctx.params.rev)
-  await events.role.deleted(role)
   await updateRolesOnUserTable(
     db,
     ctx.params.roleId,

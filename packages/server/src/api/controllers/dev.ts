@@ -1,4 +1,4 @@
-import { env as envCore, events } from "@budibase/backend-core"
+import { env as envCore } from "@budibase/backend-core"
 import {
   ClearDevLockResponse,
   Ctx,
@@ -104,5 +104,4 @@ export async function getBudibaseVersion(ctx: Ctx<void, GetVersionResponse>) {
   ctx.body = {
     version,
   }
-  await events.installation.versionChecked(version)
 }

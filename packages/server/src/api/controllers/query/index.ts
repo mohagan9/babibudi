@@ -1,4 +1,4 @@
-import { constants, context, events, utils } from "@budibase/backend-core"
+import { constants, context, utils } from "@budibase/backend-core"
 import { utils as JsonUtils, ValidQueryNameRegex } from "@budibase/shared-core"
 import { findHBSBlocks } from "@budibase/string-templates"
 import {
@@ -49,7 +49,6 @@ function sanitiseUserStructure(user: ContextUser) {
   const copiedUser = cloneDeep(user)
   delete copiedUser.roles
   delete copiedUser.account
-  delete copiedUser.license
   return copiedUser
 }
 
@@ -203,7 +202,6 @@ export async function save(ctx: UserCtx<SaveQueryRequest, SaveQueryResponse>) {
     query._id = generateQueryID(query.datasourceId)
     // flag to state whether the default bindings are empty strings (old behaviour) or null
     query.nullDefaultSupport = true
-    eventFn = () => events.query.created(datasource, query)
   } else {
     // check if flag has previously been set, don't let it change
     // allow it to be explicitly set to false via API incase this is ever needed
@@ -211,10 +209,8 @@ export async function save(ctx: UserCtx<SaveQueryRequest, SaveQueryResponse>) {
     if (existingQuery.nullDefaultSupport && query.nullDefaultSupport == null) {
       query.nullDefaultSupport = true
     }
-    eventFn = () => events.query.updated(datasource, query)
   }
   const response = await db.put(query)
-  await eventFn()
   query._rev = response.rev
 
   ctx.body = query
@@ -423,7 +419,6 @@ export async function preview(
   }
   // remove configuration before sending event
   delete datasource.config
-  await events.query.previewed(datasource, ctx.request.body)
   ctx.body = {
     rows,
     nestedSchemaFields,
@@ -475,10 +470,9 @@ async function execute(
     }
 
     const runQuery = async () => {
-            const response = await Runner.run<QueryResponse>(inputs)
-            events.action.crudExecuted({ type: query.queryVerb })
-            return response
-          }
+      const response = await Runner.run<QueryResponse>(inputs)
+      return response
+    }
     const { rows, pagination, extra, info } =
       query.queryVerb === "read" || opts.isAutomation
         ? await Runner.run<QueryResponse>(inputs)
@@ -540,9 +534,6 @@ export async function destroy(ctx: UserCtx<void, DeleteQueryResponse>) {
   const db = context.getWorkspaceDB()
   const queryId = ctx.params.queryId as string
   await removeDynamicVariables(queryId)
-  const query = await db.get<Query>(queryId)
-  const datasource = await sdk.datasources.get(query.datasourceId)
   await db.remove(ctx.params.queryId, ctx.params.revId)
   ctx.body = { message: `Query deleted.` }
-  await events.query.deleted(datasource, query, context.getWorkspaceId()!)
 }

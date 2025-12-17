@@ -1,7 +1,6 @@
 import {
   context,
   db,
-  events,
   HTTPError,
   logging,
   objectStore,
@@ -9,7 +8,6 @@ import {
 import chunk from "lodash/chunk"
 import {
   AnyDocument,
-  Automation,
   Datasource,
   DocumentType,
   INTERNAL_TABLE_SOURCE_ID,
@@ -28,7 +26,7 @@ import {
 } from "@budibase/types"
 import sdk from "../.."
 import { ObjectStoreBuckets } from "../../../constants"
-import { extractTableIdFromRowActionsID, getRowParams } from "../../../db/utils"
+import { getRowParams } from "../../../db/utils"
 
 export async function getResourcesInfo(): Promise<
   Record<string, { dependencies: UsedResource[] }>
@@ -51,7 +49,6 @@ export async function getResourcesInfo(): Promise<
   const baseSearchTargets: BaseSearchTarget[] = []
 
   const internalTables = await sdk.tables.getAllInternalTables()
-  const rowActions = await sdk.rowActions.getAll()
 
   baseSearchTargets.push(
     ...internalTables.map(table => ({
@@ -74,15 +71,6 @@ export async function getResourcesInfo(): Promise<
       }))
   )
 
-  baseSearchTargets.push(
-    ...automations.map<BaseSearchTarget>(automation => ({
-      id: automation._id!,
-      idToSearch: automation._id!,
-      name: automation.name!,
-      type: ResourceType.AUTOMATION,
-    }))
-  )
-
   const queries = await sdk.queries.fetch()
   baseSearchTargets.push(
     ...queries.map<BaseSearchTarget>(query => ({
@@ -92,36 +80,6 @@ export async function getResourcesInfo(): Promise<
       type: ResourceType.QUERY,
     }))
   )
-
-  if (rowActions.length) {
-    const rowActionNames = await sdk.rowActions.getNames(
-      Object.values(rowActions).flatMap(ra => Object.values(ra.actions))
-    )
-
-    for (const ra of rowActions) {
-      const rowActionAutomations = Object.entries(ra.actions).flatMap(
-        ([_id, action]) =>
-          automations
-            .filter(a => a._id === action.automationId)
-            .map(a => ({
-              id: a._id!,
-              name: a.name!,
-              type: ResourceType.AUTOMATION,
-            }))
-      )
-      for (const [id, action] of Object.entries(ra.actions)) {
-        for (const idToSearch of [id, extractTableIdFromRowActionsID(ra._id)]) {
-          baseSearchTargets.push({
-            id: ra._id,
-            idToSearch,
-            name: rowActionNames[action.automationId],
-            type: ResourceType.ROW_ACTION,
-            extraDependencies: rowActionAutomations,
-          })
-        }
-      }
-    }
-  }
 
   const searchForUsages = (
     forResource: string,
@@ -199,35 +157,6 @@ export async function getResourcesInfo(): Promise<
     }
   }
 
-  for (const rowActionResource of Object.values(dependencies)
-    .flatMap(r => r.dependencies)
-    .filter(r => r.type === ResourceType.ROW_ACTION)) {
-    const rowAction = rowActions.find(ra => ra._id === rowActionResource.id)
-    if (!rowAction) {
-      continue
-    }
-
-    for (const action of Object.values(rowAction.actions)) {
-      if (
-        dependencies[rowActionResource.id]?.dependencies.some(
-          r => r.id === action.automationId
-        )
-      ) {
-        continue
-      }
-      const automation = automations.find(a => a._id === action.automationId)
-      if (!automation) {
-        continue
-      }
-      dependencies[rowActionResource.id] ??= { dependencies: [] }
-      dependencies[rowActionResource.id].dependencies.push({
-        id: automation._id,
-        name: automation.name,
-        type: ResourceType.AUTOMATION,
-      })
-    }
-  }
-
   return dependencies
 }
 
@@ -247,7 +176,6 @@ const resourceTypeIdPrefixes: Record<ResourceType, string> = {
   [ResourceType.TABLE]: prefixed(DocumentType.TABLE),
   [ResourceType.ROW_ACTION]: prefixed(DocumentType.ROW_ACTIONS),
   [ResourceType.QUERY]: prefixed(DocumentType.QUERY),
-  [ResourceType.AUTOMATION]: prefixed(DocumentType.AUTOMATION),
   [ResourceType.WORKSPACE_APP]: prefixed(DocumentType.WORKSPACE_APP),
   [ResourceType.SCREEN]: prefixed(DocumentType.SCREEN),
 }
@@ -257,14 +185,6 @@ function getResourceType(id: string): ResourceType | undefined {
     id.startsWith(idPrefix)
   )?.[0] as ResourceType | undefined
   return type
-}
-
-function isAutomation(doc: AnyDocument): doc is Automation {
-  if (!doc._id) {
-    return false
-  }
-  const type = getResourceType(doc._id)
-  return type === ResourceType.AUTOMATION
 }
 
 function isWorkspaceApp(doc: AnyDocument): doc is WorkspaceApp {
@@ -640,12 +560,6 @@ export async function duplicateResourcesToWorkspace(
         delete sanitizedDoc._rev
         delete sanitizedDoc.createdAt
         delete sanitizedDoc.updatedAt
-        if (isAutomation(sanitizedDoc) || isWorkspaceApp(sanitizedDoc)) {
-          sanitizedDoc.disabled = true
-        }
-        if (isAutomation(sanitizedDoc)) {
-          sanitizedDoc.appId = toWorkspace
-        }
         return sanitizedDoc
       })
     )
@@ -676,10 +590,6 @@ export async function duplicateResourcesToWorkspace(
     const type = getResourceType(doc._id)
 
     switch (type) {
-      case ResourceType.AUTOMATION:
-        name = (doc as Automation).name
-        displayType = "Automation"
-        break
       case ResourceType.DATASOURCE:
         name = (doc as Datasource).name || "Unknown"
         displayType = "Datasource"
@@ -715,11 +625,5 @@ export async function duplicateResourcesToWorkspace(
       name,
       type: displayType,
     }
-
-    await events.resource.duplicatedToWorkspace({
-      resource,
-      fromWorkspace: fromWorkspaceName,
-      toWorkspace: toWorkspaceName,
-    })
   }
 }

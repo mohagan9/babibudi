@@ -1,4 +1,4 @@
-import { context, docIds, events, HTTPError } from "@budibase/backend-core"
+import { context, docIds, HTTPError } from "@budibase/backend-core"
 import { RequiredKeys, WithoutDocMetadata, WorkspaceApp } from "@budibase/types"
 import sdk from "../.."
 import { helpers } from "@budibase/shared-core"
@@ -152,9 +152,6 @@ export async function remove(
       )
 
     await db.remove(workspaceAppId, _rev)
-
-    // Clear out any favourites related to this
-    events.workspace.deleted(existing, context.getWorkspaceId()!)
   } catch (e: any) {
     if (e.status === 404) {
       throw new HTTPError(

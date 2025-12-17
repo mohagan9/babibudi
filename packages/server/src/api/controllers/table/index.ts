@@ -1,4 +1,4 @@
-import { csv, events, HTTPError } from "@budibase/backend-core"
+import { csv, HTTPError } from "@budibase/backend-core"
 import {
   canBeDisplayColumn,
   helpers,
@@ -139,7 +139,6 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
     savedTable = await sdk.tables.create(table, rows, ctx.user._id)
     savedTable = await sdk.tables.enrichViewSchemas(savedTable)
     savedTable = await processTable(savedTable)
-    await events.table.created(savedTable)
   } else {
     const api = pickApi({ table })
     const { table: updatedTable, oldTable } = await api.updateTable(
@@ -148,16 +147,9 @@ export async function save(ctx: UserCtx<SaveTableRequest, SaveTableResponse>) {
     )
     savedTable = updatedTable
     savedTable = await processTable(savedTable)
-
-    if (oldTable) {
-      await events.table.updated(oldTable, savedTable)
-    }
   }
   if (renaming) {
     await sdk.views.renameLinkedViews(savedTable, renaming)
-  }
-  if (isImport) {
-    await events.table.imported(savedTable)
   }
   ctx.message = `Table ${table.name} saved successfully.`
   ctx.eventEmitter?.emitTable(EventType.TABLE_SAVE, appId, { ...savedTable })
@@ -171,7 +163,6 @@ export async function destroy(ctx: UserCtx<void, DeleteTableResponse>) {
   const tableId = ctx.params.tableId
   await sdk.rowActions.deleteAll(tableId)
   const deletedTable = await pickApi({ tableId }).destroy(ctx)
-  await events.table.deleted(deletedTable, appId)
 
   ctx.eventEmitter?.emitTable(EventType.TABLE_DELETE, appId, deletedTable)
   ctx.table = deletedTable

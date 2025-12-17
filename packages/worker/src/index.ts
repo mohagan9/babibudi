@@ -7,7 +7,6 @@ import {
   auth,
   cache,
   env as coreEnv,
-  events,
   features,
   logging,
   middleware,
@@ -105,7 +104,6 @@ const shutdown = async (signal?: string) => {
     `Worker service shutting down gracefully... ${signal ? `Signal: ${signal}` : ""}`
   )
   timers.cleanup()
-  await events.shutdown()
   await redis.clients.shutdown()
   await queue.shutdown()
 }

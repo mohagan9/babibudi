@@ -1,13 +1,11 @@
-import { context, events } from "@budibase/backend-core"
+import { context } from "@budibase/backend-core"
 import {
   Ctx,
   DocumentType,
   FieldType,
   Row,
   Table,
-  TableExportFormat,
   TableSchema,
-  View,
 } from "@budibase/types"
 import sdk from "../../../sdk"
 import { apiFileReturn } from "../../../utilities/fileSystem"
@@ -73,7 +71,6 @@ export async function destroy(ctx: Ctx) {
   const table = await sdk.tables.getTable(view.meta.tableId)
   delete table.views![viewName]
   await db.put(table)
-  await events.view.deleted(view as View)
 
   ctx.body = view
   builderSocket?.emitTableUpdate(ctx, table)
@@ -134,11 +131,5 @@ export async function exportView(ctx: Ctx) {
     ctx.body = apiFileReturn(jsonWithSchema(schema, exportRows))
   } else {
     throw "Format not recognised"
-  }
-
-  if (viewName.startsWith(DocumentType.TABLE)) {
-    await events.table.exported(table, format as TableExportFormat)
-  } else {
-    await events.view.exported(table, format as TableExportFormat)
   }
 }
