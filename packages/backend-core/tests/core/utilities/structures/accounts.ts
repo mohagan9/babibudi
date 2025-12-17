@@ -1,4 +1,4 @@
-import { generator, quotas, uuid } from "."
+import { generator, uuid } from "."
 import { generateGlobalUserID } from "../../../../src/docIds"
 import {
   Account,
@@ -26,7 +26,6 @@ export const account = (partial: Partial<Account> = {}): Account => {
     name: generator.name(),
     size: "10+",
     profession: "Software Engineer",
-    quotaUsage: quotas.usage(),
     ...partial,
   }
 }

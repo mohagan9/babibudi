@@ -2,7 +2,6 @@ import { AIEndpoints } from "./ai"
 import { AnalyticsEndpoints } from "./analytics"
 import { AppEndpoints } from "./app"
 import { AttachmentEndpoints } from "./attachments"
-import { AuditLogEndpoints } from "./auditLogs"
 import { AuthEndpoints } from "./auth"
 import { AutomationEndpoints } from "./automations"
 import { BackupEndpoints } from "./backups"
@@ -12,7 +11,6 @@ import { EnvironmentVariableEndpoints } from "./environmentVariables"
 import { EventEndpoints } from "./events"
 import { FeatureFlagEndpoints } from "./features"
 import { FlagEndpoints } from "./flags"
-import { GroupEndpoints } from "./groups"
 import { LayoutEndpoints } from "./layouts"
 import { LicensingEndpoints } from "./licensing"
 import { LogEndpoints } from "./logs"
@@ -116,7 +114,6 @@ export type APIClient = BaseAPIClient &
   AnalyticsEndpoints &
   AppEndpoints &
   AttachmentEndpoints &
-  AuditLogEndpoints &
   AuthEndpoints &
   AutomationEndpoints &
   BackupEndpoints &
@@ -125,7 +122,6 @@ export type APIClient = BaseAPIClient &
   EnvironmentVariableEndpoints &
   EventEndpoints &
   FlagEndpoints &
-  GroupEndpoints &
   LayoutEndpoints &
   LicensingEndpoints &
   LogEndpoints &

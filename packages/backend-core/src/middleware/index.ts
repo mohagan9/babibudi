@@ -1,7 +1,6 @@
 export { correlationMiddleware as correlation } from "../logging/correlation/middleware"
 export { pinoMiddleware as pino } from "../logging/pino/middleware"
 export { adminOnly } from "./adminOnly"
-export { auditLog } from "./auditLog"
 export { authenticated } from "./authenticated"
 export { builderOnly } from "./builderOnly"
 export { builderOrAdmin } from "./builderOrAdmin"

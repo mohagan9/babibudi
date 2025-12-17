@@ -36,12 +36,10 @@ import { buildSelfEndpoints } from "./self"
 import { buildViewEndpoints } from "./views"
 import { buildViewV2Endpoints } from "./viewsV2"
 import { buildLicensingEndpoints } from "./licensing"
-import { buildGroupsEndpoints } from "./groups"
 import { buildPluginEndpoints } from "./plugins"
 import { buildBackupEndpoints } from "./backups"
 import { buildEnvironmentVariableEndpoints } from "./environmentVariables"
 import { buildEventEndpoints } from "./events"
-import { buildAuditLogEndpoints } from "./auditLogs"
 import { buildLogsEndpoints } from "./logs"
 import { buildMigrationEndpoints } from "./migrations"
 import { buildRowActionEndpoints } from "./rowActions"
@@ -304,12 +302,10 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildViewEndpoints(API),
     ...buildSelfEndpoints(API),
     ...buildLicensingEndpoints(API),
-    ...buildGroupsEndpoints(API),
     ...buildPluginEndpoints(API),
     ...buildBackupEndpoints(API),
     ...buildEnvironmentVariableEndpoints(API),
     ...buildEventEndpoints(API),
-    ...buildAuditLogEndpoints(API),
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
     ...buildAgentEndpoints(API),

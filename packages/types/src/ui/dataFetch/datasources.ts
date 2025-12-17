@@ -7,7 +7,6 @@ export type DataFetchDatasource =
   | QueryDatasource
   | RelationshipDatasource
   | UserDatasource
-  | GroupUserDatasource
   | CustomDatasource
   | NestedProviderDatasource
   | FieldDatasource
@@ -57,10 +56,6 @@ export interface RelationshipDatasource {
 
 export interface UserDatasource {
   type: "user"
-}
-
-export interface GroupUserDatasource {
-  type: "groupUser"
 }
 
 export interface CustomDatasource {

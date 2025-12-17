@@ -1,7 +1,6 @@
 export * from "./account"
 export * from "./action"
 export * from "./ai"
-export * from "./auditLog"
 export * from "./auth"
 export * from "./automation"
 export * from "./backfill"

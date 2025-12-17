@@ -1,6 +1,5 @@
 import { structures } from "@budibase/backend-core/tests"
 import * as configs from "./configs"
-import * as groups from "./groups"
 import { v4 as uuid } from "uuid"
 
 export const TENANT_ID = "default"
@@ -12,7 +11,6 @@ const pkg = {
   configs,
   TENANT_ID,
   CSRF_TOKEN,
-  groups,
 }
 
 export default pkg

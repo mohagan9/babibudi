@@ -13,7 +13,6 @@
   import Component from "./Component.svelte"
   import SDK from "@/sdk"
   import {
-    featuresStore,
     createContextStore,
     initialise,
     screenStore,
@@ -29,7 +28,6 @@
     modalStore,
     dataSourceStore,
     notificationStore,
-    recaptchaStore,
   } from "@/stores"
   import NotificationDisplay from "./overlay/NotificationDisplay.svelte"
   import ConfirmationDisplay from "./overlay/ConfirmationDisplay.svelte"
@@ -189,8 +187,6 @@
   >
     {#if $environmentStore.maintenance.length > 0}
       <MaintenanceScreen maintenanceList={$environmentStore.maintenance} />
-    {:else if $featuresStore.recaptchaEnabled && $appStore.application?.features?.recaptchaEnabled && $appStore.recaptchaKey && !$recaptchaStore.verified && !$builderStore.inBuilder}
-      <RecaptchaV2 />
     {:else}
       <EmbedProvider>
         <DeviceBindingsProvider>
@@ -282,10 +278,6 @@
                               <DevTools />
                             {/if}
                           </div>
-
-                          {#if !$builderStore.inBuilder && $featuresStore.logoEnabled}
-                            <FreeFooter />
-                          {/if}
                         </div>
 
                         <!-- Preview and dev tools utilities  -->

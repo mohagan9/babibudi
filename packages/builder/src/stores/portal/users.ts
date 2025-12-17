@@ -12,7 +12,6 @@ import {
   User,
   UserIdentifier,
 } from "@budibase/types"
-import { licensing } from "."
 import { BudiStore } from "../BudiStore"
 
 type UserState = SearchUsersResponse & SearchUsersRequest
@@ -155,7 +154,6 @@ class UserStore extends BudiStore<UserState> {
       return body
     })
     const response = await API.createUsers(mappedUsers)
-    licensing.setQuotaUsage()
 
     // re-search from first page
     await this.search()
@@ -164,18 +162,15 @@ class UserStore extends BudiStore<UserState> {
 
   async delete(id: string) {
     await API.deleteUser(id)
-    licensing.setQuotaUsage()
   }
 
   async bulkDelete(users: UserIdentifier[]) {
     const res = API.deleteUsers(users)
-    licensing.setQuotaUsage()
     return res
   }
 
   async save(user: User) {
     const res = await API.saveUser(user)
-    licensing.setQuotaUsage()
     return res
   }
 

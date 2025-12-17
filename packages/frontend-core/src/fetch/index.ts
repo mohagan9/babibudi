@@ -2,7 +2,6 @@ import { DataFetchDatasource, Table, ViewV2Enriched } from "@budibase/types"
 import { APIClient } from "../api/types"
 import CustomFetch from "./CustomFetch"
 import FieldFetch from "./FieldFetch"
-import GroupUserFetch from "./GroupUserFetch"
 import JSONArrayFetch from "./JSONArrayFetch"
 import NestedProviderFetch from "./NestedProviderFetch"
 import QueryArrayFetch from "./QueryArrayFetch"
@@ -22,7 +21,6 @@ export const DataFetchMap = {
   query: QueryFetch,
   link: RelationshipFetch,
   user: UserFetch,
-  groupUser: GroupUserFetch,
   custom: CustomFetch,
 
   // Client specific datasource types
@@ -39,7 +37,6 @@ export interface DataFetchClassMap {
   query: QueryFetch
   link: RelationshipFetch
   user: UserFetch
-  groupUser: GroupUserFetch
   custom: CustomFetch
 
   // Client specific datasource types
@@ -56,7 +53,6 @@ export type DataFetch =
   | QueryFetch
   | RelationshipFetch
   | UserFetch
-  | GroupUserFetch
   | CustomFetch
   | NestedProviderFetch
   | FieldFetch

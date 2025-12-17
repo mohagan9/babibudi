@@ -32,7 +32,6 @@ const koaSession = require("koa-session")
 
 import { userAgent } from "koa-useragent"
 
-import { initPro } from "./initPro"
 import { handleScimBody } from "./middleware/handleScimBody"
 
 if (coreEnv.ENABLE_SSO_MAINTENANCE_MODE) {
@@ -144,7 +143,6 @@ export default server.listen(parseInt(env.PORT || "4002"), async () => {
   }
   console.log(startupLog)
 
-  await initPro()
   await redis.clients.init()
   features.init()
 

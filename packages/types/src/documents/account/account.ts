@@ -1,6 +1,4 @@
-import { Feature, Hosting, License, PlanType, Quotas } from "../../sdk"
-import { DeepPartial } from "../../shared"
-import { QuotaUsage } from "../global"
+import { Hosting } from "../../sdk"
 
 export interface CreateAccount {
   email: string
@@ -23,11 +21,6 @@ export const isCreatePasswordAccount = (
   account: CreateAccount
 ): account is CreatePassswordAccount => account.authType === AuthType.PASSWORD
 
-export interface LicenseOverrides {
-  features?: Feature[]
-  quotas?: DeepPartial<Quotas>
-}
-
 export interface Account extends CreateAccount {
   // generated
   accountId: string
@@ -35,21 +28,12 @@ export interface Account extends CreateAccount {
   // registration
   verified: boolean
   verificationSent: boolean
-  // licensing
-  planType?: PlanType
-  license?: License
   installId?: string
   installTenantId?: string
   installVersion?: string
   stripeCustomerId?: string
-  licenseKey?: string
-  licenseKeyActivatedAt?: number
-  licenseRequestedAt?: number
-  licenseOverrides?: LicenseOverrides
   provider?: AccountSSOProvider
   providerType?: AccountSSOProviderType
-  quotaUsage?: QuotaUsage
-  offlineLicenseToken?: string
   tenantName?: string
 }
 
