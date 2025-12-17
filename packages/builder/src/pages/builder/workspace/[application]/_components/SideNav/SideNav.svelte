@@ -5,35 +5,26 @@
     Body,
     Link,
     Divider,
-    Modal,
-    PopoverAlignment,
     TooltipPosition,
     TooltipType,
     notifications,
     StatusLight,
   } from "@budibase/bbui"
   import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
-  import { url, goto, isActive } from "@roxi/routify"
+  import { url, goto } from "@roxi/routify"
   import BBLogo from "assets/BBLogo.svelte"
   import {
     appStore,
     builderStore,
     workspaceFavouriteStore,
     workspaceAppStore,
-    automationStore,
     datasources,
     tables,
     queries,
     viewsV2,
   } from "@/stores/builder"
   import FavouriteResourceButton from "@/pages/builder/_components/FavouriteResourceButton.svelte"
-  import {
-    appsStore,
-    featureFlags,
-    licensing,
-    enrichedApps,
-    agentsStore,
-  } from "@/stores/portal"
+  import { featureFlags, enrichedApps } from "@/stores/portal"
   import SideNavLink from "./SideNavLink.svelte"
   import SideNavUserSettings from "./SideNavUserSettings.svelte"
   import { onDestroy, setContext } from "svelte"
@@ -41,7 +32,6 @@
     type Datasource,
     type Query,
     type Table,
-    type UIAutomation,
     type UIInternalDatasource,
     type UIWorkspaceApp,
     type ViewV2,
@@ -52,25 +42,15 @@
   import { derived, get, type Readable } from "svelte/store"
   import { IntegrationTypes } from "@/constants/backend"
   import { bb } from "@/stores/bb"
-  import WorkspaceSelect from "@/components/common/WorkspaceSelect.svelte"
   import CreateWorkspaceModal from "../CreateWorkspaceModal.svelte"
-  import HelpMenu from "@/components/common/HelpMenu.svelte"
   import { buildLiveUrl } from "@/helpers/urls"
   import { type EnrichedApp } from "@/types"
 
   export const show = () => {
     pinned.set(true)
   }
-
-  $: automationErrors = getAutomationErrors($enrichedApps || [], appId)
-  $: automationErrorCount = Object.keys(automationErrors).length
   $: backupErrors = getBackupErrors($enrichedApps || [], appId)
   $: backupErrorCount = Object.keys(backupErrors).length
-
-  const getAutomationErrors = (apps: EnrichedApp[], appId: string) => {
-    const target = apps.find(app => app.devId === appId)
-    return target?.automationErrors || {}
-  }
 
   const getBackupErrors = (apps: EnrichedApp[], appId: string) => {
     const target = apps.find(app => app.devId === appId)
@@ -88,7 +68,6 @@
     workspaceApp?: UIWorkspaceApp
   }
   interface AllResourceStores {
-    automations: UIAutomation[]
     apps: UIWorkspaceApp[]
     datasources: (Datasource | UIInternalDatasource)[]
     tables: Table[]
@@ -119,8 +98,6 @@
   let timeout: ReturnType<typeof setTimeout> | undefined
   let resourceLookup: Readable<Record<string, UIFavouriteResource>> | null =
     null
-  let workspaceSelect: WorkspaceSelect | undefined
-  let createWorkspaceModal: Modal | undefined
   let workspaceMenuOpen = false
 
   $: appId = $appStore.appId
@@ -131,18 +108,6 @@
   // keep sidebar expanded when selector is open, even if mouse leaves
   $: navFocused = focused || workspaceMenuOpen
 
-  // Ensure the workspaceSelect closes if the sidebar is hidden
-  $: if (collapsed && workspaceSelect) {
-    workspaceSelect.hide()
-  }
-
-  // Hide the picker if the user cannot see it
-  $: canSelectWorkspace = !$licensing.isFreePlan || $appsStore.apps.length > 1
-
-  $: if (!canSelectWorkspace) {
-    workspaceMenuOpen = false
-  }
-
   // Ignore resources without names
   $: favourites = $workspaceFavouriteStore
     .filter(f => $resourceLookup?.[f.resourceId])
@@ -151,31 +116,19 @@
   const initResourceStores = (): Readable<AllResourceStores> =>
     derived(
       [
-        automationStore,
         workspaceAppStore,
         datasources,
         tables,
         queries,
         viewsV2,
-        agentsStore,
         workspaceFavouriteStore,
       ],
-      ([
-        $automations,
-        $apps,
-        $datasources,
-        $tables,
-        $queries,
-        $views,
-        $agents,
-      ]) => ({
-        automations: $automations.automations,
+      ([$apps, $datasources, $tables, $queries, $views]) => ({
         apps: $apps.workspaceApps,
         datasources: $datasources.list,
         tables: $tables.list,
         queries: $queries.list,
         views: $views.list,
-        agents: $agents.agents,
       })
     )
 
@@ -361,10 +314,6 @@
   })
 </script>
 
-<Modal bind:this={createWorkspaceModal}>
-  <CreateWorkspaceModal />
-</Modal>
-
 <div class="nav_wrapper" style={`--nav-logo-width: ${navLogoSize}px;`}>
   <div class="nav_spacer" class:pinned={$pinned} />
   <div
@@ -384,18 +333,7 @@
       </div>
 
       <div class="nav-title">
-        {#if canSelectWorkspace}
-          <WorkspaceSelect
-            bind:this={workspaceSelect}
-            bind:open={workspaceMenuOpen}
-            on:create={() => {
-              createWorkspaceModal?.show()
-              setFocused(false)
-            }}
-          />
-        {:else}
-          <h1>{$appStore.name}</h1>
-        {/if}
+        <h1>{$appStore.name}</h1>
       </div>
       <Icon
         name="sidebar-simple"
@@ -415,32 +353,6 @@
               {collapsed}
               on:click={keepCollapsed}
             />
-            <span class="root-nav" class:selected={$isActive("./automation")}>
-              {#if collapsed && automationErrorCount}
-                <span class="status-indicator">
-                  <StatusLight
-                    color="var(--spectrum-global-color-static-red-600)"
-                    size="M"
-                  />
-                </span>
-              {/if}
-              <SideNavLink
-                icon="path"
-                text="Automations"
-                url={$url("./automation")}
-                {collapsed}
-                on:click={keepCollapsed}
-              >
-                <svelte:fragment slot="right">
-                  {#if automationErrorCount}
-                    <StatusLight
-                      color="var(--spectrum-global-color-static-red-600)"
-                      size="M"
-                    />
-                  {/if}
-                </svelte:fragment>
-              </SideNavLink>
-            </span>
 
             <SideNavLink
               icon="webhooks-logo"
@@ -603,14 +515,6 @@
             {collapsed}
           />
         {/if}
-        <HelpMenu align={PopoverAlignment.RightOutside} let:open>
-          <SideNavLink
-            icon={"question"}
-            text={"Help"}
-            {collapsed}
-            forceActive={open}
-          />
-        </HelpMenu>
         <SideNavUserSettings {collapsed} />
       </div>
       <div class="popover-container"></div>

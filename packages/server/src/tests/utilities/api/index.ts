@@ -1,7 +1,6 @@
 import TestConfiguration from "../TestConfiguration"
 import { AssetsAPI } from "./assets"
 import { AttachmentAPI } from "./attachment"
-import { AutomationAPI } from "./automation"
 import { BackupAPI } from "./backup"
 import { DatasourceAPI } from "./datasource"
 import { DeployAPI } from "./deploy"
@@ -34,7 +33,6 @@ import { WorkspaceFavouriteAPI } from "./workspaceFavourite"
 export default class API {
   workspace: WorkspaceAPI
   attachment: AttachmentAPI
-  automation: AutomationAPI
   backup: BackupAPI
   datasource: DatasourceAPI
   deploy: DeployAPI
@@ -70,7 +68,6 @@ export default class API {
   constructor(config: TestConfiguration) {
     this.workspace = new WorkspaceAPI(config)
     this.attachment = new AttachmentAPI(config)
-    this.automation = new AutomationAPI(config)
     this.backup = new BackupAPI(config)
     this.datasource = new DatasourceAPI(config)
     this.deploy = new DeployAPI(config)

@@ -1,6 +1,5 @@
 import workerFarm from "worker-farm"
 import env from "../environment"
-import { AutomationJob } from "@budibase/types"
 import { QueryEvent } from "./definitions"
 
 export const ThreadType = {
@@ -13,9 +12,6 @@ function typeToFile(type: any) {
   switch (type) {
     case ThreadType.QUERY:
       filename = "./query"
-      break
-    case ThreadType.AUTOMATION:
-      filename = "./automation"
       break
     default:
       throw "Unknown thread type"
@@ -74,7 +70,7 @@ export class Thread {
     )
   }
 
-  run<T>(job: AutomationJob | QueryEvent): Promise<T> {
+  run<T>(job: QueryEvent): Promise<T> {
     const timeout = this.timeoutMs
     return new Promise((resolve, reject) => {
       function fire(worker: any) {

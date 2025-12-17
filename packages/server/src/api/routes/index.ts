@@ -6,7 +6,6 @@ import { endpointGroupList } from "./endpointGroups"
 import "./analytics"
 import "./apikeys"
 import "./auth"
-import "./automation"
 import "./backup"
 import "./component"
 import "./datasource"
@@ -51,6 +50,4 @@ for (let endpoint of endpoints) {
   endpoint.apply(appRoutes)
 }
 
-export const mainRoutes: Router[] = [
-  appRoutes,
-]
+export const mainRoutes: Router[] = [appRoutes]

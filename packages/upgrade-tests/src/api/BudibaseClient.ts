@@ -1,7 +1,6 @@
 import { ApplicationAPI } from "./application"
 import { TableAPI } from "./table"
 import { RowAPI } from "./row"
-import { AutomationAPI } from "./automation"
 import { ViewAPI } from "./view"
 import { BudibaseError } from "../utils/BudibaseError"
 import { v4 as uuidv4 } from "uuid"
@@ -35,7 +34,6 @@ export class BudibaseClient {
   private _config: ClientConfig
 
   application: ApplicationAPI
-  automation: AutomationAPI
   config: ConfigAPI
   datasource: DatasourceAPI
   plugin: PluginAPI
@@ -78,7 +76,6 @@ export class BudibaseClient {
     this._config = config
 
     this.application = new ApplicationAPI(this)
-    this.automation = new AutomationAPI(this)
     this.config = new ConfigAPI(this)
     this.datasource = new DatasourceAPI(this)
     this.plugin = new PluginAPI(this)
