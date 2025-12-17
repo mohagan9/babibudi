@@ -1,5 +1,8 @@
 import { db, db as dbCore, users } from "@budibase/backend-core"
-import { User, Workspace } from "@budibase/types"
+import { ContextUser, User, Workspace } from "@budibase/types"
+import { WorkspaceStatus } from "../../../db/utils"
+import { getLocksById } from "../../../utilities/redis"
+import { enrichApps } from "../../users/sessions"
 import sdk from "../.."
 
 export function filterAppList(user: User, apps: Workspace[]) {
@@ -16,6 +19,42 @@ export function filterAppList(user: User, apps: Workspace[]) {
   return apps.filter(app =>
     appList.includes(dbCore.getProdWorkspaceID(app.appId))
   )
+}
+
+export async function fetch(status: WorkspaceStatus, user: ContextUser) {
+  const dev = status === WorkspaceStatus.DEV
+  const all = status === WorkspaceStatus.ALL
+  let workspaces = await dbCore.getAllWorkspaces({ dev, all })
+
+  // need to type this correctly - add roles back in to convert from ContextUser to User
+  const completeUser: User = {
+    ...user,
+    roles: user?.roles || {},
+  }
+  workspaces = filterAppList(completeUser, workspaces)
+
+  const workspaceIds = workspaces
+    .filter(workspace => workspace.status === "development")
+    .map(workspace => workspace.appId)
+
+  // get the locks for all the dev workspaces
+  if (dev || all) {
+    const locks = await getLocksById(workspaceIds)
+    for (let workspace of workspaces) {
+      const lock = locks[workspace.appId]
+      if (lock) {
+        workspace.lockedBy = lock as any
+      } else {
+        // make sure its definitely not present
+        delete workspace.lockedBy
+      }
+    }
+  }
+
+  // Enrich apps with all builder user sessions
+  const enrichedWorkspaces = await enrichApps(workspaces)
+
+  return await enrichedWorkspaces
 }
 
 export async function enrichWithDefaultWorkspaceAppUrl(apps: Workspace[]) {
