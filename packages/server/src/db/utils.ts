@@ -1,6 +1,5 @@
 import { context, db as dbCore, utils } from "@budibase/backend-core"
 import {
-  AIFieldMetadata,
   DatabaseQueryOpts,
   Datasource,
   DocumentType,
@@ -305,10 +304,6 @@ export function isRelationshipColumn(
   column: FieldSchema
 ): column is RelationshipFieldMetadata {
   return column.type === FieldType.LINK
-}
-
-export function isAIColumn(column: FieldSchema): column is AIFieldMetadata {
-  return column.type === FieldType.AI
 }
 
 /**

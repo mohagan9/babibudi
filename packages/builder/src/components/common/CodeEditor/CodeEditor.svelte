@@ -668,15 +668,15 @@
     white-space: nowrap !important;
   }
 
-  .code-editor.ai-generated :global(.cm-editor) {
+  .code-editor :global(.cm-editor) {
     background: var(--spectrum-global-color-blue-50) !important;
   }
 
-  .code-editor.ai-generated :global(.cm-content) {
+  .code-editor :global(.cm-content) {
     background: transparent !important;
   }
 
-  .code-editor.ai-generated :global(.cm-line) {
+  .code-editor :global(.cm-line) {
     background: #765ffe1a !important;
     display: inline-block;
     min-width: fit-content;

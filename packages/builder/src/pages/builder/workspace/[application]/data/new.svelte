@@ -15,7 +15,6 @@
   import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
   import CreationPage from "@/components/common/CreationPage.svelte"
   import ICONS from "@/components/backend/DatasourceNavigator/icons/index.js"
-  import AiTableGeneration from "./_components/AITableGeneration.svelte"
   import { IntegrationTypes } from "@/constants/backend"
 
   $goto
@@ -64,9 +63,6 @@
   </div>
 
   <div class="options bb-options">
-    <div class="ai-generation">
-      <AiTableGeneration />
-    </div>
     <DatasourceOption
       on:click={() => internalTableModal.show()}
       title="Create new table"
@@ -138,7 +134,7 @@
   .bb-options {
     max-width: calc(3 * 235px + 2 * 24px); /* 3 columns + 2 gaps */
   }
-  .options .ai-generation {
+  .options {
     grid-column: 1 / -1;
   }
 </style>

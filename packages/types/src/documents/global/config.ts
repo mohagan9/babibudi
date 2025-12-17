@@ -103,16 +103,7 @@ export interface SCIMInnerConfig {
 
 export interface SCIMConfig extends Config<SCIMInnerConfig> {}
 
-export type AIProvider =
-  | "OpenAI"
-  | "Anthropic"
-  | "AzureOpenAI"
-  | "TogetherAI"
-  | "Custom"
-  | "BudibaseAI"
-
 export interface ProviderConfig {
-  provider: AIProvider
   isDefault: boolean
   name: string
   active: boolean
@@ -120,19 +111,6 @@ export interface ProviderConfig {
   apiKey?: string
   defaultModel?: string
 }
-
-export interface AIInnerConfig {
-  [key: string]: ProviderConfig
-}
-
-export interface AIConfig extends Config<AIInnerConfig> {}
-
-export interface RecaptchaInnerConfig {
-  siteKey: string
-  secretKey: string
-}
-
-export interface RecaptchaConfig extends Config<RecaptchaInnerConfig> {}
 
 export const isConfig = (config: Object): config is Config =>
   "type" in config && "config" in config
@@ -172,8 +150,4 @@ export type ConfigTypeToConfig<T extends ConfigType> =
           ? OIDCConfig
           : T extends ConfigType.OIDC_LOGOS
             ? OIDCLogosConfig
-            : T extends ConfigType.SCIM
-              ? SCIMConfig
-              : T extends ConfigType.AI
-                ? AIConfig
-                : never
+            : never

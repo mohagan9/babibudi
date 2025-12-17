@@ -124,7 +124,6 @@ const stringifyField = (value: any, schema: FieldSchema): string => {
     case FieldType.LONGFORM:
     case FieldType.BIGINT:
     case FieldType.OPTIONS:
-    case FieldType.AI:
     case FieldType.BARCODEQR:
       return value || ""
 

@@ -110,8 +110,7 @@
     const { type, formulaType } = col.schema
     return (
       searchableTypes.includes(type) ||
-      (type === FieldType.FORMULA && formulaType === FormulaType.STATIC) ||
-      type === FieldType.AI
+      (type === FieldType.FORMULA && formulaType === FormulaType.STATIC)
     )
   }
 

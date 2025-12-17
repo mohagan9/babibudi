@@ -108,7 +108,6 @@
     const excludedTypes = [
       FieldType.ATTACHMENT_SINGLE,
       FieldType.ATTACHMENTS,
-      FieldType.AI,
       FieldType.SIGNATURE_SINGLE,
     ]
 

@@ -183,7 +183,6 @@ export const TYPE_TRANSFORM_MAP: Record<
       }
     },
   },
-  [FieldType.AI]: {},
   [FieldType.BB_REFERENCE_SINGLE]: {},
   [FieldType.SIGNATURE_SINGLE]: {},
   [FieldType.INTERNAL]: {},

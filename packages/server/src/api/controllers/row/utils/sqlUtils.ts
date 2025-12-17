@@ -120,7 +120,7 @@ export async function buildSqlFieldList(
 ) {
   const { relationships } = opts || {}
 
-  const nonMappedColumns = [FieldType.LINK, FieldType.FORMULA, FieldType.AI]
+  const nonMappedColumns = [FieldType.LINK, FieldType.FORMULA]
 
   function extractRealFields(table: Table, existing: string[] = []) {
     return Object.entries(table.schema)

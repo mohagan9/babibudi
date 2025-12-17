@@ -5,10 +5,8 @@ export enum WorkspaceResource {
   DATASOURCE = "datasource",
   QUERY = "query",
   TABLE = "table",
-  AUTOMATION = "automation",
   WORKSPACE_APP = "workspace_app",
   VIEW = "view",
-  AGENT = "agent",
 }
 
 export interface AddWorkspaceFavouriteRequest {

@@ -1,7 +1,6 @@
 import { sql } from "@budibase/backend-core"
 import { generator } from "@budibase/backend-core/tests"
 import {
-  AIOperationEnum,
   CalculationType,
   FieldType,
   RelationshipType,
@@ -70,11 +69,7 @@ describe("buildInternalFieldList", () => {
 
     withField(
       name: string,
-      type:
-        | FieldType.STRING
-        | FieldType.NUMBER
-        | FieldType.FORMULA
-        | FieldType.AI,
+      type: FieldType.STRING | FieldType.NUMBER | FieldType.FORMULA,
       options?: { visible: boolean }
     ) {
       switch (type) {
@@ -91,14 +86,6 @@ describe("buildInternalFieldList", () => {
             name,
             type,
             formula: "any",
-            ...options,
-          }
-          break
-        case FieldType.AI:
-          this._table.schema[name] = {
-            name,
-            type,
-            operation: AIOperationEnum.PROMPT,
             ...options,
           }
           break
@@ -541,7 +528,6 @@ describe("buildInternalFieldList", () => {
       const otherTable = new TableConfig()
         .withField("hidden", FieldType.STRING, { visible: false })
         .withField("formula", FieldType.FORMULA)
-        .withField("ai", FieldType.AI)
         .withRelation("link", "otherTableId")
         .create()
 

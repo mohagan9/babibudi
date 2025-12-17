@@ -19,7 +19,6 @@ const FieldTypeMap: Record<FieldType, SQLiteType> = {
   [FieldType.BOOLEAN]: SQLiteType.NUMERIC,
   [FieldType.DATETIME]: SQLiteType.TEXT,
   [FieldType.FORMULA]: SQLiteType.TEXT,
-  [FieldType.AI]: SQLiteType.TEXT,
   [FieldType.LONGFORM]: SQLiteType.TEXT,
   [FieldType.NUMBER]: SQLiteType.REAL,
   [FieldType.STRING]: SQLiteType.TEXT,

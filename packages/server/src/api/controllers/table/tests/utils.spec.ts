@@ -1,9 +1,4 @@
-import {
-  AIOperationEnum,
-  AutoFieldSubType,
-  FieldType,
-  JsonFieldSubType,
-} from "@budibase/types"
+import { AutoFieldSubType, FieldType, JsonFieldSubType } from "@budibase/types"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import { importToRows } from "../utils"
 
@@ -121,12 +116,6 @@ describe("utils", () => {
                 type: FieldType.STRING,
                 presence: true,
               },
-            },
-            aicol: {
-              name: "aicol",
-              type: FieldType.AI,
-              operation: AIOperationEnum.PROMPT,
-              prompt: "Test prompt",
             },
           },
         })

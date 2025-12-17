@@ -1,5 +1,5 @@
 import { auth } from "@budibase/backend-core"
-import { ConfigType, PKCEMethod } from "@budibase/types"
+import { ConfigType } from "@budibase/types"
 import Joi from "joi"
 import * as controller from "../../controllers/global/configs"
 import { adminRoutes, loggedInRoutes } from "../endpointGroups"
@@ -51,7 +51,6 @@ function oidcValidation() {
         uuid: Joi.string().required(),
         activated: Joi.boolean().required(),
         scopes: Joi.array().optional(),
-        pkce: Joi.string().valid(...Object.values(PKCEMethod)).optional().allow(null)
       })
     ).required()
   }).unknown(true)
@@ -62,29 +61,6 @@ function scimValidation() {
   return Joi.object({
     enabled: Joi.boolean().required(),
   }).unknown(true)
-}
-
-function aiValidation() {
-  // prettier-ignore
-  return Joi.object().pattern(
-    Joi.string(),
-    Joi.object({
-      provider: Joi.string().required(),
-      isDefault: Joi.boolean().required(),
-      name: Joi.string().required(),
-      active: Joi.boolean().required(),
-      baseUrl: Joi.string().optional().allow("", null),
-      apiKey: Joi.string().optional(),
-      defaultModel: Joi.string().optional(),
-    }).required()
-  )
-}
-
-function recaptchaValidation() {
-  return Joi.object({
-    siteKey: Joi.string().required(),
-    secretKey: Joi.string().required(),
-  }).required()
 }
 
 function buildConfigSaveValidation() {
@@ -105,8 +81,6 @@ function buildConfigSaveValidation() {
           { is: ConfigType.GOOGLE, then: googleValidation() },
           { is: ConfigType.OIDC, then: oidcValidation() },
           { is: ConfigType.SCIM, then: scimValidation() },
-          { is: ConfigType.AI, then: aiValidation() },
-          { is: ConfigType.RECAPTCHA, then: recaptchaValidation() },
         ],
       }),
   }).required().unknown(true),

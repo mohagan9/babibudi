@@ -1,5 +1,4 @@
 import {
-  AIConfig,
   Config,
   ConfigType,
   GoogleConfig,
@@ -7,9 +6,6 @@ import {
   OIDCConfig,
   OIDCInnerConfig,
   OIDCLogosConfig,
-  RecaptchaConfig,
-  SCIMConfig,
-  SCIMInnerConfig,
   SettingsConfig,
   SettingsInnerConfig,
   SMTPConfig,
@@ -252,25 +248,4 @@ export async function getSMTPConfig(
       fallback: true,
     }
   }
-}
-
-// SCIM
-
-export async function getSCIMConfig(): Promise<SCIMInnerConfig | undefined> {
-  const config = await getConfig<SCIMConfig>(ConfigType.SCIM)
-  return config?.config
-}
-
-// AI
-
-export async function getAIConfig(): Promise<AIConfig | undefined> {
-  return getConfig<AIConfig>(ConfigType.AI)
-}
-
-// RECAPTCHA
-
-export async function getRecaptchaConfig(): Promise<
-  RecaptchaConfig | undefined
-> {
-  return getConfig<RecaptchaConfig>(ConfigType.RECAPTCHA)
 }

@@ -15,7 +15,6 @@ import { generator, mocks, structures } from "@budibase/backend-core/tests"
 import { dataFilters, isViewId } from "@budibase/shared-core"
 import { encodeJSBinding } from "@budibase/string-templates"
 import {
-  AIOperationEnum,
   AutoFieldSubType,
   BBReferenceFieldSubType,
   Datasource,
@@ -43,7 +42,6 @@ import { cloneDeep } from "lodash/fp"
 import tk from "timekeeper"
 import { DEFAULT_EMPLOYEE_TABLE_SCHEMA } from "../../../db/defaultData/datasource_bb_default"
 import { generateRowIdField } from "../../../integrations/utils"
-import { mockChatGPTResponse } from "../../../tests/utilities/mocks/ai/openai"
 
 const descriptions = datasourceDescribe({ plus: true })
 
@@ -1925,9 +1923,6 @@ if (descriptions.length) {
                 let envCleanup: () => void
 
                 beforeAll(async () => {
-                  mocks.licenses.useBudibaseAI()
-                  mocks.licenses.useAICustomConfigs()
-
                   envCleanup = setEnv({ OPENAI_API_KEY: "mock" })
 
                   // Ensure MockAgent is installed for OpenAI interceptors
@@ -1936,18 +1931,8 @@ if (descriptions.length) {
                   } = require("../../../tests/jestEnv")
                   installHttpMocking()
 
-                  // Set up 2 interceptors for the 2 rows that will be processed
-                  mockChatGPTResponse("Mock LLM Response")
-                  mockChatGPTResponse("Mock LLM Response")
-
                   tableOrViewId = await createTableOrView({
                     product: { name: "product", type: FieldType.STRING },
-                    ai: {
-                      name: "ai",
-                      type: FieldType.AI,
-                      operation: AIOperationEnum.PROMPT,
-                      prompt: "Translate '{{ product }}' into German",
-                    },
                   })
 
                   await createRows([

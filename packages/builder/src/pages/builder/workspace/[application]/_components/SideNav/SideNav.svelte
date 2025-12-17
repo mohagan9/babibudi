@@ -24,7 +24,7 @@
     viewsV2,
   } from "@/stores/builder"
   import FavouriteResourceButton from "@/pages/builder/_components/FavouriteResourceButton.svelte"
-  import { featureFlags, enrichedApps } from "@/stores/portal"
+  import { enrichedApps } from "@/stores/portal"
   import SideNavLink from "./SideNavLink.svelte"
   import SideNavUserSettings from "./SideNavUserSettings.svelte"
   import { onDestroy, setContext } from "svelte"
@@ -42,7 +42,6 @@
   import { derived, get, type Readable } from "svelte/store"
   import { IntegrationTypes } from "@/constants/backend"
   import { bb } from "@/stores/bb"
-  import CreateWorkspaceModal from "../CreateWorkspaceModal.svelte"
   import { buildLiveUrl } from "@/helpers/urls"
   import { type EnrichedApp } from "@/types"
 
@@ -368,22 +367,6 @@
               {collapsed}
               on:click={keepCollapsed}
             />
-            {#if $featureFlags.AI_AGENTS}
-              <SideNavLink
-                icon="cpu"
-                text="Agents"
-                url={$url("./agent")}
-                {collapsed}
-                on:click={keepCollapsed}
-              />
-              <SideNavLink
-                icon="chat"
-                text="Chat"
-                url={$url("./chat")}
-                {collapsed}
-                on:click={keepCollapsed}
-              />
-            {/if}
           </div>
           <Divider size="S" />
           <div class="favourite-wrapper">

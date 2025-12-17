@@ -1,8 +1,6 @@
 import {
   AddWorkspaceFavouriteRequest,
   AddWorkspaceFavouriteResponse,
-  Agent,
-  Automation,
   Datasource,
   DeleteWorkspaceFavouriteResponse,
   Query,
@@ -18,14 +16,7 @@ import {
 import sdk from "../../sdk"
 import { db, HTTPError } from "@budibase/backend-core"
 
-type WorkspaceResourceDoc =
-  | Table
-  | Automation
-  | WorkspaceApp
-  | Datasource
-  | Query
-  | ViewV2
-  | Agent
+type WorkspaceResourceDoc = Table | WorkspaceApp | Datasource | Query | ViewV2
 
 export type ResourceGetter = (
   id: string
@@ -70,13 +61,11 @@ export async function create(
   }
 
   const check: Record<WorkspaceResource, ResourceGetter> = {
-    [WorkspaceResource.AUTOMATION]: sdk.automations.get,
     [WorkspaceResource.TABLE]: sdk.tables.getTable,
     [WorkspaceResource.WORKSPACE_APP]: sdk.workspaceApps.get,
     [WorkspaceResource.DATASOURCE]: sdk.datasources.get,
     [WorkspaceResource.QUERY]: sdk.queries.find,
     [WorkspaceResource.VIEW]: sdk.views.get,
-    [WorkspaceResource.AGENT]: sdk.ai.agents.getOrThrow,
   }
   const verifyResource: ResourceGetter = check[body.resourceType]
 

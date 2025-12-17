@@ -233,11 +233,7 @@
     })
   }
 
-  const excludedTypes = [
-    FieldType.ATTACHMENT_SINGLE,
-    FieldType.ATTACHMENTS,
-    FieldType.AI,
-  ]
+  const excludedTypes = [FieldType.ATTACHMENT_SINGLE, FieldType.ATTACHMENTS]
 
   async function fetchSchema(datasource: any) {
     if (datasource) {

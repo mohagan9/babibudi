@@ -387,11 +387,7 @@ export async function enrichSchema(
     const result: Record<string, ViewV2ColumnEnriched> = {}
     for (const relTableFieldName of Object.keys(relTable.schema)) {
       const relTableField = relTable.schema[relTableFieldName]
-      if (
-        [FieldType.LINK, FieldType.FORMULA, FieldType.AI].includes(
-          relTableField.type
-        )
-      ) {
+      if ([FieldType.LINK, FieldType.FORMULA].includes(relTableField.type)) {
         continue
       }
 
@@ -453,17 +449,6 @@ export async function enrichSchema(
       // field were the relationship columns. We blank this out here to make sure it's
       // not set on non-relationship columns, then below we populate it by calling
       // populateRelSchema.
-      //
-      // For Budibase 3.0 we introduced the FieldType.AI fields. Some of these fields
-      // have `columns: string[]` and it flew under the radar here because the
-      // AIFieldMetadata type isn't a union on its subtypes, it has a collection of
-      // optional fields. So columns is `columns?: string[]` which allows undefined,
-      // and doesn't fail this type check.
-      //
-      // What this means in practice is when FieldType.AI fields get enriched, we
-      // delete their `columns`. At the time of writing, I don't believe anything in
-      // the frontend depends on this, but it is odd and will probably bite us at
-      // some point.
       columns: undefined,
     }
 

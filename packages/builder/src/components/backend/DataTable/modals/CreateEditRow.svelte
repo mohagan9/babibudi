@@ -6,7 +6,6 @@
   import { FIELDS } from "@/constants/backend"
 
   const FORMULA_TYPE = FIELDS.FORMULA.type
-  const AI_TYPE = FIELDS.AI.type
 
   export let row = {}
 

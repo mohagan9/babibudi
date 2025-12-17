@@ -1,6 +1,5 @@
 <script>
   import { Menu, MenuItem, Helpers } from "@budibase/bbui"
-  import { FieldType } from "@budibase/types"
   import { getContext } from "svelte"
   import { NewRowID } from "../lib/constants"
   import GridPopover from "./GridPopover.svelte"
@@ -27,9 +26,6 @@
 
   $: style = makeStyle($menu)
   $: isNewRow = $focusedRowId === NewRowID
-  $: hasAIColumns = $visibleColumns.some(
-    col => col.schema.type === FieldType.AI
-  )
 
   const makeStyle = menu => {
     return `left:${menu.left}px; top:${menu.top}px;`
@@ -56,12 +52,6 @@
   const copyToClipboard = async value => {
     await Helpers.copyToClipboard(value)
     $notifications.success("Copied to clipboard")
-  }
-
-  const generateAIColumns = async () => {
-    menu.actions.close()
-    await rows.actions.applyRowChanges({ rowId: $focusedRowId })
-    $notifications.success("Generated AI columns")
   }
 </script>
 
@@ -171,15 +161,6 @@
           >
             Delete row
           </MenuItem>
-          {#if $config.aiEnabled}
-            <MenuItem
-              icon="magic-wand"
-              disabled={isNewRow || !hasAIColumns}
-              on:click={generateAIColumns}
-            >
-              Generate AI Columns
-            </MenuItem>
-          {/if}
         {/if}
       </Menu>
     </GridPopover>

@@ -155,8 +155,7 @@ function isEditableColumn(column: FieldSchema) {
     column.autoReason !== AutoReason.FOREIGN_KEY &&
     column.subtype !== AutoFieldSubType.AUTO_ID
   const isFormula = column.type === FieldType.FORMULA
-  const isAIColumn = column.type === FieldType.AI
-  return !(isExternalAutoColumn || isFormula || isAIColumn)
+  return !(isExternalAutoColumn || isFormula)
 }
 
 export class ExternalRequest<T extends Operation> {
