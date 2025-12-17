@@ -1,5 +1,4 @@
 export * from "./attachment"
-export * from "./automation"
 export * from "./backup"
 export * from "./component"
 export * from "./datasource"

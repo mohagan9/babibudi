@@ -59,7 +59,6 @@
   export let buttonsCollapsedText = null
   export let darkMode = false
   export let isCloud: boolean | null | undefined = null
-  export let aiEnabled = false
   export let canHideColumns = true
   export let externalClipboard: ExternalClipboardData | undefined = undefined
 
@@ -119,7 +118,6 @@
     buttonsCollapsedText,
     darkMode,
     isCloud,
-    aiEnabled,
     canHideColumns,
     externalClipboard,
   })

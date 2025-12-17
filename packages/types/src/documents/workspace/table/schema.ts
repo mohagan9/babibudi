@@ -11,7 +11,6 @@ import {
   RelationshipType,
   StringFieldSubType,
 } from "./constants"
-import { AIOperationEnum } from "../../../sdk/ai"
 
 export interface UIFieldMetadata {
   order?: number
@@ -119,16 +118,6 @@ export interface FormulaFieldMetadata extends BaseFieldSchema {
   formula: string
   formulaType?: FormulaType
   responseType?: FormulaResponseType
-}
-
-export interface AIFieldMetadata extends BaseFieldSchema {
-  type: FieldType.AI
-  operation: AIOperationEnum
-  columns?: string[]
-  column?: string
-  categories?: string
-  prompt?: string
-  language?: string
 }
 
 export interface BBReferenceFieldMetadata
@@ -255,7 +244,6 @@ export type FieldSchema =
   | RelationshipFieldMetadata
   | AutoColumnFieldMetadata
   | FormulaFieldMetadata
-  | AIFieldMetadata
   | NumberFieldMetadata
   | LongFormFieldMetadata
   | StringFieldMetadata

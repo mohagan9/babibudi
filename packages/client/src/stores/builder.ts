@@ -1,11 +1,9 @@
 import { writable, get } from "svelte/store"
-import { API } from "@/api"
 import { devToolsStore } from "./devTools.js"
 import { eventStore } from "./events.js"
 import {
   ComponentDefinition,
   DropPosition,
-  PingSource,
   PreviewDevice,
   Screen,
   Theme,
@@ -92,13 +90,6 @@ const createBuilderStore = () => {
     },
     notifyLoaded: () => {
       eventStore.actions.dispatchEvent("preview-loaded")
-    },
-    analyticsPing: async ({ embedded }: { embedded: boolean }) => {
-      try {
-        await API.analyticsPing({ source: PingSource.APP, embedded })
-      } catch (error) {
-        // Do nothing
-      }
     },
     moveComponent: async (
       componentId: string,

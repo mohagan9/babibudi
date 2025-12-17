@@ -3,7 +3,6 @@
   // because it functions similarly to one
   import { getContext, onMount } from "svelte"
   import { get, derived, readable } from "svelte/store"
-  import { featuresStore } from "@/stores"
   import { Grid } from "@budibase/frontend-core"
   import { processStringSync } from "@budibase/string-templates"
   import { UILogicalOperator, EmptyFilterOption } from "@budibase/types"
@@ -285,7 +284,6 @@
     {buttonsCollapsed}
     {buttonsCollapsedText}
     isCloud={$environmentStore.cloud}
-    aiEnabled={$featuresStore.aiEnabled}
     on:rowclick={e => onRowClick?.({ row: e.detail })}
   />
 </div>
