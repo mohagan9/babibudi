@@ -2,7 +2,6 @@ import { type Writable, get, type Readable, derived } from "svelte/store"
 import { API } from "@/api"
 import { notifications } from "@budibase/bbui"
 import { DeploymentProgressResponse, DeploymentStatus } from "@budibase/types"
-import analytics, { Events, EventSource } from "@/analytics"
 import { appsStore } from "@/stores/portal/apps"
 import { DerivedBudiStore } from "@/stores/BudiStore"
 import { appStore } from "./app"
@@ -94,7 +93,6 @@ class DeploymentStore extends DerivedBudiStore<
       await API.publishAppChanges(get(appStore).appId, opts)
       await this.completePublish()
     } catch (error: any) {
-      analytics.captureException(error)
       const message = error?.message ? ` - ${error.message}` : ""
       notifications.error(`Error publishing app${message}`)
     }
@@ -141,13 +139,7 @@ class DeploymentStore extends DerivedBudiStore<
   }
 
   viewPublishedApp() {
-    const app = get(appStore)
     const { liveUrl } = get(selectedAppUrls)
-    analytics.captureEvent(Events.APP_VIEW_PUBLISHED, {
-      appId: app.appId,
-      eventSource: EventSource.PORTAL,
-    })
-
     window.open(liveUrl)
   }
 }

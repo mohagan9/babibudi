@@ -4,7 +4,6 @@ import { get, derived } from "svelte/store"
 import { cloneDeep } from "lodash/fp"
 import { API } from "@/api"
 import { Helpers } from "@budibase/bbui"
-import analytics, { Events } from "@/analytics"
 import { makePropSafe as safe } from "@budibase/string-templates"
 import {
   findComponentPath,
@@ -579,11 +578,6 @@ export class ComponentStore extends BudiStore<ComponentState> {
     })
 
     componentTreeNodesStore.makeNodeVisible(componentInstance._id!)
-
-    // Log event
-    analytics.captureEvent(Events.COMPONENT_CREATED, {
-      name: componentInstance._component,
-    })
 
     return componentInstance
   }
@@ -1191,11 +1185,6 @@ export class ComponentStore extends BudiStore<ComponentState> {
       if (!block || !parent?._children?.length) {
         return false
       }
-
-      // Log event
-      analytics.captureEvent(Events.BLOCK_EJECTED, {
-        block: block._component,
-      })
 
       // Attach block children back into ejected definition, using the
       // _containsSlot flag to know where to insert them

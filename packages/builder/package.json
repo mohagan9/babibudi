@@ -25,7 +25,6 @@
       "\\.(css|less|sass|scss)$": "identity-obj-proxy",
       "components(.*)$": "<rootDir>/src/components$1",
       "stores(.*)$": "<rootDir>/src/stores$1",
-      "analytics(.*)$": "<rootDir>/src/analytics$1",
       "constants/backend": "<rootDir>/src/constants/backend/index.js"
     },
     "moduleFileExtensions": [

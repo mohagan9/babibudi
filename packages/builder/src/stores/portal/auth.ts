@@ -1,7 +1,6 @@
 import { get } from "svelte/store"
 import { API } from "@/api"
 import { admin } from "./admin"
-import analytics from "@/analytics"
 import { BudiStore } from "@/stores/BudiStore"
 import { reset as resetBuilderStores } from "@/stores/builder"
 import { CookieUtils, Constants } from "@budibase/frontend-core"
@@ -45,19 +44,6 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       isSSO: user != null && isSSOUser(user),
       postLogout: sessionTerminated,
     })
-
-    if (user) {
-      analytics
-        .activate()
-        .then(() => {
-          analytics.identify(user._id!)
-        })
-        .catch(() => {
-          // This request may fail due to browser extensions blocking requests
-          // containing the word analytics, so we don't want to spam users with
-          // an error here.
-        })
-    }
   }
 
   clearSession() {

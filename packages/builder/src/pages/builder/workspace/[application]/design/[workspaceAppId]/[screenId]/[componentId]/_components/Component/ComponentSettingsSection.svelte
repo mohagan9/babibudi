@@ -6,7 +6,6 @@
   import EjectBlockButton from "@/components/design/settings/controls/EjectBlockButton.svelte"
   import { getComponentForSetting } from "@/components/design/settings/componentSettings"
   import InfoDisplay from "./InfoDisplay.svelte"
-  import analytics, { Events } from "@/analytics"
   import { shouldDisplaySetting } from "@budibase/frontend-core"
   import { getContext, setContext } from "svelte"
 
@@ -85,14 +84,6 @@
         await onUpdateSetting(setting, value)
       } else {
         await componentStore.updateSetting(setting.key, value)
-      }
-      // Send event if required
-      if (setting.sendEvents) {
-        analytics.captureEvent(Events.COMPONENT_UPDATED, {
-          name: componentInstance._component,
-          setting: setting.key,
-          value,
-        })
       }
     } catch (error) {
       notifications.error("Error updating component prop")
