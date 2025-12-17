@@ -163,7 +163,6 @@ router
     }
     return next()
   })
-  .use(middleware.auditLog)
 
 router.get("/health", ctx => (ctx.status = 200))
 
