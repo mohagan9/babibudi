@@ -6,7 +6,6 @@
     navigation,
     appsStore,
     organisation,
-    groups,
     enrichedApps,
   } from "@/stores/portal"
   import { sdk } from "@budibase/shared-core"
@@ -215,11 +214,7 @@
       }
       if ($auth.user) {
         // We need to load apps to know if we need to show onboarding fullscreen
-        await Promise.all([
-          appsStore.load(),
-          organisation.init(),
-          groups.init(),
-        ])
+        await Promise.all([appsStore.load(), organisation.init()])
 
         await auth.getInitInfo()
       }
