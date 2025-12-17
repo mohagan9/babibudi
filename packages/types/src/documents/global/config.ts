@@ -65,7 +65,6 @@ export interface OIDCStrategyConfiguration {
   clientID: string
   clientSecret: string
   callbackURL: string
-  pkce?: PKCEMethod
 }
 
 export interface OIDCConfigs {
@@ -87,7 +86,6 @@ export interface OIDCInnerConfig {
   uuid: string
   activated: boolean
   scopes: string[]
-  pkce?: PKCEMethod
 }
 
 export interface OIDCConfig extends Config<OIDCConfigs> {}
@@ -150,20 +148,6 @@ export const isGoogleConfig = (config: Config): config is GoogleConfig =>
 
 export const isOIDCConfig = (config: Config): config is OIDCConfig =>
   config.type === ConfigType.OIDC
-
-export const isSCIMConfig = (config: Config): config is SCIMConfig =>
-  config.type === ConfigType.SCIM
-
-export const isAIConfig = (config: Config): config is AIConfig =>
-  config.type === ConfigType.AI
-
-export const isRecaptchaConfig = (config: Config): config is RecaptchaConfig =>
-  config.type === ConfigType.RECAPTCHA
-
-export enum PKCEMethod {
-  S256 = "S256",
-  PLAIN = "plain",
-}
 
 export enum ConfigType {
   SETTINGS = "settings",

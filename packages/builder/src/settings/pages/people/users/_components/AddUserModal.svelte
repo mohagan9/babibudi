@@ -8,9 +8,7 @@
     Layout,
     Icon,
   } from "@budibase/bbui"
-  import { licensing } from "@/stores/portal/licensing"
   import { Constants, emailValidator } from "@budibase/frontend-core"
-  import { capitalise } from "@/helpers"
 
   export let showOnboardingTypeModal
 
@@ -26,9 +24,6 @@
     },
   ]
   $: hasError = userData.find(x => x.error != null)
-  $: userCount = $licensing.userCount + userData.length
-  $: reached = licensing.usersLimitReached(userCount)
-  $: exceeded = licensing.usersLimitExceeded(userCount)
 
   function removeInput(idx) {
     userData = userData.filter((e, i) => i !== idx)
@@ -92,7 +87,7 @@
   confirmDisabled={disabled}
   cancelText="Cancel"
   showCloseIcon={false}
-  disabled={hasError || !userData.length || exceeded}
+  disabled={hasError || !userData.length}
 >
   <Layout noPadding gap="XS">
     <Label>Email address</Label>
@@ -123,20 +118,9 @@
       </div>
     {/each}
 
-    {#if reached}
-      <div class="user-notification">
-        <Icon name="info" />
-        <span>
-          {capitalise($licensing.license.plan.type)} plan is limited to {$licensing.userLimit}
-          users. Upgrade your plan to add more users</span
-        >
-      </div>
-    {:else}
-      <div>
-        <ActionButton on:click={addNewInput} icon="plus">Add email</ActionButton
-        >
-      </div>
-    {/if}
+    <div>
+      <ActionButton on:click={addNewInput} icon="plus">Add email</ActionButton>
+    </div>
   </Layout>
 </ModalContent>
 

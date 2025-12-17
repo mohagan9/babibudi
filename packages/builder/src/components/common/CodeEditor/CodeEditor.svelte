@@ -53,12 +53,11 @@
   import { html } from "@codemirror/lang-html"
   import { EditorModes } from "./"
   import { themeStore } from "@/stores/portal"
-  import { type EnrichedBinding, type EditorMode } from "@budibase/types"
+  import { type EditorMode } from "@budibase/types"
   import { tooltips } from "@codemirror/view"
   import type { BindingCompletion, CodeValidator } from "@/types"
   import { validateHbsTemplate } from "./validator/hbs"
   import { validateJsTemplate } from "./validator/js"
-  import AIGen from "./AIGen.svelte"
   import { hbsTagPlugin } from "./hbsTags"
 
   export let label: string | undefined = undefined
@@ -73,9 +72,7 @@
   export let readonly = false
   export let readonlyLineNumbers = false
   export let dropdown = DropdownPosition.Relative
-  export let bindings: EnrichedBinding[] = []
   export let bindingIcons: Record<string, string | undefined> = {}
-  export let aiEnabled = true
   export let lineWrapping = true
   export let renderBindingsAsTags = false
 
@@ -87,14 +84,12 @@
   let mounted = false
   let isEditorInitialised = false
   let queuedRefresh = false
-  let isAIGeneratedContent = false
 
   // Theming!
   let currentTheme = $themeStore?.theme
   let isDark = !currentTheme.includes("light")
   let themeConfig = new Compartment()
 
-  $: aiGenEnabled = mode.name === "javascript" && !readonly && aiEnabled
   $: {
     if (autofocus && isEditorInitialised) {
       editor.focus()
@@ -421,17 +416,6 @@
     })
   }
 
-  const handleAICodeUpdate = (event: CustomEvent<{ code: string }>) => {
-    const { code } = event.detail
-    value = code
-    editor.dispatch({
-      changes: { from: 0, to: editor.state.doc.length, insert: code },
-    })
-    isAIGeneratedContent = true
-    dispatch("change", code)
-    dispatch("ai_suggestion")
-  }
-
   onMount(() => {
     mounted = true
     // Capture scrolling
@@ -453,36 +437,9 @@
   </div>
 {/if}
 
-<div
-  class={`code-editor ${mode?.name || ""} ${
-    isAIGeneratedContent ? "ai-generated" : ""
-  }`}
-  bind:this={editorEle}
->
+<div class={`code-editor ${mode?.name || ""}`} bind:this={editorEle}>
   <div tabindex="-1" bind:this={textarea}></div>
 </div>
-
-{#if aiGenEnabled}
-  <AIGen
-    {bindings}
-    {value}
-    on:update={handleAICodeUpdate}
-    on:accept={() => {
-      dispatch("change", editor.state.doc.toString())
-      dispatch("blur", editor.state.doc.toString())
-      isAIGeneratedContent = false
-    }}
-    on:reject={event => {
-      const { code } = event.detail
-      value = code || ""
-      editor.dispatch({
-        changes: { from: 0, to: editor.state.doc.length, insert: code || "" },
-      })
-      isAIGeneratedContent = false
-      dispatch("change", code || "")
-    }}
-  />
-{/if}
 
 <style>
   /* Editor */

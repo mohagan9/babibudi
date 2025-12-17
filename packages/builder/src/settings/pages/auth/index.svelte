@@ -27,9 +27,6 @@
   import { API } from "@/api"
   import { organisation } from "@/stores/portal/organisation"
   import { admin } from "@/stores/portal/admin"
-  import { licensing } from "@/stores/portal/licensing"
-  import { PKCEMethod } from "@budibase/types"
-  import Scim from "./scim.svelte"
   import Google from "./google.svelte"
 
   const ConfigTypes = {
@@ -37,13 +34,6 @@
   }
 
   const HasSpacesRegex = /[\\"\s]/
-
-  $: enforcedSSO = $organisation.isSSOEnforced
-
-  const pkceOptions = [
-    { label: "S256 (recommended)", value: PKCEMethod.S256 },
-    { label: "Plain", value: PKCEMethod.PLAIN },
-  ]
 
   $: OIDCConfigFields = {
     Oidc: [
@@ -277,31 +267,6 @@
     </Body>
   </Layout>
   <Divider noMargin />
-  <Layout noPadding gap="XS">
-    <div class="provider-title">
-      <div class="enforce-sso-heading-container">
-        <div class="enforce-sso-title">
-          <Heading size="XS">Enforce Single Sign-On</Heading>
-        </div>
-        {#if !$licensing.enforceableSSO}
-          <Tags>
-            <Tag icon="lock">Enterprise plan</Tag>
-          </Tags>
-        {/if}
-      </div>
-      {#if $licensing.enforceableSSO}
-        <Toggle on:change={toggleIsSSOEnforced} bind:value={enforcedSSO} />
-      {/if}
-    </div>
-    <Body size="S">
-      Require SSO authentication for all users. It is recommended to read the
-      help <Link
-        size="M"
-        href={"https://docs.budibase.com/docs/authentication-and-sso"}
-        >documentation</Link
-      > before enabling this feature.
-    </Body>
-  </Layout>
   <Google />
   {#if providers.oidc}
     <Divider noMargin />
@@ -364,25 +329,6 @@
         on:change={e => onFileSelected(e)}
         bind:this={fileinput}
       />
-      <div class="form-row">
-        <div class="lock">
-          <Label size="L">PKCE Method</Label>
-          {#if !$licensing.pkceOidcEnabled}
-            <Icon name="lock" size="S" />
-          {/if}
-        </div>
-        {#if $licensing.pkceOidcEnabled}
-          <Select
-            placeholder="None"
-            bind:value={providers.oidc.config.configs[0].pkce}
-            options={pkceOptions}
-          />
-        {:else}
-          <Body size="XS">
-            PKCE support is only available on enterprise licenses.
-          </Body>
-        {/if}
-      </div>
       <div class="form-row">
         <Label size="L">Activated</Label>
         <Toggle
@@ -485,10 +431,6 @@
       </Button>
     </div>
   {/if}
-  {#if $licensing.scimEnabled}
-    <Divider noMargin />
-    <Scim />
-  {/if}
 </Layout>
 
 <style>
@@ -512,14 +454,6 @@
     flex-direction: row;
     align-items: center;
   }
-  .enforce-sso-title {
-    margin-right: 10px;
-  }
-  .enforce-sso-heading-container {
-    display: flex;
-    flex-direction: row;
-    align-items: start;
-  }
   .provider-title {
     display: flex;
     flex-direction: row;
@@ -541,9 +475,5 @@
     display: flex;
     align-items: center;
     margin-left: 10px;
-  }
-  .lock {
-    display: flex;
-    gap: var(--spacing-s);
   }
 </style>

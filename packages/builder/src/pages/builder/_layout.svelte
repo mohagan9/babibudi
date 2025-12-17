@@ -33,8 +33,6 @@
     Button,
   } from "@budibase/bbui"
   import SettingsModal from "@/components/settings/SettingsModal.svelte"
-  import AccountLockedModal from "@/components/portal/licensing/AccountLockedModal.svelte"
-  import EnterpriseBasicTrialBanner from "@/components/portal/licensing/EnterpriseBasicTrialBanner.svelte"
   import { writable } from "svelte/store"
 
   $isActive
@@ -44,7 +42,6 @@
   let loaded = writable(false)
   let commandPaletteModal
   let settingsModal
-  let accountLockedModal
   let hasAuthenticated = false
   let lastExecutedAction = null
 
@@ -63,11 +60,6 @@
     }
     hasAuthenticated = isAuthenticated
   }
-
-  $: lockAction =
-    $licensing?.errUserLimit || $auth?.user?.lockedBy
-      ? accountLockedModal.show
-      : null
 
   $: updateBannerVisibility($auth.user, $licensing.license?.plan?.type, isOwner)
 
@@ -254,10 +246,6 @@
         ])
 
         await auth.getInitInfo()
-
-        if (lockAction) {
-          lockAction()
-        }
       }
 
       // Validate tenant if in a multi-tenant env
@@ -300,15 +288,6 @@
     hasAuthenticated = !!$auth.user
   })
 </script>
-
-<EnterpriseBasicTrialBanner show={$licensing.showTrialBanner} />
-
-<AccountLockedModal
-  bind:this={accountLockedModal}
-  lockedBy={$auth.user?.lockedBy}
-  onConfirm={() =>
-    isOwner ? licensing.goToUpgradePage() : licensing.goToPricingPage()}
-/>
 
 <!-- Global settings modal -->
 <SettingsModal bind:this={settingsModal} on:hide={() => bb.hideSettings()} />

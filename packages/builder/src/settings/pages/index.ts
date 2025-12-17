@@ -5,8 +5,6 @@ import ProfilePage from "@/settings/pages/profile.svelte"
 import UsersPage from "@/settings/pages/people/users/index.svelte"
 import UserPage from "@/settings/pages/people/users/user.svelte"
 import UserInvitesPage from "@/settings/pages/people/users/invites.svelte"
-import GroupPage from "@/settings/pages/people/groups/group.svelte"
-import GroupsPage from "@/settings/pages/people/groups/index.svelte"
 import PluginsPage from "@/settings/pages/plugins/index.svelte"
 import EmailPage from "@/settings/pages/email.svelte"
 import EmailTemplatesPage from "@/settings/pages/email/EmailTemplates.svelte"
@@ -20,8 +18,6 @@ import EnvironmentPage from "@/settings/pages/environment/index.svelte"
 import VersionPage from "@/settings/pages/version.svelte"
 import DiagnosticsPage from "@/settings/pages/diagnostics.svelte"
 import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
-import UpgradePage from "@/settings/pages/upgrade.svelte"
-import UsagePage from "@/settings/pages/usage.svelte"
 
 // App pages
 import GeneralInfoPage from "@/settings/pages/general.svelte"
@@ -39,8 +35,6 @@ const componentMap = {
   users: UsersPage,
   user: UserPage,
   user_invites: UserInvitesPage,
-  group: GroupPage,
-  groups: GroupsPage,
   plugins: PluginsPage,
   email: EmailPage,
   email_templates: EmailTemplatesPage,
@@ -54,8 +48,6 @@ const componentMap = {
   version: VersionPage,
   diagnostics: DiagnosticsPage,
   system_logs: SystemLogsPage,
-  upgrade: UpgradePage,
-  usage: UsagePage,
   general_info: GeneralInfoPage,
   automations: AutomationsPage,
   backups: BackupsPage,

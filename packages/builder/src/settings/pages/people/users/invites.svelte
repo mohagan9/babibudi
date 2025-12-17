@@ -1,7 +1,6 @@
 <script lang="ts">
   import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
   import { auth } from "@/stores/portal/auth"
-  import { licensing } from "@/stores/portal/licensing"
   import { users } from "@/stores/portal/users"
   import { Layout, Table, notifications } from "@budibase/bbui"
   import { sdk } from "@budibase/shared-core"

@@ -14,7 +14,6 @@
   import AddUserModal from "./_components/AddUserModal.svelte"
   import { users } from "@/stores/portal/users"
   import { auth } from "@/stores/portal/auth"
-  import { licensing } from "@/stores/portal/licensing"
   import { organisation } from "@/stores/portal/organisation"
   import { admin } from "@/stores/portal/admin"
   import { onMount } from "svelte"
@@ -304,23 +303,6 @@
 </script>
 
 <Layout noPadding gap="L">
-  {#if $licensing.errUserLimit}
-    <InlineAlert
-      type="error"
-      onConfirm={() => {
-        if (isOwner) {
-          licensing.goToUpgradePage()
-        } else {
-          window.open("https://budibase.com/pricing/", "_blank")
-        }
-      }}
-      buttonText={isOwner ? "Upgrade" : "View plans"}
-      cta
-      header="Account de-activated"
-      message="Due to the free plan user limit being exceeded, your account has been de-activated.
-      Upgrade your plan to re-activate your account."
-    />
-  {/if}
   <div use:routeActions class="controls">
     {#if !readonly}
       <div class="buttons">
@@ -336,9 +318,7 @@
           <ActionButton
             size="M"
             quiet
-            on:click={$licensing.userLimitReached
-              ? userLimitReachedModal.show
-              : importUsersModal.show}
+            on:click={importUsersModal.show}
             disabled={readonly}
           >
             <Icon name={"upload-simple"} size="M" />
@@ -346,9 +326,7 @@
           <Button
             size="M"
             disabled={readonly}
-            on:click={$licensing.userLimitReached
-              ? userLimitReachedModal.show
-              : createUserModal.show}
+            on:click={createUserModal.show}
             cta
           >
             Add users

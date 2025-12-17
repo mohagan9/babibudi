@@ -14,7 +14,6 @@
   } from "@/stores/builder"
   import { featureFlags } from "@/stores/portal"
   import { admin } from "@/stores/portal/admin"
-  import { licensing } from "@/stores/portal/licensing"
   import {
     Body,
     Button,
@@ -212,32 +211,6 @@
     </div>
     <Divider noMargin />
   {/if}
-  <Layout noPadding gap="XS">
-    <div class="row">
-      <Heading size="S">Recaptcha</Heading>
-      {#if !$licensing.recaptchaEnabled}
-        <Icon name="lock" />
-      {/if}
-    </div>
-    {#if !$licensing.recaptchaEnabled}
-      <Body size="S"
-        >Recaptcha support is included with enterprise licenses</Body
-      >
-    {:else if !$recaptchaStore.available}
-      <Body size="S"
-        >Please configure Recaptcha keys to enable this protection</Body
-      >
-    {:else}
-      <Body size="S">Enable recaptcha protection for all pages</Body>
-    {/if}
-  </Layout>
-  <div>
-    {#if $licensing.recaptchaEnabled && $recaptchaStore.available}
-      <Button secondary on:click={updateRecaptcha}
-        >{appRecaptchaEnabled ? "Disable" : "Enable"}</Button
-      >
-    {/if}
-  </div>
   <Divider noMargin />
   <Heading size="XS">Danger zone</Heading>
   <div class="row">
