@@ -19,7 +19,6 @@
     jsHelperAutocomplete,
   } from "../CodeEditor"
   import { JsonFormatter } from "@budibase/frontend-core"
-  import { licensing } from "@/stores/portal"
   import type {
     EnrichedBinding,
     Snippet,
@@ -47,7 +46,7 @@
   $: readable = runtimeToReadableBinding(bindings, value || "")
   $: jsValue = decodeJSBinding(readable)
 
-  $: useSnippets = allowSnippets && !$licensing.isFreePlan
+  $: useSnippets = allowSnippets
   $: enrichedBindings = enrichBindings(bindings, context, $snippets)
   $: editorMode = EditorModes.JS
   $: bindingCompletions = bindingsToCompletions(enrichedBindings, editorMode)

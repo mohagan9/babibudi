@@ -1,25 +1,12 @@
 <script lang="ts">
   import groupBy from "lodash/fp/groupBy"
   import { convertToJS } from "@budibase/string-templates"
-  import { licensing } from "@/stores/portal"
-  import {
-    Input,
-    Layout,
-    Icon,
-    Popover,
-    Tags,
-    Tag,
-    Body,
-    Button,
-  } from "@budibase/bbui"
+  import { Input, Layout, Icon, Popover } from "@budibase/bbui"
   import { handlebarsCompletions } from "@/constants/completions"
   import type { EnrichedBinding, Helper, Snippet } from "@budibase/types"
   import { BindingMode } from "@budibase/types"
   import { EditorModes } from "../CodeEditor"
   import CodeEditor from "../CodeEditor/CodeEditor.svelte"
-
-  import SnippetDrawer from "./SnippetDrawer.svelte"
-  import UpgradeButton from "@/pages/builder/_components/UpgradeButton.svelte"
 
   export let addHelper: (_helper: Helper, _js?: boolean) => void = () => {}
   export let addBinding: (_binding: EnrichedBinding) => void = () => {}
@@ -43,10 +30,7 @@
   let helpers = handlebarsCompletions()
   let selectedCategory: string | null
   let hideTimeout: ReturnType<typeof setTimeout> | null
-  let snippetDrawer: SnippetDrawer
-  let editableSnippet: Snippet | null
 
-  $: enableSnippets = !$licensing.isFreePlan
   $: bindingIcons = bindings?.reduce<Record<string, string>>((acc, ele) => {
     if (ele.icon) {
       acc[ele.category] = acc[ele.category] || ele.icon
@@ -86,12 +70,6 @@
       (mode !== BindingMode.JavaScript || helper.allowsJs)
     )
   })
-
-  $: filteredSnippets = getFilteredSnippets(
-    enableSnippets,
-    snippets || [],
-    search
-  )
 
   function onModeChange(_mode: BindingMode | undefined) {
     selectedCategory = null
@@ -181,48 +159,6 @@
     searching = false
     search = ""
   }
-
-  const getFilteredSnippets = (
-    enableSnippets: boolean,
-    snippets: Snippet[],
-    search: string
-  ) => {
-    if (!enableSnippets || !snippets.length) {
-      return []
-    }
-    if (!search?.length) {
-      return snippets
-    }
-    return snippets.filter(snippet =>
-      snippet.name.toLowerCase().includes(search.toLowerCase())
-    )
-  }
-
-  const showSnippet = (snippet: Snippet, target: HTMLElement) => {
-    stopHidingPopover()
-    if (!snippet.code) {
-      return
-    }
-    popoverAnchor = target
-    hoverTarget = {
-      type: "snippet",
-      code: snippet.code,
-    }
-
-    popover.show()
-  }
-
-  const createSnippet = () => {
-    editableSnippet = null
-    snippetDrawer.show()
-  }
-
-  const editSnippet = (e: Event, snippet: Snippet) => {
-    e.preventDefault()
-    e.stopPropagation()
-    editableSnippet = snippet
-    snippetDrawer.show()
-  }
 </script>
 
 <Popover
@@ -275,19 +211,6 @@
           on:click={() => (selectedCategory = null)}
         />
         {selectedCategory}
-        {#if selectedCategory === "Snippets"}
-          {#if enableSnippets}
-            <div class="add-snippet-button">
-              <Icon size="S" name="plus" hoverable on:click={createSnippet} />
-            </div>
-          {:else}
-            <div class="title">
-              <Tags>
-                <Tag icon="lock" emphasized>Premium</Tag>
-              </Tags>
-            </div>
-          {/if}
-        {/if}
       </div>
     {/if}
 
@@ -404,46 +327,9 @@
           </div>
         {/if}
       {/if}
-
-      {#if selectedCategory === "Snippets" || search}
-        <div class="snippet-list">
-          {#if enableSnippets && filteredSnippets.length}
-            {#each filteredSnippets as snippet}
-              <li
-                class="snippet"
-                on:mouseenter={e => showSnippet(snippet, e.currentTarget)}
-                on:mouseleave={hidePopover}
-                on:click={() => addSnippet(snippet)}
-              >
-                {snippet.name}
-                <Icon
-                  name="pencil"
-                  hoverable
-                  size="S"
-                  on:click={e => editSnippet(e, snippet)}
-                />
-              </li>
-            {/each}
-          {:else if !search}
-            <div class="upgrade">
-              <Body size="S">
-                Snippets let you create reusable JS functions and values that
-                can all be managed in one place
-              </Body>
-              {#if enableSnippets}
-                <Button cta on:click={createSnippet}>Create snippet</Button>
-              {:else}
-                <UpgradeButton />
-              {/if}
-            </div>
-          {/if}
-        </div>
-      {/if}
     {/if}
   </Layout>
 </div>
-
-<SnippetDrawer bind:this={snippetDrawer} snippet={editableSnippet} />
 
 <style>
   .binding-side-panel {

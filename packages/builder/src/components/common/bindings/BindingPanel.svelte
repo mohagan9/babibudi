@@ -30,7 +30,6 @@
   import { BindingHelpers } from "./utils"
   import { capitalise } from "@/helpers"
   import { Utils, JsonFormatter } from "@budibase/frontend-core"
-  import { licensing } from "@/stores/portal"
   import { BindingMode } from "@budibase/types"
   import type {
     EnrichedBinding,
@@ -103,9 +102,7 @@
   $: bindingOptions = bindingsToCompletions(enrichedBindings, editorMode)
   $: helperOptions = allowHelpers ? getHelperCompletions(editorMode) : []
   $: snippetsOptions =
-    usingJS && allowSnippets && !$licensing.isFreePlan && snippets?.length
-      ? snippets
-      : []
+    usingJS && allowSnippets && snippets?.length ? snippets : []
 
   $: completions = !usingJS
     ? [hbAutocomplete([...bindingOptions, ...helperOptions])]

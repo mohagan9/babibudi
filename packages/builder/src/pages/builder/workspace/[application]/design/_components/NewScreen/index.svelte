@@ -2,7 +2,6 @@
   import CreationPage from "@/components/common/CreationPage.svelte"
   import { AutoScreenTypes } from "@/constants"
   import { appStore, screenStore, workspaceAppStore } from "@/stores/builder"
-  import { licensing } from "@/stores/portal"
   import {
     Body,
     keepOpen,
@@ -10,13 +9,10 @@
     ModalCancelFrom,
     ModalContent,
     notifications,
-    Tag,
-    Tags,
   } from "@budibase/bbui"
   import CreateScreenModal from "./CreateScreenModal.svelte"
   import blank from "./images/blank.svg"
   import form from "./images/formUpdate.svg"
-  import pdf from "./images/pdf.svg"
   import table from "./images/tableInline.svg"
 
   export let onClose: (() => void) | null = null
@@ -158,34 +154,6 @@
               color="var(--spectrum-global-color-gray-900)">Form</Body
             >
             <Body size="S">Capture data from your users</Body>
-          </div>
-        </div>
-
-        <div
-          class="card"
-          class:disabled={!$licensing.pdfEnabled}
-          on:click={$licensing.pdfEnabled
-            ? () => onSelect(AutoScreenTypes.PDF)
-            : null}
-          class:selected={selectedType === AutoScreenTypes.PDF}
-        >
-          <div class="image">
-            <img alt="A PDF document" src={pdf} width="185" />
-          </div>
-          <div class="text">
-            <Body
-              size="M"
-              weight="500"
-              color="var(--spectrum-global-color-gray-900)"
-            >
-              PDF
-              {#if !$licensing.pdfEnabled}
-                <Tags>
-                  <Tag icon="lock" emphasized>Premium</Tag>
-                </Tags>
-              {/if}
-            </Body>
-            <Body size="S">Create, edit and export your PDF</Body>
           </div>
         </div>
       </div>

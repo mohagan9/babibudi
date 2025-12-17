@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Modal } from "@budibase/bbui"
   import DeleteModal from "@/components/deploy/DeleteModal.svelte"
-  import { licensing } from "@/stores/portal"
   import DuplicateAppModal from "./DuplicateAppModal.svelte"
   import ExportAppModal from "./ExportAppModal.svelte"
   import type { EnrichedApp } from "@/types"
@@ -33,25 +32,12 @@
   }
 </script>
 
-<DeleteModal
-  bind:this={deleteModal}
-  appId={app?.devId}
-  appName={app?.name}
-  onDeleteSuccess={async () => {
-    await licensing.init()
-  }}
-/>
+<DeleteModal bind:this={deleteModal} appId={app?.devId} appName={app?.name} />
 
 <Modal bind:this={exportModal}>
   <ExportAppModal appId={app.devId || ""} published={exportPublishedVersion} />
 </Modal>
 
 <Modal bind:this={duplicateModal}>
-  <DuplicateAppModal
-    appId={app.devId || ""}
-    appName={app?.name}
-    onDuplicateSuccess={async () => {
-      await licensing.init()
-    }}
-  />
+  <DuplicateAppModal appId={app.devId || ""} appName={app?.name} />
 </Modal>
