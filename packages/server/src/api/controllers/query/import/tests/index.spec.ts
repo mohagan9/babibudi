@@ -1,4 +1,3 @@
-import { events } from "@budibase/backend-core"
 import { BodyType, Datasource, SourceName } from "@budibase/types"
 import fs from "fs"
 import path from "path"
@@ -156,12 +155,6 @@ describe("Rest Importer", () => {
     )
     expect(importResult.errorQueries.length).toBe(0)
     expect(importResult.queries.length).toBe(assertions[key].count)
-    expect(events.query.imported).toHaveBeenCalledTimes(1)
-    expect(events.query.imported).toHaveBeenCalledWith(
-      datasource,
-      assertions[key].source,
-      assertions[key].count
-    )
     jest.clearAllMocks()
   }
 
@@ -298,12 +291,6 @@ describe("Rest Importer", () => {
     expect(importResult.errorQueries.length).toBe(0)
     expect(importResult.queries.length).toBe(1)
     expect(importResult.queries[0].name).toBe(endpoint.name)
-    expect(events.query.imported).toHaveBeenCalledTimes(1)
-    expect(events.query.imported).toHaveBeenCalledWith(
-      datasource,
-      restImporter.source.getImportSource(),
-      1
-    )
     jest.clearAllMocks()
   })
 
@@ -358,12 +345,6 @@ describe("Rest Importer", () => {
     expect(importResult.errorQueries.length).toBe(0)
     expect(importResult.queries.length).toBe(1)
     expect(importResult.queries[0].queryVerb).toBe("read")
-    expect(events.query.imported).toHaveBeenCalledTimes(1)
-    expect(events.query.imported).toHaveBeenCalledWith(
-      datasource,
-      "openapi2.0",
-      1
-    )
     jest.clearAllMocks()
   })
 

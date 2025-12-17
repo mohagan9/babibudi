@@ -1,6 +1,5 @@
 import { breakExternalTableId } from "../../../integrations/utils"
 import { handleRequest } from "../row/external"
-import { events } from "@budibase/backend-core"
 import { isRows, isSchema, parse } from "../../../utilities/schema"
 import {
   BulkImportRequest,
@@ -119,6 +118,5 @@ export async function bulkImport(
   await handleRequest(Operation.BULK_UPSERT, table, {
     rows: parsedRows,
   })
-  await events.rows.imported(table, parsedRows.length)
   return table
 }

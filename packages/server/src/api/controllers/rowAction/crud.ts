@@ -1,4 +1,3 @@
-import { events } from "@budibase/backend-core"
 import {
   CreateRowActionRequest,
   Ctx,
@@ -59,8 +58,6 @@ export async function create(
   const createdAction = await sdk.rowActions.create(tableId, {
     name: ctx.request.body.name,
   })
-
-  await events.rowAction.created(createdAction)
 
   ctx.body = {
     tableId,

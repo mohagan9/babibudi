@@ -1,4 +1,4 @@
-import { events, roles } from "@budibase/backend-core"
+import { roles } from "@budibase/backend-core"
 import { structures } from "@budibase/backend-core/tests"
 import {
   BuiltinPermissionID,
@@ -162,7 +162,6 @@ describe("/screens", () => {
 
       expect(responseScreen._rev).toBeDefined()
       expect(responseScreen.name).toEqual(screen.name)
-      expect(events.screen.created).toHaveBeenCalledTimes(1)
     })
 
     it("should be able to update a screen", async () => {
@@ -177,7 +176,6 @@ describe("/screens", () => {
 
       expect(responseScreen._rev).toBeDefined()
       expect(responseScreen.name).toEqual(screen.name)
-      expect(events.screen.created).not.toHaveBeenCalled()
     })
 
     it("should apply authorization to endpoint", async () => {
@@ -208,7 +206,6 @@ describe("/screens", () => {
         screen._rev!
       )
       expect(response.message).toBeDefined()
-      expect(events.screen.deleted).toHaveBeenCalledTimes(1)
     })
 
     it("should apply authorization to endpoint", async () => {

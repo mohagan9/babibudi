@@ -4,7 +4,6 @@ import {
   EventPublishType,
   PostEventPublishResponse,
 } from "@budibase/types"
-import { events } from "@budibase/backend-core"
 
 export async function publish(
   ctx: UserCtx<PostEventPublishRequest, PostEventPublishResponse>

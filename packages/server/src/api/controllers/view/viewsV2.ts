@@ -17,7 +17,6 @@ import {
   CreateViewResponse,
   UpdateViewResponse,
 } from "@budibase/types"
-import { events } from "@budibase/backend-core"
 import { builderSocket, gridSocket } from "../../../websockets"
 import { helpers } from "@budibase/shared-core"
 
@@ -163,8 +162,6 @@ export async function create(ctx: Ctx<CreateViewRequest, CreateViewResponse>) {
   }
   const result = await sdk.views.create(tableId, parsedView)
 
-  await events.view.created(result)
-
   ctx.status = 201
   ctx.body = {
     data: result,
@@ -173,46 +170,6 @@ export async function create(ctx: Ctx<CreateViewRequest, CreateViewResponse>) {
   const table = await sdk.tables.getTable(tableId)
   builderSocket?.emitTableUpdate(ctx, table)
   gridSocket?.emitViewUpdate(ctx, result)
-}
-
-async function handleViewFilterEvents(existingView: ViewV2, view: ViewV2) {
-  const filterGroups = view.queryUI?.groups?.length || 0
-  const properties = { filterGroups, tableId: view.tableId }
-  if (
-    filterGroups >= 2 &&
-    filterGroups > (existingView?.queryUI?.groups?.length || 0)
-  ) {
-    await events.view.filterUpdated(properties)
-  }
-}
-
-async function handleViewEvents(existingView: ViewV2, view: ViewV2) {
-  // Grouped filters
-  if (view.queryUI?.groups) {
-    await handleViewFilterEvents(existingView, view)
-  }
-
-  // if new columns in the view
-  for (const key in view.schema) {
-    if ("calculationType" in view.schema[key] && !existingView?.schema?.[key]) {
-      await events.view.calculationCreated({
-        calculationType: view.schema[key].calculationType,
-        tableId: view.tableId,
-      })
-    }
-
-    // view joins
-    for (const column in view.schema[key]?.columns ?? []) {
-      // if the new column is visible and it wasn't before
-      if (
-        !existingView?.schema?.[key].columns?.[column].visible &&
-        view.schema?.[key].columns?.[column].visible
-      ) {
-        // new view join exposing a column
-        await events.view.viewJoinCreated({ tableId: view.tableId })
-      }
-    }
-  }
 }
 
 export async function update(ctx: Ctx<UpdateViewRequest, UpdateViewResponse>) {
@@ -248,9 +205,6 @@ export async function update(ctx: Ctx<UpdateViewRequest, UpdateViewResponse>) {
     parsedView
   )
 
-  await handleViewEvents(existingView, result)
-  await events.view.updated(result)
-
   ctx.body = { data: result }
 
   const table = await sdk.tables.getTable(tableId)
@@ -267,6 +221,4 @@ export async function remove(ctx: Ctx<void, void>) {
   const table = await sdk.tables.getTable(view.tableId)
   builderSocket?.emitTableUpdate(ctx, table)
   gridSocket?.emitViewDeletion(ctx, view)
-
-  await events.view.deleted(view, ctx.appId)
 }

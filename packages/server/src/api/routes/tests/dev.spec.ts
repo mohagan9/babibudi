@@ -1,4 +1,3 @@
-import { events } from "@budibase/backend-core"
 import * as setup from "./utilities"
 
 describe("/dev", () => {
@@ -19,7 +18,6 @@ describe("/dev", () => {
         .set(config.defaultHeaders())
         .expect("Content-Type", /json/)
         .expect(200)
-      expect(events.app.reverted).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -32,10 +30,6 @@ describe("/dev", () => {
         .expect(200)
 
       expect(res.body.version).toBe("0.0.0+jest")
-      expect(events.installation.versionChecked).toHaveBeenCalledTimes(1)
-      expect(events.installation.versionChecked).toHaveBeenCalledWith(
-        "0.0.0+jest"
-      )
     })
   })
 })

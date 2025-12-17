@@ -9,7 +9,7 @@ import {
 } from "../../../../tests"
 
 const sendMailMock = mocks.email.mock()
-import { events, constants } from "@budibase/backend-core"
+import { constants } from "@budibase/backend-core"
 import { Response } from "superagent"
 
 import * as userSdk from "../../../../sdk/users"
@@ -64,7 +64,6 @@ describe("/api/global/auth", () => {
         const response = await config.api.auth.login(tenantId, email, password)
 
         expectSetAuthCookie(response)
-        expect(events.auth.login).toHaveBeenCalledTimes(1)
       })
 
       it("should return 403 with incorrect credentials", async () => {
@@ -198,7 +197,6 @@ describe("/api/global/auth", () => {
     describe("POST /api/global/auth/logout", () => {
       it("should logout", async () => {
         const response = await config.api.auth.logout()
-        expect(events.auth.logout).toHaveBeenCalledTimes(1)
 
         const authCookie = getAuthCookie(response)
         expect(authCookie).toBe("")
@@ -219,8 +217,6 @@ describe("/api/global/auth", () => {
         })
         expect(sendMailMock).toHaveBeenCalled()
         expect(code).toBeDefined()
-        expect(events.user.passwordResetRequested).toHaveBeenCalledTimes(1)
-        expect(events.user.passwordResetRequested).toHaveBeenCalledWith(user)
       })
 
       describe("sso user", () => {
@@ -267,8 +263,6 @@ describe("/api/global/auth", () => {
         delete user.password
 
         expect(res.body).toEqual({ message: "password reset successfully." })
-        expect(events.user.passwordReset).toHaveBeenCalledTimes(1)
-        expect(events.user.passwordReset).toHaveBeenCalledWith(user)
 
         // login using new password
         await config.api.auth.login(user.tenantId, user.email, newPassword)
@@ -411,8 +405,6 @@ describe("/api/global/auth", () => {
           )
         }
 
-        expect(events.auth.login).toHaveBeenCalledWith("oidc", email)
-        expect(events.auth.login).toHaveBeenCalledTimes(1)
         expect(res.status).toBe(302)
         const location = res.get("location")
         expect(location).toBe("/")

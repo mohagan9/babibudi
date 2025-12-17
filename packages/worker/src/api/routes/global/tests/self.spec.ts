@@ -1,6 +1,5 @@
 jest.mock("nodemailer")
 import { TestConfiguration } from "../../../../tests"
-import { events } from "@budibase/backend-core"
 
 describe("/api/global/self", () => {
   const config = new TestConfiguration()
@@ -40,10 +39,6 @@ describe("/api/global/self", () => {
 
       user._rev = dbUser._rev
       expect(res.body._id).toBe(user._id)
-      expect(events.user.updated).toHaveBeenCalledTimes(1)
-      expect(events.user.updated).toHaveBeenCalledWith(dbUser)
-      expect(events.user.passwordUpdated).toHaveBeenCalledTimes(1)
-      expect(events.user.passwordUpdated).toHaveBeenCalledWith(dbUser)
     })
   })
 

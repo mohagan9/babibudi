@@ -1,7 +1,6 @@
 import { checkBuilderEndpoint } from "./utilities/TestFunctions"
 import * as setup from "./utilities"
 const { basicLayout } = setup.structures
-import { events } from "@budibase/backend-core"
 import { Layout } from "@budibase/types"
 
 describe("/layouts", () => {
@@ -26,7 +25,6 @@ describe("/layouts", () => {
         .expect("Content-Type", /json/)
         .expect(200)
       expect(res.body._rev).toBeDefined()
-      expect(events.layout.created).toHaveBeenCalledTimes(1)
     })
 
     it("should apply authorization to endpoint", async () => {
@@ -46,7 +44,6 @@ describe("/layouts", () => {
         .expect("Content-Type", /json/)
         .expect(200)
       expect(res.body.message).toBeDefined()
-      expect(events.layout.deleted).toHaveBeenCalledTimes(1)
     })
 
     it("should apply authorization to endpoint", async () => {

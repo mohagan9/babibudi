@@ -1,7 +1,6 @@
 import { Table, WithoutDocMetadata } from "@budibase/types"
 import { create } from "./create"
 import { getAllInternalTables } from "./getters"
-import { events } from "@budibase/backend-core"
 import { helpers } from "@budibase/shared-core"
 
 /**
@@ -29,7 +28,6 @@ export async function duplicate(table: Table, userId?: string): Promise<Table> {
   }
 
   const duplicatedTable = await create(tableToCreate, undefined, userId)
-  await events.table.created(duplicatedTable)
 
   return duplicatedTable
 }

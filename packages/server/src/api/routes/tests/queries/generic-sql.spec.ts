@@ -1,4 +1,3 @@
-import { events } from "@budibase/backend-core"
 import { generator } from "@budibase/backend-core/tests"
 import { Datasource, Query, QueryPreview } from "@budibase/types"
 import { Knex } from "knex"
@@ -103,9 +102,6 @@ if (descriptions.length) {
               createdAt: expect.any(String),
               updatedAt: expect.any(String),
             })
-
-            expect(events.query.created).toHaveBeenCalledTimes(1)
-            expect(events.query.updated).not.toHaveBeenCalled()
           })
         })
 
@@ -139,9 +135,6 @@ if (descriptions.length) {
               transformer: "return data",
               readable: true,
             })
-
-            expect(events.query.created).not.toHaveBeenCalled()
-            expect(events.query.updated).toHaveBeenCalledTimes(1)
           })
         })
 
@@ -158,13 +151,6 @@ if (descriptions.length) {
 
             const queries = await config.api.query.fetch()
             expect(queries).not.toContainEqual(query)
-
-            expect(events.query.deleted).toHaveBeenCalledTimes(1)
-            expect(events.query.deleted).toHaveBeenCalledWith(
-              datasource,
-              query,
-              config.devWorkspaceId
-            )
           })
         })
 
@@ -296,7 +282,6 @@ if (descriptions.length) {
               number: null,
             },
           ])
-          expect(events.query.previewed).toHaveBeenCalledTimes(1)
         })
 
         it("should update schema when column type changes from number to string", async () => {

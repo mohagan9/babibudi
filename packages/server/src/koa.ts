@@ -5,7 +5,7 @@ import http from "http"
 import * as api from "./api"
 import { Thread } from "./threads"
 import * as redis from "./utilities/redis"
-import { events, logging, middleware, timers } from "@budibase/backend-core"
+import { logging, middleware, timers } from "@budibase/backend-core"
 import { userAgent } from "koa-useragent"
 import gracefulShutdown from "http-graceful-shutdown"
 
@@ -49,7 +49,6 @@ export default function createKoaApp() {
     console.log("Server shutting down gracefully...")
     timers.cleanup()
     await redis.shutdown()
-    events.shutdown()
     await Thread.shutdown()
     api.shutdown()
   }
