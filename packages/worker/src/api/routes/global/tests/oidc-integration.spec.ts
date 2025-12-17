@@ -2,17 +2,12 @@ import { TestConfiguration } from "../../../../tests"
 import {
   getOIDCConfigs,
   waitForDex,
-  generateCodeVerifier,
-  generateCodeChallenge,
   buildAuthorizationUrl,
-  exchangeCodeForTokens,
 } from "../../../../tests/utils/oidc"
-import { ConfigType, OIDCInnerConfig, PKCEMethod } from "@budibase/types"
+import { ConfigType, OIDCInnerConfig } from "@budibase/types"
 import { middleware } from "@budibase/backend-core"
 import fetch from "node-fetch"
 import { generator, mocks } from "@budibase/backend-core/tests"
-
-mocks.licenses.usePkceOidc()
 
 // Set longer timeout for container startup
 jest.setTimeout(120000)
@@ -79,8 +74,6 @@ describe("OIDC Integration Tests", () => {
 
       const state = generator.guid()
       const nonce = generator.guid()
-      const codeVerifier = generateCodeVerifier()
-      const codeChallenge = generateCodeChallenge(codeVerifier, PKCEMethod.S256)
 
       const authUrl = buildAuthorizationUrl({
         authorizationUrl: strategyConfig.authorizationURL,
@@ -88,10 +81,6 @@ describe("OIDC Integration Tests", () => {
         redirectUri: callbackUrl,
         state,
         nonce,
-        pkce: {
-          codeChallenge,
-          codeChallengeMethod: PKCEMethod.S256,
-        },
       })
 
       expect(authUrl).toContain(strategyConfig.authorizationURL)
@@ -103,9 +92,6 @@ describe("OIDC Integration Tests", () => {
       expect(authUrl).toContain(`nonce=${nonce}`)
       expect(authUrl).toContain("response_type=code")
       expect(authUrl).toContain("scope=openid+profile+email")
-      expect(authUrl).toContain(
-        `code_challenge=${encodeURIComponent(codeChallenge)}`
-      )
       expect(authUrl).toContain("code_challenge_method=S256")
     })
 
@@ -132,103 +118,6 @@ describe("OIDC Integration Tests", () => {
     })
   })
 
-  describe("PKCE Authentication Tests", () => {
-    afterEach(async () => {
-      await config.deleteConfig(ConfigType.OIDC)
-    })
-
-    it("should generate valid PKCE code verifier", () => {
-      const verifier = generateCodeVerifier()
-
-      expect(verifier).toBeDefined()
-      expect(typeof verifier).toBe("string")
-      expect(verifier.length).toBeGreaterThan(40)
-      expect(verifier).toMatch(/^[A-Za-z0-9\-._~]+$/)
-
-      // Should generate different verifiers each time
-      const verifier2 = generateCodeVerifier()
-      expect(verifier).not.toBe(verifier2)
-    })
-
-    it("should generate valid PKCE code challenge for S256 method", () => {
-      const verifier = generateCodeVerifier()
-      const challenge = generateCodeChallenge(verifier, PKCEMethod.S256)
-
-      expect(challenge).toBeDefined()
-      expect(typeof challenge).toBe("string")
-      expect(challenge).not.toBe(verifier)
-      expect(challenge.length).toBe(43) // Base64url encoded SHA256 hash length
-      expect(challenge).toMatch(/^[A-Za-z0-9\-_]+$/)
-    })
-
-    it("should generate valid PKCE code challenge for PLAIN method", () => {
-      const verifier = generateCodeVerifier()
-      const challenge = generateCodeChallenge(verifier, PKCEMethod.PLAIN)
-
-      expect(challenge).toBeDefined()
-      expect(challenge).toBe(verifier) // PLAIN method returns verifier as-is
-    })
-
-    it("should reject invalid PKCE method", () => {
-      const verifier = generateCodeVerifier()
-
-      expect(() => {
-        generateCodeChallenge(verifier, "INVALID" as PKCEMethod)
-      }).toThrow("Unsupported PKCE method: INVALID")
-    })
-
-    it("should handle token exchange without PKCE", async () => {
-      const callbackUrl = "http://localhost:4001/api/global/auth/oidc/callback"
-      const strategyConfig = await middleware.oidc.fetchStrategyConfig(
-        oidcConfigs.noPkce,
-        callbackUrl
-      )
-
-      // Mock token exchange (since we can't easily get a real auth code in tests)
-      const mockCode = "mock-authorization-code"
-
-      try {
-        await exchangeCodeForTokens(
-          strategyConfig.tokenURL,
-          strategyConfig.clientID,
-          strategyConfig.clientSecret,
-          mockCode,
-          callbackUrl
-        )
-      } catch (error: any) {
-        // Expect this to fail with mock code, but validate the request structure
-        expect(error.message).toContain("Token exchange failed")
-        expect(error.message).toContain("400") // Bad Request for invalid code
-      }
-    })
-
-    it("should handle token exchange with PKCE", async () => {
-      const callbackUrl = "http://localhost:4001/api/global/auth/oidc/callback"
-      const strategyConfig = await middleware.oidc.fetchStrategyConfig(
-        oidcConfigs.withPkce,
-        callbackUrl
-      )
-
-      const codeVerifier = generateCodeVerifier()
-      const mockCode = "mock-authorization-code"
-
-      try {
-        await exchangeCodeForTokens(
-          strategyConfig.tokenURL,
-          strategyConfig.clientID,
-          strategyConfig.clientSecret,
-          mockCode,
-          callbackUrl,
-          codeVerifier
-        )
-      } catch (error: any) {
-        // Expect this to fail with mock code, but validate the request structure
-        expect(error.message).toContain("Token exchange failed")
-        expect(error.message).toContain("400") // Bad Request for invalid code
-      }
-    })
-  })
-
   describe("Token Validation Tests", () => {
     afterEach(async () => {
       await config.deleteConfig(ConfigType.OIDC)
@@ -247,7 +136,6 @@ describe("OIDC Integration Tests", () => {
       expect(strategyConfigNoPkce.userInfoURL).toBeDefined()
       expect(strategyConfigNoPkce.clientID).toBe("budibase-no-pkce")
       expect(strategyConfigNoPkce.clientSecret).toBe("test-secret-no-pkce")
-      expect(strategyConfigNoPkce.pkce).toBeUndefined()
 
       // Test with PKCE
       const strategyConfigWithPkce = await middleware.oidc.fetchStrategyConfig(
@@ -259,7 +147,6 @@ describe("OIDC Integration Tests", () => {
       expect(strategyConfigWithPkce.userInfoURL).toBeDefined()
       expect(strategyConfigWithPkce.clientID).toBe("budibase-pkce")
       expect(strategyConfigWithPkce.clientSecret).toBe("test-secret-pkce")
-      expect(strategyConfigWithPkce.pkce).toBe(PKCEMethod.S256)
     })
 
     it("should validate OIDC endpoints are accessible", async () => {

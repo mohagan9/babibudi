@@ -9,7 +9,7 @@ import {
   EmailTemplatePurpose,
   User,
 } from "@budibase/types"
-import { configs, cache, objectStore, HTTPError } from "@budibase/backend-core"
+import { configs, cache, HTTPError } from "@budibase/backend-core"
 import ical from "ical-generator"
 import _ from "lodash"
 import { marked } from "marked"
@@ -141,7 +141,7 @@ export async function sendEmail(
   purpose: EmailTemplatePurpose,
   opts: SendEmailOpts
 ) {
-  const config = await configs.getSMTPConfig(opts?.automation)
+  const config = await configs.getSMTPConfig()
   if (!config && !TEST_MODE) {
     throw "Unable to find SMTP configuration."
   }
@@ -167,15 +167,6 @@ export async function sendEmail(
       user: opts?.user,
       contents: opts?.contents,
     }),
-  }
-  if (opts?.attachments) {
-    let attachments = await Promise.all(
-      opts.attachments?.map(objectStore.processAutomationAttachment)
-    )
-    attachments = attachments.map(attachment => {
-      return _.omit(attachment, "path")
-    })
-    message = { ...message, attachments }
   }
 
   message = {

@@ -64,8 +64,8 @@ export class UserAPI extends TestAPI {
 
   // BULK
 
-  bulkCreateUsers = async (users: User[], groups: any[] = []) => {
-    const body: BulkUserRequest = { create: { users, groups } }
+  bulkCreateUsers = async (users: User[]) => {
+    const body: BulkUserRequest = { create: { users } }
     const res = await this.request
       .post(`/api/global/users/bulk`)
       .send(body)

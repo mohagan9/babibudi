@@ -1,6 +1,6 @@
 import { GenericContainer, Wait } from "testcontainers"
 import { testContainerUtils } from "@budibase/backend-core/tests"
-import { OIDCInnerConfig, PKCEMethod } from "@budibase/types"
+import { OIDCInnerConfig } from "@budibase/types"
 import { generator } from "@budibase/backend-core/tests"
 import fetch from "node-fetch"
 import * as crypto from "crypto"
@@ -92,7 +92,6 @@ export function getOIDCConfigs(port: number): OIDCTestConfig {
     uuid: generator.guid(),
     activated: true,
     scopes: ["openid", "profile", "email"],
-    pkce: PKCEMethod.S256,
   }
 
   return {
@@ -121,18 +120,6 @@ export function generateCodeVerifier(): string {
   return crypto.randomBytes(32).toString("base64url")
 }
 
-export function generateCodeChallenge(
-  verifier: string,
-  method: PKCEMethod
-): string {
-  if (method === PKCEMethod.PLAIN) {
-    return verifier
-  } else if (method === PKCEMethod.S256) {
-    return crypto.createHash("sha256").update(verifier).digest("base64url")
-  }
-  throw new Error(`Unsupported PKCE method: ${method}`)
-}
-
 // OIDC Authentication Helper Functions
 export interface AuthorizationUrlParams {
   authorizationUrl: string
@@ -141,10 +128,6 @@ export interface AuthorizationUrlParams {
   state: string
   nonce: string
   scopes?: string[]
-  pkce?: {
-    codeChallenge: string
-    codeChallengeMethod: PKCEMethod
-  }
 }
 
 export function buildAuthorizationUrl(params: AuthorizationUrlParams): string {
@@ -158,14 +141,6 @@ export function buildAuthorizationUrl(params: AuthorizationUrlParams): string {
     "scope",
     (params.scopes || ["openid", "profile", "email"]).join(" ")
   )
-
-  if (params.pkce) {
-    url.searchParams.set("code_challenge", params.pkce.codeChallenge)
-    url.searchParams.set(
-      "code_challenge_method",
-      params.pkce.codeChallengeMethod
-    )
-  }
 
   return url.toString()
 }

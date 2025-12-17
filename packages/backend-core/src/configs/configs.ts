@@ -222,20 +222,14 @@ export async function getSMTPConfigDoc(): Promise<SMTPConfig | undefined> {
   return getConfig<SMTPConfig>(ConfigType.SMTP)
 }
 
-export async function getSMTPConfig(
-  isAutomation?: boolean
-): Promise<SMTPInnerConfig | undefined> {
+export async function getSMTPConfig(): Promise<SMTPInnerConfig | undefined> {
   const config = await getSMTPConfigDoc()
   if (config) {
     return config.config
   }
 
-  // always allow fallback in self host
-  // in cloud don't allow for automations
-  const allowFallback = env.SELF_HOSTED || !isAutomation
-
   // Use an SMTP fallback configuration from env variables
-  if (env.SMTP_FALLBACK_ENABLED && allowFallback) {
+  if (env.SMTP_FALLBACK_ENABLED) {
     return {
       port: env.SMTP_PORT,
       host: env.SMTP_HOST!,

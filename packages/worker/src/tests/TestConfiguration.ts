@@ -1,11 +1,3 @@
-import mocks from "./mocks"
-
-// init the licensing mock
-mocks.licenses.init(mocks.pro)
-
-// use unlimited license by default
-mocks.licenses.useUnlimited()
-
 import * as dbConfig from "../db"
 import env from "../environment"
 import * as controllers from "./controllers"

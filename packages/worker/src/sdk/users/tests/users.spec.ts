@@ -50,7 +50,6 @@ describe("users", () => {
       it("returns true for all users when sso is enforced", async () => {
         await context.doInTenant(structures.tenant.id(), async () => {
           const user = structures.users.user()
-          mocks.pro.features.isSSOEnforced.mockResolvedValueOnce(true)
           const result = await userDb.isPreventPasswordActions(user)
           expect(result).toBe(true)
         })
