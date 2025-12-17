@@ -1,7 +1,6 @@
 import { AppEndpoints } from "./app"
 import { AttachmentEndpoints } from "./attachments"
 import { AuthEndpoints } from "./auth"
-import { AutomationEndpoints } from "./automations"
 import { BackupEndpoints } from "./backups"
 import { ConfigEndpoints } from "./configs"
 import { DatasourceEndpoints } from "./datasources"
@@ -106,7 +105,6 @@ export type APIClient = BaseAPIClient &
   AppEndpoints &
   AttachmentEndpoints &
   AuthEndpoints &
-  AutomationEndpoints &
   BackupEndpoints &
   ConfigEndpoints &
   DatasourceEndpoints &

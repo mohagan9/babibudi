@@ -9,7 +9,6 @@ import { appStore } from "./app"
 import { processStringSync } from "@budibase/string-templates"
 import { selectedAppUrls } from "./appUrls"
 import { workspaceDeploymentStore } from "@/stores/builder/workspaceDeployment"
-import { automationStore } from "./automations"
 import { workspaceAppStore } from "./workspaceApps"
 
 interface DeploymentState {
@@ -114,7 +113,6 @@ class DeploymentStore extends DerivedBudiStore<
         workspaceDeploymentStore.fetch(),
         workspaceAppStore.refresh(),
         appsStore.load(),
-        automationStore.actions.fetch(),
       ])
       await this.load()
     } catch (err) {
@@ -132,7 +130,6 @@ class DeploymentStore extends DerivedBudiStore<
         workspaceDeploymentStore.fetch(),
         workspaceAppStore.refresh(),
         appsStore.load(),
-        automationStore.actions.fetch(),
       ])
       notifications.send("App unpublished", {
         type: "success",

@@ -14,7 +14,6 @@ import { ApiVersion } from "../constants"
 import { buildAppEndpoints } from "./app"
 import { buildAttachmentEndpoints } from "./attachments"
 import { buildAuthEndpoints } from "./auth"
-import { buildAutomationEndpoints } from "./automations"
 import { buildConfigEndpoints } from "./configs"
 import { buildDatasourceEndpoints } from "./datasources"
 import { buildFlagEndpoints } from "./flags"
@@ -275,7 +274,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildAppEndpoints(API),
     ...buildAttachmentEndpoints(API),
     ...buildAuthEndpoints(API),
-    ...buildAutomationEndpoints(API),
     ...buildConfigEndpoints(API),
     ...buildDatasourceEndpoints(API),
     ...buildFlagEndpoints(API),

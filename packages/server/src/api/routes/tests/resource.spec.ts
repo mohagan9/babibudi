@@ -3,7 +3,6 @@ import { generator } from "@budibase/backend-core/tests"
 import { Header } from "@budibase/shared-core"
 import {
   AnyDocument,
-  Automation,
   Datasource,
   FieldType,
   Query,
@@ -18,7 +17,6 @@ import fs from "fs"
 import os from "os"
 import path from "path"
 import tk from "timekeeper"
-import { createAutomationBuilder } from "../../../automations/tests/utilities/AutomationTestBuilder"
 import { generateRowActionsID } from "../../../db/utils"
 import {
   basicQuery,
@@ -113,70 +111,6 @@ describe("/api/resources/usage", () => {
       })
     })
 
-    it("should check automations for datasource usage", async () => {
-      const table = await config.api.table.save(basicTable())
-      // Create an automation using the builder
-      const { automation } = await createAutomationBuilder(config)
-        .onRowSaved({ tableId: table._id! })
-        .save()
-
-      const result = await config.api.resource.getResourceDependencies()
-
-      expect(result.body.resources[automation._id!]).toEqual({
-        dependencies: [
-          {
-            id: table._id,
-            name: table.name,
-            type: ResourceType.TABLE,
-          },
-          {
-            id: automation._id,
-            name: automation.name,
-            type: ResourceType.AUTOMATION,
-          },
-        ],
-      })
-    })
-
-    it("should include row actions and their automations when referenced by an automation", async () => {
-      const table = await config.api.table.save(basicTable())
-      const rowAction = await config.api.rowAction.save(table._id!, {
-        name: "Row action usage",
-      })
-
-      const result = await config.api.resource.getResourceDependencies()
-
-      expect(result.body.resources[rowAction.automationId]).toEqual({
-        dependencies: [
-          {
-            id: table._id,
-            name: table.name,
-            type: ResourceType.TABLE,
-          },
-          {
-            id: generateRowActionsID(table._id!),
-            name: rowAction.name,
-            type: ResourceType.ROW_ACTION,
-          },
-          {
-            id: rowAction.automationId,
-            name: "Row action usage",
-            type: ResourceType.AUTOMATION,
-          },
-        ],
-      })
-
-      expect(result.body.resources[generateRowActionsID(table._id!)]).toEqual({
-        dependencies: [
-          {
-            id: rowAction.automationId,
-            name: rowAction.name,
-            type: ResourceType.AUTOMATION,
-          },
-        ],
-      })
-    })
-
     it("should not detect datasource when for internal tables", async () => {
       const table = await config.api.table.save(basicTable())
 
@@ -191,50 +125,6 @@ describe("/api/resources/usage", () => {
           },
         ],
       })
-    })
-
-    it("should include row actions and their automations when checking a table", async () => {
-      const table = await config.api.table.save(basicTable())
-      const anotherTable = await config.api.table.save(basicTable())
-      const rowAction = await config.api.rowAction.save(table._id!, {
-        name: "Table row action",
-      })
-      const rowAction2 = await config.api.rowAction.save(table._id!, {
-        name: "Table row action 2",
-      })
-      const _anotherRowAction = await config.api.rowAction.save(
-        anotherTable._id!,
-        {
-          name: "Table row action 3",
-        }
-      )
-
-      const result = await config.api.resource.getResourceDependencies()
-      const tableDependencies =
-        result.body.resources[table._id!].dependencies ?? []
-
-      expect(tableDependencies).toEqual([
-        {
-          id: table._id,
-          name: table.name,
-          type: ResourceType.TABLE,
-        },
-        {
-          id: generateRowActionsID(table._id!),
-          name: rowAction.name,
-          type: ResourceType.ROW_ACTION,
-        },
-        {
-          id: rowAction.automationId,
-          name: rowAction.name,
-          type: ResourceType.AUTOMATION,
-        },
-        {
-          id: rowAction2.automationId,
-          name: rowAction2.name,
-          type: ResourceType.AUTOMATION,
-        },
-      ])
     })
 
     it("should detect datasource when for rest queries", async () => {
@@ -373,7 +263,6 @@ describe("/api/resources/usage", () => {
         tables?: Table[]
         datasource?: Datasource[]
         queries?: Query[]
-        automations?: Automation[]
         rowActions?: { tableId: string; actions: RowActionResponse[] }[]
       }
     ) => {
@@ -423,28 +312,6 @@ describe("/api/resources/usage", () => {
         const queries = await config.api.query.fetch()
         expect(queries.sort()).toEqual(
           (expected.queries || []).map(copiedMetadata).sort()
-        )
-
-        const { automations } = await config.api.automation.fetch()
-        expect(automations.sort(sortById)).toEqual(
-          (expected.automations || [])
-            // Automation sdk trims fields such as fromWorkspace
-            .map(a => copiedMetadata({ ...a, fromWorkspace: undefined }))
-            .sort(sortById)
-        )
-
-        const workspaceDb = db.getDB(db.getDevWorkspaceID(workspaceId), {
-          skip_setup: true,
-        })
-        expect(
-          await workspaceDb.getMultiple(automations.map(a => a._id!))
-        ).toEqual(
-          automations.map(a =>
-            expect.objectContaining({
-              _id: a._id,
-              fromWorkspace: config.getDevWorkspaceId(),
-            })
-          )
         )
 
         for (const rowActionExpectation of expected.rowActions || []) {
@@ -702,9 +569,6 @@ describe("/api/resources/usage", () => {
         apps: [app.app],
         screens: app.screens,
         tables: [table],
-        automations: [
-          { ...rowActionAutomation, appId: newWorkspace.appId, disabled: true },
-        ],
         rowActions: [
           {
             tableId: table._id!,
@@ -986,27 +850,6 @@ describe("/api/resources/usage", () => {
         },
         status: 400,
         stack: expect.anything(),
-      })
-    })
-
-    it("disables duplicated automations in the destination workspace", async () => {
-      const newWorkspace = await config.api.workspace.create({
-        name: `Destination ${generator.natural()}`,
-      })
-
-      const { automation } = await createAutomationBuilder(config)
-        .onCron({ cron: "* * * * *" })
-        .save({ disabled: false })
-
-      expect(automation.disabled).toBe(false)
-
-      const resourcesToCopy = await collectDependantResourceIds(automation._id!)
-      await duplicateResources(resourcesToCopy, newWorkspace.appId)
-
-      await validateWorkspace(newWorkspace.appId, {
-        automations: [
-          { ...automation, disabled: true, appId: newWorkspace.appId },
-        ],
       })
     })
 

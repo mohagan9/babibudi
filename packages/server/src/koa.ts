@@ -3,7 +3,6 @@ import Koa from "koa"
 import koaBody from "koa-body"
 import http from "http"
 import * as api from "./api"
-import * as automations from "./automations"
 import { Thread } from "./threads"
 import * as redis from "./utilities/redis"
 import { events, logging, middleware, timers } from "@budibase/backend-core"
@@ -49,7 +48,6 @@ export default function createKoaApp() {
   const shutdown = async () => {
     console.log("Server shutting down gracefully...")
     timers.cleanup()
-    await automations.shutdown()
     await redis.shutdown()
     events.shutdown()
     await Thread.shutdown()

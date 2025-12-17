@@ -2,21 +2,7 @@ import { roles, utils } from "@budibase/backend-core"
 import { BASE_LAYOUT_PROP_IDS, EMPTY_LAYOUT } from "../../constants/layouts"
 import { cloneDeep } from "lodash/fp"
 import {
-  BUILTIN_ACTION_DEFINITIONS,
-  TRIGGER_DEFINITIONS,
-} from "../../automations"
-import {
-  AIOperationEnum,
   AutoFieldSubType,
-  Automation,
-  AutomationActionStepId,
-  AutomationEventType,
-  AutomationResults,
-  AutomationStatus,
-  AutomationStep,
-  AutomationStepType,
-  AutomationTrigger,
-  AutomationTriggerStepId,
   BBReferenceFieldSubType,
   CreateViewRequest,
   Datasource,
@@ -24,7 +10,6 @@ import {
   FieldType,
   INTERNAL_TABLE_SOURCE_ID,
   JsonFieldSubType,
-  LoopStepType,
   Query,
   Role,
   SourceName,
@@ -33,13 +18,9 @@ import {
   Webhook,
   WebhookActionType,
   BuiltinPermissionID,
-  DeepPartial,
-  FilterCondition,
-  AutomationTriggerResult,
   CreateEnvironmentVariableRequest,
   Screen,
 } from "@budibase/types"
-import { LoopInput } from "../../definitions/automations"
 import { merge } from "lodash"
 import { generator } from "@budibase/backend-core/tests"
 export {
@@ -167,303 +148,6 @@ function viewV2CreateRequest(tableId: string): CreateViewRequest {
 
 export const viewV2 = {
   createRequest: viewV2CreateRequest,
-}
-
-export function automationStep(
-  actionDefinition = BUILTIN_ACTION_DEFINITIONS.CREATE_ROW
-): AutomationStep {
-  return {
-    id: utils.newid(),
-    ...actionDefinition,
-    stepId: AutomationActionStepId.CREATE_ROW,
-    inputs: { row: {} },
-  }
-}
-
-export function automationTrigger(
-  triggerDefinition = TRIGGER_DEFINITIONS.ROW_SAVED
-): AutomationTrigger {
-  return {
-    id: utils.newid(),
-    ...triggerDefinition,
-  } as AutomationTrigger
-}
-
-export function newAutomation({
-  steps,
-  trigger,
-}: { steps?: AutomationStep[]; trigger?: AutomationTrigger } = {}) {
-  return basicAutomation({
-    definition: {
-      steps: steps || [automationStep()],
-      trigger: trigger || automationTrigger(),
-    },
-  })
-}
-
-export function rowActionAutomation() {
-  const automation = newAutomation({
-    trigger: {
-      ...automationTrigger(TRIGGER_DEFINITIONS.ROW_ACTION),
-    },
-  })
-  return automation
-}
-
-export function basicAutomation(opts?: DeepPartial<Automation>): Automation {
-  const baseAutomation: Automation = {
-    name: "My Automation",
-    screenId: "kasdkfldsafkl",
-    live: true,
-    uiTree: {},
-    definition: {
-      trigger: {
-        stepId: AutomationTriggerStepId.APP,
-        name: "test",
-        tagline: "test",
-        icon: "test",
-        description: "test",
-        type: AutomationStepType.TRIGGER,
-        inputs: {},
-        id: "test",
-        schema: {
-          inputs: {
-            properties: {},
-          },
-          outputs: {
-            properties: {},
-          },
-        },
-      },
-      steps: [],
-    },
-    type: "automation",
-    appId: "appId",
-  }
-  return merge(baseAutomation, opts)
-}
-
-export function loopAutomation(
-  tableId: string,
-  loopOpts?: LoopInput
-): Automation {
-  if (!loopOpts) {
-    loopOpts = {
-      option: LoopStepType.ARRAY,
-      binding: "{{ steps.1.rows }}",
-    }
-  }
-  const automation: any = {
-    name: "looping",
-    type: "automation",
-    definition: {
-      steps: [
-        {
-          id: "b",
-          type: "ACTION",
-          stepId: AutomationActionStepId.QUERY_ROWS,
-          internal: true,
-          inputs: {
-            tableId,
-          },
-          schema: BUILTIN_ACTION_DEFINITIONS.QUERY_ROWS.schema,
-        },
-        {
-          id: "c",
-          type: "ACTION",
-          stepId: AutomationActionStepId.LOOP,
-          internal: true,
-          inputs: loopOpts,
-          blockToLoop: "d",
-          schema: BUILTIN_ACTION_DEFINITIONS.LOOP.schema,
-        },
-        {
-          id: "d",
-          type: "ACTION",
-          internal: true,
-          stepId: AutomationActionStepId.SERVER_LOG,
-          inputs: {
-            text: "log statement",
-          },
-          schema: BUILTIN_ACTION_DEFINITIONS.SERVER_LOG.schema,
-        },
-      ],
-      trigger: {
-        id: "a",
-        type: "TRIGGER",
-        event: AutomationEventType.ROW_SAVE,
-        stepId: AutomationTriggerStepId.ROW_SAVED,
-        inputs: {
-          tableId,
-        },
-        schema: TRIGGER_DEFINITIONS.ROW_SAVED.schema,
-      },
-    },
-  }
-  return automation as Automation
-}
-
-export function collectAutomation(opts?: DeepPartial<Automation>): Automation {
-  const baseAutomation: Automation = {
-    appId: "appId",
-    name: "looping",
-    type: "automation",
-    definition: {
-      steps: [
-        {
-          id: "b",
-          name: "b",
-          tagline: "An automation action step",
-          icon: "Icon",
-          type: AutomationStepType.ACTION,
-          internal: true,
-          description: "Execute script",
-          stepId: AutomationActionStepId.EXECUTE_SCRIPT,
-          inputs: {
-            code: "return [1,2,3]",
-          },
-          schema: BUILTIN_ACTION_DEFINITIONS.EXECUTE_SCRIPT.schema,
-        },
-        {
-          id: "c",
-          name: "c",
-          type: AutomationStepType.ACTION,
-          tagline: "An automation action step",
-          icon: "Icon",
-          internal: true,
-          description: "Collect",
-          stepId: AutomationActionStepId.COLLECT,
-          inputs: {
-            collection: "{{ literal steps.1.value }}",
-          },
-          schema: BUILTIN_ACTION_DEFINITIONS.SERVER_LOG.schema,
-        },
-      ],
-      trigger: {
-        id: "a",
-        type: AutomationStepType.TRIGGER,
-        event: AutomationEventType.ROW_SAVE,
-        stepId: AutomationTriggerStepId.ROW_SAVED,
-        name: "trigger Step",
-        tagline: "An automation trigger",
-        description: "A trigger",
-        icon: "Icon",
-        inputs: {
-          tableId: "tableId",
-        },
-        schema: TRIGGER_DEFINITIONS.ROW_SAVED.schema,
-      },
-    },
-  }
-  return merge(baseAutomation, opts)
-}
-
-export function filterAutomation(opts?: DeepPartial<Automation>): Automation {
-  const automation: Automation = {
-    name: "looping",
-    type: "automation",
-    appId: "appId",
-    definition: {
-      steps: [
-        {
-          name: "Filter Step",
-          tagline: "An automation filter step",
-          description: "A filter automation",
-          id: "b",
-          icon: "Icon",
-          type: AutomationStepType.ACTION,
-          internal: true,
-          stepId: AutomationActionStepId.FILTER,
-          inputs: {
-            field: "name",
-            value: "test",
-            condition: FilterCondition.EQUAL,
-          },
-          schema: BUILTIN_ACTION_DEFINITIONS.EXECUTE_SCRIPT.schema,
-        },
-      ],
-      trigger: {
-        name: "trigger Step",
-        tagline: "An automation trigger",
-        description: "A trigger",
-        icon: "Icon",
-        id: "a",
-        type: AutomationStepType.TRIGGER,
-        event: AutomationEventType.ROW_SAVE,
-        stepId: AutomationTriggerStepId.ROW_SAVED,
-        inputs: {
-          tableId: "tableId",
-        },
-        schema: TRIGGER_DEFINITIONS.ROW_SAVED.schema,
-      },
-    },
-  }
-  return merge(automation, opts)
-}
-
-export function updateRowAutomationWithFilters(
-  appId: string,
-  tableId: string
-): Automation {
-  return {
-    name: "updateRowWithFilters",
-    type: "automation",
-    appId,
-    definition: {
-      steps: [
-        {
-          name: "Filter Step",
-          tagline: "An automation filter step",
-          description: "A filter automation",
-          icon: "Icon",
-          id: "b",
-          type: AutomationStepType.ACTION,
-          internal: true,
-          stepId: AutomationActionStepId.SERVER_LOG,
-          inputs: { text: "log statement" },
-          schema: BUILTIN_ACTION_DEFINITIONS.SERVER_LOG.schema,
-        },
-      ],
-      trigger: {
-        name: "trigger Step",
-        tagline: "An automation trigger",
-        description: "A trigger",
-        icon: "Icon",
-        id: "a",
-        type: AutomationStepType.TRIGGER,
-        event: AutomationEventType.ROW_UPDATE,
-        stepId: AutomationTriggerStepId.ROW_UPDATED,
-        inputs: { tableId },
-        schema: TRIGGER_DEFINITIONS.ROW_UPDATED.schema,
-      },
-    },
-  }
-}
-
-export function basicAutomationResults(
-  automationId: string
-): AutomationResults {
-  const trigger: AutomationTriggerResult = {
-    id: "trigger",
-    stepId: AutomationTriggerStepId.APP,
-    outputs: {},
-  }
-  return {
-    automationId,
-    status: AutomationStatus.SUCCESS,
-    trigger,
-    steps: [
-      trigger,
-      {
-        id: "step1",
-        stepId: AutomationActionStepId.SERVER_LOG,
-        inputs: {},
-        outputs: {
-          success: true,
-        },
-      },
-    ],
-  }
 }
 
 export function basicRow(tableId: string) {
@@ -706,12 +390,6 @@ export function fullSchemaWithoutLinks({
       constraints: {
         presence: allRequired,
       },
-    },
-    [FieldType.AI]: {
-      name: "ai",
-      type: FieldType.AI,
-      operation: AIOperationEnum.PROMPT,
-      prompt: "Translate this into German :'{{ product }}'",
     },
     [FieldType.BARCODEQR]: {
       name: "barcodeqr",

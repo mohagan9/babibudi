@@ -13,11 +13,9 @@ import { Server } from "http"
 import Koa from "koa"
 import { AddressInfo } from "net"
 import * as api from "../api"
-import * as automations from "../automations"
-import * as bullboard from "../automations/bullboard"
 import env from "../environment"
 import { default as eventEmitter, init as eventInit } from "../events"
-import { automationsEnabled, printFeatures } from "../features"
+import { printFeatures } from "../features"
 import * as jsRunner from "../jsRunner"
 import sdk from "../sdk"
 import * as fileSystem from "../utilities/fileSystem"
@@ -25,7 +23,6 @@ import * as redis from "../utilities/redis"
 import { generateApiKey, getChecklist } from "../utilities/workerRequests"
 import { watch } from "../watch"
 import { initialise as initialiseWebsockets } from "../websockets"
-import * as workspaceMigrations from "../workspaceMigrations/queue"
 
 export type State = "uninitialised" | "starting" | "ready"
 let STATE: State = "uninitialised"
@@ -35,11 +32,6 @@ export function getState(): State {
 }
 
 async function initRoutes(app: Koa) {
-  if (!env.isTest()) {
-    const plugin = await bullboard.init()
-    app.use(plugin)
-  }
-
   app.context.eventEmitter = eventEmitter
   app.context.auth = {}
 
@@ -109,11 +101,6 @@ export async function startup(
   // get the references to the queue promises, don't await as
   // they will never end, unless the processing stops
   let queuePromises = []
-  // app migrations and automations on other service
-  if (automationsEnabled()) {
-    queuePromises.push(automations.init())
-    queuePromises.push(workspaceMigrations.init())
-  }
   queuePromises.push(sdk.dev.init())
   if (app) {
     console.log("Initialising routes")

@@ -223,7 +223,6 @@ interface OtherFieldMetadata extends BaseFieldSchema {
     | FieldType.LINK
     | FieldType.AUTO
     | FieldType.FORMULA
-    | FieldType.AI
     | FieldType.NUMBER
     | FieldType.LONGFORM
     | FieldType.BB_REFERENCE

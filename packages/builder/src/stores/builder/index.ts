@@ -10,12 +10,6 @@ import { builderStore } from "./builder"
 import { hoverStore } from "./hover"
 import { previewStore } from "./preview"
 import { workspaceDeploymentStore } from "./workspaceDeployment"
-import {
-  automationStore,
-  selectedAutomation,
-  automationHistoryStore,
-  evaluationContext,
-} from "./automations"
 import { userStore, userSelectedResourceMap, isOnlyUser } from "./users"
 import { deploymentStore } from "./deployment"
 import { contextMenuStore } from "./contextMenu"
@@ -37,7 +31,6 @@ import { integrations } from "./integrations"
 import { sortedIntegrations } from "./sortedIntegrations"
 import { queries } from "./queries"
 import { flags } from "./flags"
-import { rowActions } from "./rowActions"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
 import { recaptchaStore } from "./recaptcha"
@@ -45,7 +38,6 @@ import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
 import { FetchAppPackageResponse } from "@budibase/types"
 import { selectedAppUrls } from "./appUrls"
-import { agentsStore } from "../portal"
 import { restTemplates } from "./restTemplates"
 export {
   componentTreeNodesStore,
@@ -59,9 +51,6 @@ export {
   builderStore,
   userSelectedResourceMap,
   previewStore,
-  automationStore,
-  selectedAutomation,
-  automationHistoryStore,
   sortedScreens,
   userStore,
   isOnlyUser,
@@ -80,8 +69,6 @@ export {
   flags,
   hoverStore,
   snippets,
-  rowActions,
-  evaluationContext,
   screenComponentsList,
   screenComponentErrors,
   screenComponentErrorList,
@@ -103,13 +90,11 @@ export const reset = () => {
   componentStore.reset()
   layoutStore.reset()
   navigationStore.reset()
-  rowActions.reset()
   workspaceDeploymentStore.reset()
 }
 
 const refreshBuilderData = async () => {
   await Promise.all([
-    automationStore.actions.fetch(),
     datasources.init(),
     integrations.init(),
     queries.init(),
@@ -123,7 +108,6 @@ const refreshBuilderData = async () => {
 
 const resetBuilderHistory = () => {
   screenStore.history.reset()
-  automationHistoryStore.reset()
 }
 
 export const initialise = async (pkg: FetchAppPackageResponse) => {
@@ -142,7 +126,6 @@ export const initialise = async (pkg: FetchAppPackageResponse) => {
   screenStore.syncAppScreens(pkg)
   layoutStore.syncAppLayouts(pkg)
   await workspaceFavouriteStore.sync()
-  agentsStore.init()
   resetBuilderHistory()
   await refreshBuilderData()
 }

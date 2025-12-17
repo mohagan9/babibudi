@@ -6,8 +6,6 @@ import {
   events,
 } from "@budibase/backend-core"
 import {
-  Automation,
-  BackupTrigger,
   DeploymentDoc,
   DeploymentProgressResponse,
   DeploymentStatus,
@@ -21,11 +19,6 @@ import {
   UserCtx,
   Workspace,
 } from "@budibase/types"
-import {
-  clearMetadata,
-  disableAllCrons,
-  enableCronOrEmailTrigger,
-} from "../../../automations/utils"
 import { DocumentType, getAutomationParams } from "../../../db/utils"
 import env from "../../../environment"
 import sdk from "../../../sdk"
@@ -84,44 +77,6 @@ async function storeDeploymentHistory(deployment: Deployment) {
   await db.put(deploymentDoc)
   deployment.fromJSON(deploymentDoc.history[deploymentId])
   return deployment
-}
-
-async function initDeployedApp(prodAppId: string) {
-  const db = context.getProdWorkspaceDB()
-  console.log("Reading automation docs")
-  const automations = (
-    await db.allDocs<Automation>(
-      getAutomationParams(null, {
-        include_docs: true,
-      })
-    )
-  ).rows.map(row => row.doc!)
-  await clearMetadata()
-  const { count } = await disableAllCrons(prodAppId)
-  const promises = []
-
-  for (let automation of automations) {
-    promises.push(
-      enableCronOrEmailTrigger(prodAppId, automation).catch(err => {
-        throw new Error(
-          `Failed to enable CRON or Email trigger for automation "${automation.name}": ${err.message}`,
-          { cause: err }
-        )
-      })
-    )
-  }
-  const results = await Promise.all(promises)
-  const enabledCount = results
-    .map(result => result.enabled)
-    .filter(result => result).length
-  console.log(
-    `Cleared ${count} old CRON, enabled ${enabledCount} new CRON triggers for app deployment`
-  )
-  // sync the automations back to the dev DB - since there is now CRON
-  // information attached
-  await sdk.workspaces.syncWorkspace(dbCore.getDevWorkspaceID(prodAppId), {
-    automationOnly: true,
-  })
 }
 
 async function applyPendingColumnRenames(
@@ -405,19 +360,13 @@ export const publishWorkspace = async function (
         deployment.appUrl = appDoc.url
         appDoc.appId = prodId
         appDoc.instance._id = prodId
-        const [automations, workspaceApps, tables] = await Promise.all([
-          sdk.automations.fetch(),
+        const [workspaceApps, tables] = await Promise.all([
           sdk.workspaceApps.fetch(),
           sdk.tables.getAllInternalTables(),
         ])
-        const automationIds = automations.map(auto => auto._id!)
         const workspaceAppIds = workspaceApps.map(app => app._id!)
         const tableIds = tables.map(table => table._id!)
-        const fullMap = [
-          ...(automationIds ?? []),
-          ...(workspaceAppIds ?? []),
-          ...(tableIds ?? []),
-        ]
+        const fullMap = [...(workspaceAppIds ?? []), ...(tableIds ?? [])]
         appDoc.resourcesPublishedAt = {
           ...prodAppDoc?.resourcesPublishedAt,
           ...Object.fromEntries(
@@ -427,7 +376,6 @@ export const publishWorkspace = async function (
         delete appDoc.automationErrors
         await db.put(appDoc)
         await cache.workspace.invalidateWorkspaceMetadata(prodId)
-        await initDeployedApp(prodId)
 
         return { app: appDoc, prodWorkspaceId: prodId }
       } finally {
