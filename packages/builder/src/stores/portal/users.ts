@@ -57,7 +57,6 @@ class UserStore extends BudiStore<UserState> {
       creator?: boolean
       email: string
       apps?: any[]
-      groups?: any[]
     }[]
   ) {
     const users: InviteUsersRequest = payload.map(user => {
@@ -72,7 +71,6 @@ class UserStore extends BudiStore<UserState> {
         userInfo: {
           admin: user.admin ? { global: true } : undefined,
           builder,
-          userGroups: user.groups,
           roles: user.apps ? user.apps : undefined,
         },
       }
@@ -126,7 +124,7 @@ class UserStore extends BudiStore<UserState> {
     return await API.getUserCountByApp(appId)
   }
 
-  async create(data: { users: UserInfo[]; groups: any[] }) {
+  async create(data: { users: UserInfo[] }) {
     let mappedUsers: UnsavedUser[] = data.users.map(user => {
       const body: UnsavedUser = {
         email: user.email,
@@ -156,7 +154,7 @@ class UserStore extends BudiStore<UserState> {
 
       return body
     })
-    const response = await API.createUsers(mappedUsers, data.groups)
+    const response = await API.createUsers(mappedUsers)
     licensing.setQuotaUsage()
 
     // re-search from first page

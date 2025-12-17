@@ -12,7 +12,6 @@
   import { onMount } from "svelte"
   import { routeActions } from "../.."
   import EmailTableRenderer from "./_components/EmailTableRenderer.svelte"
-  import GroupsTableRenderer from "./_components/GroupsTableRenderer.svelte"
   import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
 
   type ParsedInvite = {
@@ -21,7 +20,6 @@
     builder?: {
       apps: string[]
     }
-    userGroups?: string[]
     apps?: string[]
   }
 
@@ -31,7 +29,6 @@
   let parsedInvites: ParsedInvite[] = []
   let customRenderers = [
     { column: "email", component: EmailTableRenderer },
-    { column: "userGroups", component: GroupsTableRenderer },
     // { column: "apps", component: AppsTableRenderer },
     { column: "role", component: RoleTableRenderer },
   ]
@@ -47,9 +44,6 @@
       sortable: false,
       width: "1fr",
     },
-    ...($licensing.groupsEnabled && {
-      userGroups: { sortable: false, displayName: "Groups", width: "1fr" },
-    }),
     apps: {
       sortable: false,
       width: "1fr",
@@ -62,7 +56,7 @@
 
   const invitesToSchema = (invites: InviteWithCode[]): ParsedInvite[] => {
     return invites.map(invite => {
-      const { admin, builder, userGroups, apps } = invite.info
+      const { admin, builder, apps } = invite.info
 
       return {
         _id: invite.code,
@@ -71,7 +65,6 @@
           apps: builder?.apps || [],
         },
         admin,
-        userGroups: userGroups,
         apps: apps ? [...new Set(Object.keys(apps))] : undefined,
       }
     })

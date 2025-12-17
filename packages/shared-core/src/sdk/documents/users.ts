@@ -6,7 +6,6 @@ import {
   User,
   UserAdminInfo,
   UserBuilderInfo,
-  UserGroup,
   UserRoleInfo,
 } from "@budibase/types"
 import { getProdAppID } from "./applications"
@@ -154,27 +153,7 @@ export function containsUserID(value: string | undefined): boolean {
   return value.includes(`${DocumentType.USER}${SEPARATOR}`)
 }
 
-function getUserGroups(userId: string | undefined, groups?: UserGroup[]) {
-  return groups?.filter(group => group.users?.find(u => u._id === userId)) || []
-}
-
-export function getUserAppGroups(
-  appId: string,
-  userId: string,
-  groups?: UserGroup[]
-) {
-  const prodAppId = getProdAppID(appId)
-  const userGroups = getUserGroups(userId, groups)
-  return userGroups.filter(group =>
-    Object.keys(group.roles || {}).find(app => app === prodAppId)
-  )
-}
-
-export function userAppAccessList(user: User, groups?: UserGroup[]) {
-  const userGroups = getUserGroups(user._id, groups)
-  const userGroupApps = userGroups.flatMap(userGroup =>
-    Object.keys(userGroup.roles || {})
-  )
-  const fullList = [...Object.keys(user?.roles || {}), ...userGroupApps]
+export function userAppAccessList(user: User) {
+  const fullList = [...Object.keys(user?.roles || {})]
   return [...new Set(fullList)]
 }

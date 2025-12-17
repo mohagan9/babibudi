@@ -17,20 +17,14 @@
     Banner,
     Table,
   } from "@budibase/bbui"
-  import { onMount, setContext, getContext } from "svelte"
+  import { onMount, getContext } from "svelte"
   import { users } from "@/stores/portal/users"
   import { auth } from "@/stores/portal/auth"
-  import { groups } from "@/stores/portal/groups"
   import { appsStore } from "@/stores/portal/apps"
-  import { licensing } from "@/stores/portal/licensing"
   import { roles } from "@/stores/builder"
   import ForceResetPasswordModal from "./_components/ForceResetPasswordModal.svelte"
-  import UserGroupPicker from "@/components/settings/UserGroupPicker.svelte"
   import DeleteUserModal from "./_components/DeleteUserModal.svelte"
-  import GroupIcon from "../groups/_components/GroupIcon.svelte"
   import { Constants, UserAvatar } from "@budibase/frontend-core"
-  import RemoveGroupTableRenderer from "./_components/RemoveGroupTableRenderer.svelte"
-  import GroupNameTableRenderer from "../groups/_components/GroupNameTableRenderer.svelte"
   import AppNameTableRenderer from "./_components/AppNameTableRenderer.svelte"
   import AppRoleTableRenderer from "./_components/AppRoleTableRenderer.svelte"
   import { sdk } from "@budibase/shared-core"
@@ -49,22 +43,6 @@
   $: if (params.userId && userId !== params.userId) {
     userId = params.userId
   }
-
-  $: groupSchema = {
-    name: {
-      width: "1fr",
-    },
-    ...(!isAdmin
-      ? {}
-      : // Add
-        {
-          _id: {
-            displayName: "",
-            width: "auto",
-            borderLeft: true,
-          },
-        }),
-  }
   const appSchema = {
     name: {
       width: "2fr",
@@ -74,16 +52,6 @@
       displayName: "Access",
     },
   }
-  const customGroupTableRenderers = [
-    {
-      column: "name",
-      component: GroupNameTableRenderer,
-    },
-    {
-      column: "_id",
-      component: RemoveGroupTableRenderer,
-    },
-  ]
   const customAppTableRenderers = [
     {
       column: "name",
@@ -104,23 +72,15 @@
   let loaded = false
   let userFieldsToUpdate = {}
 
-  $: internalGroups = $groups?.filter(g => !g?.scimInfo?.isSync)
-
   $: isSSO = !!user?.provider
   $: isAdmin = sdk.users.isAdmin($auth.user)
   $: isScim = user?.scimInfo?.isSync
   $: readonly = !isAdmin || isScim
   $: privileged = sdk.users.isAdminOrGlobalBuilder(user)
   $: nameLabel = getNameLabel(user)
-  $: filteredGroups = getFilteredGroups(internalGroups, searchTerm)
   $: availableApps = user
-    ? getApps(user, sdk.users.userAppAccessList(user, $groups || []))
+    ? getApps(user, sdk.users.userAppAccessList(user))
     : []
-  $: userGroups = $groups.filter(x => {
-    return x.users?.find(y => {
-      return y._id === userId
-    })
-  })
   $: globalRole = users.getUserRole(user)
   $: isTenantOwner = tenantOwner?.email && tenantOwner.email === user?.email
 
@@ -141,14 +101,6 @@
     })
   }
 
-  const getFilteredGroups = (groups, search) => {
-    if (!search) {
-      return groups
-    }
-    search = search.toLowerCase()
-    return groups.filter(group => group.name?.toLowerCase().includes(search))
-  }
-
   const getRole = (prodAppId, user) => {
     if (privileged) {
       return Constants.Roles.ADMIN
@@ -160,18 +112,6 @@
 
     if (user?.roles?.[prodAppId]) {
       return user.roles[prodAppId]
-    }
-
-    // check if access via group for creator
-    const foundGroup = $groups?.find(
-      group => group.roles?.[prodAppId] || group.builder?.apps[prodAppId]
-    )
-    if (foundGroup.builder?.apps[prodAppId]) {
-      return Constants.Roles.CREATOR
-    }
-    // can't tell how groups will control role
-    if (foundGroup.roles[prodAppId]) {
-      return Constants.Roles.GROUP
     }
   }
 
@@ -246,26 +186,12 @@
     tenantOwner = await users.getAccountHolder()
   }
 
-  const addGroup = async groupId => {
-    await groups.addUser(groupId, userId)
-    await fetchUser()
-  }
-
-  const removeGroup = async groupId => {
-    await groups.removeUser(groupId, userId)
-    await fetchUser()
-  }
-
-  setContext("groups", {
-    removeGroup,
-  })
-
   onMount(async () => {
     try {
-      await Promise.all([fetchUser(), groups.init(), roles.fetch()])
+      await Promise.all([fetchUser(), roles.fetch()])
       loaded = true
     } catch (error) {
-      notifications.error("Error getting user groups")
+      notifications.error("Error fetching users")
     }
   })
 </script>
@@ -358,47 +284,6 @@
         on:click={saveUser}>Save</Button
       >
     </div>
-
-    {#if $licensing.groupsEnabled}
-      <!-- User groups -->
-      <Layout gap="S" noPadding>
-        <div class="tableTitle">
-          <Heading size="XS">Groups</Heading>
-          {#if internalGroups?.length && isAdmin}
-            <div bind:this={popoverAnchor}>
-              <Button on:click={popover.show()} secondary>Add to group</Button>
-            </div>
-            <Popover align="right" bind:this={popover} anchor={popoverAnchor}>
-              <UserGroupPicker
-                labelKey="name"
-                bind:searchTerm
-                list={filteredGroups}
-                selected={user.userGroups}
-                on:select={e => addGroup(e.detail)}
-                on:deselect={e => removeGroup(e.detail)}
-                iconComponent={GroupIcon}
-                extractIconProps={item => ({ group: item, size: "S" })}
-              />
-            </Popover>
-          {/if}
-        </div>
-        <Table
-          schema={groupSchema}
-          data={userGroups}
-          allowEditRows={false}
-          allowEditColumns={false}
-          customPlaceholder
-          customRenderers={customGroupTableRenderers}
-          on:click={e => {
-            bb.settings(`/people/groups/${e.detail._id}`)
-          }}
-        >
-          <div class="placeholder" slot="placeholder">
-            <Heading size="XS">This user is not in any groups</Heading>
-          </div>
-        </Table>
-      </Layout>
-    {/if}
 
     <Layout gap="S" noPadding>
       <Heading size="S">Workspaces</Heading>

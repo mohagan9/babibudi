@@ -55,10 +55,7 @@ export interface UserEndpoints {
   getUserCountByApp: (appId: string) => Promise<number>
   getAccountHolder: () => Promise<LookupAccountHolderResponse>
   searchUsers: (data: SearchUsersRequest) => Promise<SearchUsersResponse>
-  createUsers: (
-    users: UnsavedUser[],
-    groups: any[]
-  ) => Promise<BulkUserCreated | undefined>
+  createUsers: (users: UnsavedUser[]) => Promise<BulkUserCreated | undefined>
   addWorkspaceIdToInvite: (
     code: string,
     role: string
@@ -140,15 +137,13 @@ export const buildUserEndpoints = (API: BaseAPIClient): UserEndpoints => ({
   /**
    * Creates multiple users.
    * @param users the array of user objects to create
-   * @param groups the array of group ids to add all users to
    */
-  createUsers: async (users, groups) => {
+  createUsers: async users => {
     const res = await API.post<BulkUserRequest, BulkUserResponse>({
       url: "/api/global/users/bulk",
       body: {
         create: {
           users,
-          groups,
         },
       },
     })

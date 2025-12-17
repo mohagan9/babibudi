@@ -93,7 +93,6 @@ export interface User
   password?: string
   status?: UserStatus
   createdAt?: number // override the default createdAt behaviour - users sdk historically set this to Date.now()
-  userGroups?: string[]
   freeTrialConfirmedAt?: string
   scimInfo?: { isSync: true } & Record<string, any>
   appFavourites?: string[]

@@ -9,7 +9,6 @@ import { SearchFilters } from "../../sdk"
 interface InviteInfo {
   tenantId?: string
   apps?: Record<string, string>
-  userGroups?: string[]
   builder?: {
     global?: boolean
     creator?: boolean
@@ -57,7 +56,6 @@ export interface BulkUserRequest {
   create?: {
     roles?: any[]
     users: UnsavedUser[]
-    groups: any[]
   }
 }
 

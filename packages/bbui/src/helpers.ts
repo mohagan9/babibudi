@@ -1176,7 +1176,6 @@ export const SpectrumIconMap: Record<string, string> = {
   UserDeveloper: "user-gear",
   UserEdit: "user-circle-gear",
   UserExclude: "user-minus",
-  UserGroup: "users-three",
   UserLock: "user-lock",
   UserShare: "share-network",
   UsersAdd: "users-three",

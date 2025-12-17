@@ -1,12 +1,7 @@
 <script>
   import { Button, Popover, notifications } from "@budibase/bbui"
-  import UserGroupPicker from "@/components/settings/UserGroupPicker.svelte"
   import { createPaginationStore } from "@/helpers/pagination"
-  import { groups } from "@/stores/portal/groups"
   import { users } from "@/stores/portal/users"
-
-  export let groupId
-  export let onUsersUpdated
 
   let popoverAnchor
   let popover
@@ -16,7 +11,6 @@
 
   $: page = $pageInfo.page
   $: searchUsers(page, searchTerm)
-  $: group = $groups.find(x => x._id === groupId)
 
   async function searchUsers(page, search) {
     if ($pageInfo.loading) {
@@ -44,19 +38,4 @@
 <div bind:this={popoverAnchor}>
   <Button on:click={popover.show()} cta>Add user</Button>
 </div>
-<Popover align="left" bind:this={popover} anchor={popoverAnchor}>
-  <UserGroupPicker
-    bind:searchTerm
-    labelKey="email"
-    selected={group.users?.map(user => user._id)}
-    list={$users.data}
-    on:select={async e => {
-      await groups.addUser(groupId, e.detail)
-      onUsersUpdated()
-    }}
-    on:deselect={async e => {
-      await groups.removeUser(groupId, e.detail)
-      onUsersUpdated()
-    }}
-  />
-</Popover>
+<Popover align="left" bind:this={popover} anchor={popoverAnchor}></Popover>

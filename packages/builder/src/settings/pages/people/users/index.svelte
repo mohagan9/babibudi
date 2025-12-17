@@ -13,7 +13,6 @@
   } from "@budibase/bbui"
   import AddUserModal from "./_components/AddUserModal.svelte"
   import { users } from "@/stores/portal/users"
-  import { groups } from "@/stores/portal/groups"
   import { auth } from "@/stores/portal/auth"
   import { licensing } from "@/stores/portal/licensing"
   import { organisation } from "@/stores/portal/organisation"
@@ -21,7 +20,6 @@
   import { onMount } from "svelte"
   import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
   import UpgradeModal from "@/components/common/users/UpgradeModal.svelte"
-  import GroupsTableRenderer from "./_components/GroupsTableRenderer.svelte"
   import AppsTableRenderer from "./_components/AppsTableRenderer.svelte"
   import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
   import EmailTableRenderer from "./_components/EmailTableRenderer.svelte"
@@ -40,7 +38,6 @@
     BulkUserCreated,
     InviteUsersResponse,
     User as UserDoc,
-    UserGroup,
   } from "@budibase/types"
   import { InternalTable } from "@budibase/types"
   import type { UserInfo } from "@/types"
@@ -50,9 +47,8 @@
     tenantOwnerEmail?: string
   }
 
-  interface EnrichedUser extends Omit<User, "userGroups"> {
+  interface EnrichedUser extends User {
     name: string
-    userGroups: UserGroup[]
     apps: string[]
     access: number
   }
@@ -71,10 +67,8 @@
 
   interface UserData {
     users: UserInfo[]
-    groups: any[]
   }
 
-  let groupsLoaded = !$licensing.groupsEnabled || $groups?.length
   let enrichedUsers: EnrichedUser[] = []
   let tenantOwner: AccountMetadata | null
   let createUserModal: Modal,
@@ -89,11 +83,10 @@
 
   $: customRenderers = [
     { column: "email", component: EmailTableRenderer },
-    { column: "userGroups", component: GroupsTableRenderer },
     { column: "workspaces", component: AppsTableRenderer },
     { column: "role", component: RoleTableRenderer },
   ]
-  let userData: UserData = { users: [], groups: [] }
+  let userData: UserData = { users: [] }
 
   $: isOwner = $auth.accountPortalAccess && $admin.cloud
   $: readonly = !sdk.users.isAdmin($auth.user)
@@ -109,9 +102,6 @@
       sortable: false,
       width: "1fr",
     },
-    ...($licensing.groupsEnabled && {
-      userGroups: { sortable: false, displayName: "Groups", width: "1fr" },
-    }),
     workspaces: {
       sortable: false,
       width: "1fr",
@@ -128,16 +118,6 @@
     owner: AccountMetadata | null
   ) => {
     enrichedUsers = rows?.map<EnrichedUser>(user => {
-      const userGroups: UserGroup[] = []
-      $groups.forEach(group => {
-        if (group.users) {
-          group.users?.forEach(y => {
-            if (y._id === user._id) {
-              userGroups.push(group)
-            }
-          })
-        }
-      })
       if (owner) {
         user.tenantOwnerEmail = owner.email
       }
@@ -147,13 +127,12 @@
       return {
         ...user,
         name: user.firstName ? user.firstName + " " + user.lastName : "",
-        userGroups,
         __selectable:
           role.value === Constants.BudibaseRoles.Owner ||
           $auth.user?.email === user.email
             ? false
             : true,
-        apps: sdk.users.userAppAccessList(user, $groups),
+        apps: sdk.users.userAppAccessList(user),
         access: role.sortOrder,
       }
     })
@@ -194,7 +173,6 @@
       builder: user.role === Constants.BudibaseRoles.Developer,
       creator: user.role === Constants.BudibaseRoles.Creator,
       admin: user.role === Constants.BudibaseRoles.Admin,
-      groups: userData.groups,
     }))
     try {
       inviteUsersResponse = await users.invite(payload)
@@ -226,7 +204,7 @@
   }
 
   const createUsersFromCsv = async (userCsvData: any) => {
-    const { userEmails, usersRole, userGroups: groups } = userCsvData
+    const { userEmails, usersRole } = userCsvData
 
     const users: UserInfo[] = []
     for (const email of userEmails) {
@@ -245,7 +223,7 @@
       users.push(newUser)
     }
 
-    userData = await removingDuplicities({ groups, users })
+    userData = await removingDuplicities({ users })
     if (!userData.users.length) return
 
     return createUsers()
@@ -260,7 +238,6 @@
         unsuccessful: [],
       }
       notifications.success("Successfully created user")
-      await groups.init()
       passwordModal.show()
       await fetch.refresh()
     } catch (error) {
@@ -316,12 +293,6 @@
   }
 
   onMount(async () => {
-    try {
-      await groups.init()
-      groupsLoaded = true
-    } catch (error) {
-      notifications.error("Error fetching user group data")
-    }
     try {
       tenantOwner = await users.getAccountHolder()
     } catch (err: any) {
@@ -397,7 +368,7 @@
     allowEditRows={false}
     allowSelectRows={!readonly}
     {customRenderers}
-    loading={!$fetch.loaded || !groupsLoaded}
+    loading={!$fetch.loaded}
     defaultSortColumn={"access"}
   />
 

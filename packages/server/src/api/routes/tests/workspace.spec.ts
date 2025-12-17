@@ -14,8 +14,6 @@ import {
 import nock from "nock"
 import path from "path"
 import tk from "timekeeper"
-import * as uuid from "uuid"
-import { createAutomationBuilder } from "../../../automations/tests/utilities/AutomationTestBuilder"
 import { WorkspaceStatus } from "../../../db/utils"
 import env from "../../../environment"
 import sdk from "../../../sdk"
@@ -105,38 +103,6 @@ describe("/applications", () => {
         roles: {
           [config.getProdWorkspaceId()]: role.name,
         },
-      })
-
-      await config.withUser(user, async () => {
-        const apps = await config.api.workspace.fetch()
-        expect(apps).toHaveLength(1)
-      })
-    })
-
-    it("should only return apps a user has access to through a custom role on a group", async () => {
-      let user = await config.createUser({
-        builder: { global: false },
-        admin: { global: false },
-      })
-
-      await config.withUser(user, async () => {
-        const apps = await config.api.workspace.fetch()
-        expect(apps).toHaveLength(0)
-      })
-
-      const roleName = uuid.v4().replace(/-/g, "")
-      const role = await config.api.roles.save({
-        name: roleName,
-        inherits: "PUBLIC",
-        permissionId: BuiltinPermissionID.READ_ONLY,
-        version: "name",
-      })
-
-      const group = await config.createGroup(role._id!)
-
-      user = await config.globalUser({
-        ...user,
-        userGroups: [group._id!],
       })
 
       await config.withUser(user, async () => {
@@ -878,68 +844,6 @@ describe("/applications", () => {
       )
     })
 
-    it("should allow users in multiple groups with different roles to access all permitted screens", async () => {
-      const hrRole = await config.api.roles.save({
-        name: `HR_${structures.generator.guid().replace(/[^a-zA-Z0-9]/g, "")}`,
-        inherits: [roles.BUILTIN_ROLE_IDS.BASIC],
-        permissionId: BuiltinPermissionID.WRITE,
-        version: "name",
-      })
-
-      const expensesScreen = await config.api.screen.save(
-        customScreen({
-          roleId: roles.BUILTIN_ROLE_IDS.BASIC,
-          route: "/expenses",
-        })
-      )
-      const employeesScreen = await config.api.screen.save(
-        customScreen({
-          roleId: hrRole._id!,
-          route: "/employees",
-        })
-      )
-
-      await config.publish()
-
-      const appUserGroup = await config.createGroup(
-        roles.BUILTIN_ROLE_IDS.BASIC
-      )
-      const hrGroup = await config.createGroup(hrRole._id!)
-
-      const groupUser = await config.createUser({
-        builder: { global: false },
-        admin: { global: false },
-        roles: {},
-      })
-
-      await config.addUserToGroup(appUserGroup._id!, groupUser._id!)
-      await config.addUserToGroup(hrGroup._id!, groupUser._id!)
-
-      await config.withUser(groupUser, async () => {
-        await config.withHeaders(
-          { referer: `http://localhost:10000/app${workspace.url}` },
-          async () => {
-            const res = await config.api.workspace.getAppPackage(
-              config.getProdWorkspaceId(),
-              {
-                useProdApp: true,
-              }
-            )
-            const routes = res.screens.map(screen => screen.routing.route)
-            expect(routes).toEqual(
-              expect.arrayContaining(["/expenses", "/employees"])
-            )
-            expect(res.screens).toEqual(
-              expect.arrayContaining([
-                expect.objectContaining({ _id: expensesScreen._id }),
-                expect.objectContaining({ _id: employeesScreen._id }),
-              ])
-            )
-          }
-        )
-      })
-    })
-
     describe("workspace apps", () => {
       it("should retrieve all the screens for builder calls", async () => {
         await config.api.workspaceApp.create(
@@ -1524,38 +1428,6 @@ describe("/applications", () => {
         { body: { message: "App URL is already in use." }, status: 400 }
       )
       expect(events.app.duplicated).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("POST /api/applications/:appId/sync", () => {
-    it("should not sync automation logs", async () => {
-      const automation = await config.createAutomation()
-      await context.doInWorkspaceContext(workspace.appId, () =>
-        config.createAutomationLog(automation)
-      )
-
-      await config.api.workspace.sync(workspace.appId)
-
-      const startkey = `${db.DocumentType.AUTOMATION_LOG}${db.SEPARATOR}`
-      const endkey = `${db.DocumentType.AUTOMATION_LOG}${db.SEPARATOR}${db.UNICODE_MAX}`
-
-      // exists in prod
-      const prodLogs = await db
-        .getDB(config.getProdWorkspaceId())
-        .allDocs({ startkey, endkey, include_docs: false })
-      expect(prodLogs.rows.length).toBe(1)
-
-      // doesn't exist in dev
-      const devLogs = await db
-        .getDB(config.getDevWorkspaceId())
-        .allDocs({ startkey, endkey, include_docs: false })
-      expect(devLogs.rows.length).toBe(0)
-
-      await config.api.workspace.unpublish(workspace.appId)
-
-      // logs remain visible from production after unpublish
-      const visibleLogsAfterUnpublish = await config.getAutomationLogs()
-      expect(visibleLogsAfterUnpublish.data.length).toBe(1)
     })
   })
 

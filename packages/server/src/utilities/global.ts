@@ -13,9 +13,9 @@ import env from "../environment"
 
 export async function processUser(
   user: ContextUser,
-  opts: { appId?: string; } = {}
+  opts: { appId?: string } = {}
 ) {
-  if (!user || (!user.roles && !user.userGroups)) {
+  if (!user || !user.roles) {
     return user
   }
   user = cloneDeep(user)
@@ -101,9 +101,7 @@ export async function getGlobalUsers(
   userIds?: string[]
 ): Promise<ContextUser[]> {
   const users = await getRawGlobalUsers(userIds)
-  return Promise.all(
-    users.map(user => processUser(user))
-  )
+  return Promise.all(users.map(user => processUser(user)))
 }
 
 export async function getGlobalUsersFromMetadata(users: ContextUser[]) {

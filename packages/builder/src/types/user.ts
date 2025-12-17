@@ -1,5 +1,5 @@
 import { Constants } from "@budibase/frontend-core"
-import type { User as UserDoc, UserGroup } from "@budibase/types"
+import type { User as UserDoc } from "@budibase/types"
 
 export interface UserInfo {
   email: string
@@ -12,9 +12,8 @@ export interface User extends UserDoc {
   tenantOwnerEmail?: string
 }
 
-export interface EnrichedUser extends Omit<User, "userGroups"> {
+export interface EnrichedUser extends User {
   name: string
-  userGroups: UserGroup[]
   apps: string[]
   access: number
 }
@@ -28,6 +27,5 @@ export interface ParsedInvite {
   admin?: {
     global: boolean
   }
-  userGroups?: UserGroup[]
   apps?: string[]
 }

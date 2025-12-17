@@ -1,5 +1,5 @@
 import { sdk } from "@budibase/shared-core"
-import { ContextUser, User, UserGroup, UserIdentifier } from "@budibase/types"
+import { ContextUser, User, UserIdentifier } from "@budibase/types"
 import * as accountSdk from "../accounts"
 import * as context from "../context"
 import env from "../environment"
@@ -16,51 +16,19 @@ export const hasBuilderPermissions = sdk.users.hasBuilderPermissions
 export const hasAppBuilderPermissions = sdk.users.hasAppBuilderPermissions
 export const isAdminOrWorkspaceBuilder = sdk.users.isAdminOrWorkspaceBuilder
 
-export async function creatorsInList(
-  users: (User | ContextUser)[],
-  groups?: UserGroup[]
-) {
-  const groupIds = [
-    ...new Set(
-      users.filter(user => user.userGroups).flatMap(user => user.userGroups!)
-    ),
-  ]
+export async function creatorsInList(users: (User | ContextUser)[]) {
   const db = context.getGlobalDB()
-  groups = await db.getMultiple<UserGroup>(groupIds, { allowMissing: true })
-  return users.map(user => isCreatorSync(user, groups))
+  return users.map(user => isCreatorSync(user))
 }
 
 // fetches groups if no provided, but is async and shouldn't be looped with
 export async function isCreatorAsync(user: User | ContextUser) {
-  let groups: UserGroup[] = []
-  if (user.userGroups) {
-    const db = context.getGlobalDB()
-    groups = await db.getMultiple<UserGroup>(user.userGroups)
-  }
-  return isCreatorSync(user, groups)
+  return isCreatorSync(user)
 }
 
-export function isCreatorSync(user: User | ContextUser, groups?: UserGroup[]) {
+export function isCreatorSync(user: User | ContextUser) {
   const isCreatorByUserDefinition = sdk.users.isCreator(user)
-  if (!isCreatorByUserDefinition && user) {
-    return isCreatorByGroupMembership(user, groups)
-  }
   return isCreatorByUserDefinition
-}
-
-function isCreatorByGroupMembership(
-  user: User | ContextUser,
-  groups?: UserGroup[]
-) {
-  const userGroups = groups?.filter(
-    group => user.userGroups?.indexOf(group._id!) !== -1
-  )
-  if (userGroups && userGroups.length > 0) {
-    return userGroups.some(group =>
-      Object.values(group.roles || {}).includes("CREATOR")
-    )
-  }
-  return false
 }
 
 export async function validateUniqueUser(email: string, tenantId: string) {

@@ -2,21 +2,8 @@
   import { API } from "@/api"
   import RoleSelect from "@/components/common/RoleSelect.svelte"
   import UpgradeModal from "@/components/common/users/UpgradeModal.svelte"
-  import GroupIcon from "@/settings/pages/people/groups/_components/GroupIcon.svelte"
-  import {
-    appStore,
-    builderStore,
-    deploymentStore,
-    roles,
-  } from "@/stores/builder"
-  import {
-    admin,
-    appsStore,
-    auth,
-    groups,
-    licensing,
-    users,
-  } from "@/stores/portal"
+  import { appStore, builderStore, deploymentStore } from "@/stores/builder"
+  import { admin, appsStore, auth, licensing, users } from "@/stores/portal"
   import {
     Button,
     CopyInput,
@@ -46,23 +33,16 @@
     InviteUsersResponse,
     InviteWithCode,
     User,
-    UserGroup,
     WithRequired,
   } from "@budibase/types"
   import { fly } from "svelte/transition"
   import InfoDisplay from "../design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
-  import BuilderGroupPopover from "./BuilderGroupPopover.svelte"
-
-  interface EnrichedUserGroup extends UserGroup {
-    role: string | undefined
-  }
 
   interface ExtendedUser
     extends Omit<WithRequired<User, "_id" | "_rev">, "roles"> {
     role?: string
     isAdminOrGlobalBuilder?: boolean
     isAppBuilder?: boolean
-    group?: string
   }
 
   let query: string | null = null
@@ -78,8 +58,6 @@
 
   let filteredInvites: InviteWithCode[] = []
   let filteredUsers: ExtendedUser[] = []
-  let filteredGroups: EnrichedUserGroup[] = []
-  let selectedGroup: string | null = null
   let userOnboardResponse: InviteUsersResponse | null = null
   let userLimitReachedModal: Modal
 
@@ -88,21 +66,15 @@
 
   $: validEmail = emailValidator(email) === true
   $: prodAppId = appsStore.getProdAppID($appStore.appId)
-  $: promptInvite = showInvite(
-    filteredInvites,
-    filteredUsers,
-    filteredGroups,
-    query
-  )
+  $: promptInvite = showInvite(filteredInvites, filteredUsers, query)
   $: isOwner = $auth.accountPortalAccess && $admin.cloud
 
   const showInvite = (
     invites: InviteWithCode[],
     users: ExtendedUser[],
-    groups: EnrichedUserGroup[],
     query: string | null
   ): boolean => {
-    return !invites?.length && !users?.length && !groups?.length && !!query
+    return !invites?.length && !users?.length && !!query
   }
 
   const filterInvites = async (query: string | null) => {
@@ -260,66 +232,6 @@
     }
   }
 
-  const updateAppGroup = async (groupId: string, role: string | undefined) => {
-    if (!prodAppId) {
-      notifications.error("Application id must be specified")
-      return
-    }
-
-    if (!role) {
-      await groups.removeApp(groupId, prodAppId)
-    } else {
-      await groups.addApp(groupId, prodAppId, role)
-    }
-
-    await usersFetch.refresh()
-    await groups.init()
-  }
-
-  const onUpdateGroup = async (group: EnrichedUserGroup, role?: string) => {
-    if (!group) {
-      notifications.error("A group must be specified")
-      return
-    }
-    try {
-      await updateAppGroup(group._id!, role)
-    } catch {
-      notifications.error("Group update failed")
-    }
-  }
-
-  const searchGroups = (userGroups: UserGroup[], query: string | null) => {
-    return userGroups
-      .filter((group: { name: string }) => {
-        if (!query?.length) {
-          return true
-        }
-        //Group Name only.
-        const nameMatch = group.name
-          ?.toLowerCase()
-          .includes(query?.toLowerCase())
-
-        return nameMatch
-      })
-      .map(enrichGroupRole)
-      .sort(sortRoles)
-  }
-
-  const enrichGroupRole = (group: UserGroup): EnrichedUserGroup => {
-    return {
-      ...group,
-      role: group?.builder?.apps.includes(prodAppId)
-        ? Constants.Roles.CREATOR
-        : group.roles?.[
-            groups.getGroupAppIds(group).find(x => x === prodAppId)!
-          ],
-    }
-  }
-
-  // Adds the 'role' attribute and sets it to the current app.
-  $: enrichedGroups = $groups.map(enrichGroupRole)
-  $: filteredGroups = searchGroups(enrichedGroups, query)
-
   const getInvites = async () => {
     try {
       const invites = await users.getInvites()
@@ -432,9 +344,6 @@
   }
 
   const initSidePanel = async (sidePaneOpen: boolean) => {
-    if (sidePaneOpen === true) {
-      await groups.init()
-    }
     loaded = true
   }
 
@@ -458,13 +367,8 @@
 
   const getRoleFooter = (user: {
     isAdminOrGlobalBuilder?: boolean
-    group?: string
     role?: string
   }): string | undefined => {
-    if (user.group) {
-      const role = $roles.find(role => role._id === user.role)
-      return `This user has been given ${role?.name} access from the ${user.group} group`
-    }
     if (user.isAdminOrGlobalBuilder) {
       return "Tenant admins can edit all workspaces"
     }
@@ -534,7 +438,7 @@
     <div class="search" class:focused={searchFocus}>
       <span class="search-input">
         <Input
-          placeholder={"Add users and groups to your app"}
+          placeholder={"Add users to your app"}
           autocomplete="off"
           disabled={inviting}
           bind:value={query}
@@ -632,57 +536,6 @@
             </Layout>
           {/if}
 
-          {#if $licensing.groupsEnabled && filteredGroups?.length}
-            <Layout noPadding gap="XS">
-              <div class="auth-entity-header">
-                <div class="auth-entity-title">Groups</div>
-                <div class="auth-entity-access-title">Access</div>
-              </div>
-              {#each filteredGroups as group}
-                <div
-                  class="auth-entity group"
-                  on:click={() => {
-                    if (selectedGroup != group._id) {
-                      selectedGroup = group._id ?? null
-                    } else {
-                      selectedGroup = null
-                    }
-                  }}
-                  on:keydown={() => {}}
-                >
-                  <div class="details">
-                    <GroupIcon {group} size="S" />
-                    <div class="group-name" title={group.name}>
-                      {group.name}
-                    </div>
-                    <div class="auth-entity-meta">
-                      {itemCountText("user", group.users?.length)}
-                    </div>
-                  </div>
-                  <div class="auth-entity-access">
-                    <RoleSelect
-                      placeholder={false}
-                      value={group.role}
-                      allowRemove={!!group.role}
-                      allowPublic={false}
-                      quiet={true}
-                      allowCreator={group.role === Constants.Roles.CREATOR}
-                      on:change={e => {
-                        onUpdateGroup(group, e.detail)
-                      }}
-                      on:remove={() => {
-                        onUpdateGroup(group)
-                      }}
-                      autoWidth
-                      align={PopoverAlignment.Right}
-                      labelPrefix="Can use as"
-                    />
-                  </div>
-                </div>
-              {/each}
-            </Layout>
-          {/if}
-
           {#if filteredUsers?.length}
             <div class="auth-entity-section">
               <div class="auth-entity-header">
@@ -690,53 +543,8 @@
                 <div class="auth-entity-access-title">Access</div>
               </div>
               {#each filteredUsers as user}
-                {@const userGroups = sdk.users.getUserAppGroups(
-                  $appStore.appId,
-                  user._id,
-                  $groups
-                )}
                 <div class="auth-entity">
-                  <div class="details">
-                    <div class="user-groups">
-                      <div class="user-email" title={user.email}>
-                        {user.email}
-                      </div>
-                      {#if userGroups.length}
-                        <div class="group-info">
-                          <div class="auth-entity-meta">
-                            {itemCountText("group", userGroups.length)}
-                          </div>
-                          <BuilderGroupPopover groups={userGroups} />
-                        </div>
-                      {/if}
-                    </div>
-                  </div>
-                  <div class="auth-entity-access" class:muted={user.group}>
-                    <RoleSelect
-                      footer={getRoleFooter(user)}
-                      placeholder={userGroups?.length
-                        ? "Controlled by group"
-                        : false}
-                      value={parseRole(user)}
-                      allowRemove={!!user.role && !user.group}
-                      allowPublic={false}
-                      allowCreator={true}
-                      quiet={true}
-                      on:addcreator={() => {}}
-                      on:change={e => {
-                        onUpdateUser(user, e.detail)
-                      }}
-                      on:remove={() => {
-                        onUpdateUser(user)
-                      }}
-                      autoWidth
-                      align={PopoverAlignment.Right}
-                      allowedRoles={user.isAdminOrGlobalBuilder
-                        ? [Constants.Roles.CREATOR]
-                        : null}
-                      labelPrefix="Can use as"
-                    />
-                  </div>
+                  <div class="details"></div>
                 </div>
               {/each}
             </div>
@@ -913,8 +721,7 @@
     width: 100%;
   }
 
-  .auth-entity .user-email,
-  .group-name {
+  .auth-entity .user-email {
     flex: 1 1 0;
     min-width: 0;
     overflow: hidden;
@@ -1012,24 +819,5 @@
   }
   .alert {
     padding: 0 var(--spacing-xl);
-  }
-
-  .user-groups {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    gap: var(--spacing-m);
-    width: 100%;
-    min-width: 0;
-  }
-
-  .group-info {
-    display: flex;
-    flex-direction: row;
-    gap: var(--spacing-xs);
-    justify-content: end;
-    width: 60px;
-    flex: 0 0 auto;
   }
 </style>

@@ -4,12 +4,10 @@
     Label,
     ActionButton,
     ModalContent,
-    Multiselect,
     InputDropdown,
     Layout,
     Icon,
   } from "@budibase/bbui"
-  import { groups } from "@/stores/portal/groups"
   import { licensing } from "@/stores/portal/licensing"
   import { Constants, emailValidator } from "@budibase/frontend-core"
   import { capitalise } from "@/helpers"
@@ -18,7 +16,6 @@
 
   const password = generatePassword(12)
   let disabled
-  let userGroups = []
 
   $: userData = [
     {
@@ -32,8 +29,6 @@
   $: userCount = $licensing.userCount + userData.length
   $: reached = licensing.usersLimitReached(userCount)
   $: exceeded = licensing.usersLimitExceeded(userCount)
-
-  $: internalGroups = $groups?.filter(g => !g?.scimInfo?.isSync)
 
   function removeInput(idx) {
     userData = userData.filter((e, i) => i !== idx)
@@ -85,7 +80,7 @@
     if (!valid) {
       return keepOpen
     }
-    showOnboardingTypeModal({ users: userData, groups: userGroups })
+    showOnboardingTypeModal({ users: userData })
   }
 </script>
 
@@ -143,17 +138,6 @@
       </div>
     {/if}
   </Layout>
-
-  {#if $licensing.groupsEnabled && internalGroups?.length}
-    <Multiselect
-      bind:value={userGroups}
-      placeholder="No groups"
-      label="Groups"
-      options={internalGroups}
-      getOptionLabel={option => option.name}
-      getOptionValue={option => option._id}
-    />
-  {/if}
 </ModalContent>
 
 <style>

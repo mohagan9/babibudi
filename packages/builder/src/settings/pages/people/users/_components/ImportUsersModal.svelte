@@ -1,17 +1,8 @@
 <script lang="ts">
-  import {
-    Body,
-    ModalContent,
-    RadioGroup,
-    Multiselect,
-    notifications,
-    Icon,
-  } from "@budibase/bbui"
-  import { groups } from "@/stores/portal/groups"
-  import { licensing } from "@/stores/portal/licensing"
+  import { Body, ModalContent, RadioGroup, notifications } from "@budibase/bbui"
   import { admin } from "@/stores/portal/admin"
   import { emailValidator, Constants } from "@budibase/frontend-core"
-  import { capitalise, parseUserEmailsFromCSV } from "@/helpers"
+  import { parseUserEmailsFromCSV } from "@/helpers"
   const BYTES_IN_MB = 1000000
   const FILE_SIZE_LIMIT = BYTES_IN_MB * 5
   const MAX_USERS_UPLOAD_LIMIT = 1000
@@ -19,26 +10,20 @@
   export let createUsersFromCsv: (_data: {
     userEmails: string[]
     usersRole: string
-    userGroups: string[]
   }) => void
 
   let files: File[] = []
   let csvString: string | undefined = undefined
   let userEmails: string[] = []
-  let userGroups: string[] = []
   let usersRole: string | undefined = undefined
   let invalidEmails: string[] = []
 
-  $: userCount = ($licensing?.userCount || 0) + userEmails.length
-  $: exceed = licensing.usersLimitExceeded(userCount)
   $: importDisabled =
-    !userEmails.length || !validEmails(userEmails) || !usersRole || exceed
+    !userEmails.length || !validEmails(userEmails) || !usersRole
   $: roleOptions = Constants.BudibaseRoleOptions.map(option => ({
     ...option,
     label: `${option.label} - ${option.subtitle}`,
   }))
-
-  $: internalGroups = $groups?.filter(g => !g?.scimInfo?.isSync)
 
   const validEmails = (userEmails: string[]): boolean => {
     invalidEmails = [] // Reset invalid emails
@@ -98,7 +83,7 @@
   cancelText="Cancel"
   showCloseIcon={false}
   onConfirm={() =>
-    createUsersFromCsv({ userEmails, usersRole: usersRole || "", userGroups })}
+    createUsersFromCsv({ userEmails, usersRole: usersRole || "" })}
   disabled={importDisabled}
 >
   <Body size="S">Import your users email addresses from a CSV file</Body>
@@ -109,26 +94,7 @@
       {#if files[0]}{files[0].name}{:else}Upload{/if}
     </label>
   </div>
-
-  {#if exceed}
-    <div class="user-notification">
-      <Icon name="info" />
-      {capitalise($licensing?.license?.plan?.type || "")} plan is limited to {$licensing?.userLimit}
-      users. Upgrade your plan to add more users
-    </div>
-  {/if}
   <RadioGroup bind:value={usersRole} options={roleOptions} />
-
-  {#if $licensing?.groupsEnabled && internalGroups?.length}
-    <Multiselect
-      bind:value={userGroups}
-      placeholder="No groups"
-      label="Groups"
-      options={internalGroups}
-      getOptionLabel={option => option?.name || ""}
-      getOptionValue={option => option?._id || ""}
-    />
-  {/if}
 </ModalContent>
 
 <style>

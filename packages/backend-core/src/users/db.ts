@@ -9,7 +9,6 @@ import {
   PlatformUserBySsoId,
   SaveUserOpts,
   User,
-  UserGroup,
   UserIdentifier,
   UserStatus,
 } from "@budibase/types"
@@ -43,16 +42,8 @@ type QuotaUpdateFn = (
   creatorsChange: number,
   cb?: () => Promise<any>
 ) => Promise<any>
-type GroupUpdateFn = (groupId: string, userIds: string[]) => Promise<any>
 type FeatureFn = () => Promise<Boolean>
-type GroupGetFn = (ids: string[]) => Promise<UserGroup[]>
-type GroupBuildersFn = (user: User) => Promise<string[]>
 type QuotaFns = { addUsers: QuotaUpdateFn; removeUsers: QuotaUpdateFn }
-type GroupFns = {
-  addUsers: GroupUpdateFn
-  getBulk: GroupGetFn
-  getGroupBuilderAppIds: GroupBuildersFn
-}
 type CreateAdminUserOpts = {
   password?: string
   ssoId?: string
@@ -74,12 +65,10 @@ const bulkDeleteProcessing = async (dbUser: User) => {
 
 export class UserDB {
   static quotas: QuotaFns
-  static groups: GroupFns
   static features: FeatureFns
 
-  static init(quotaFns: QuotaFns, groupFns: GroupFns, featureFns: FeatureFns) {
+  static init(quotaFns: QuotaFns, featureFns: FeatureFns) {
     UserDB.quotas = quotaFns
-    UserDB.groups = groupFns
     UserDB.features = featureFns
   }
 
@@ -230,7 +219,7 @@ export class UserDB {
     const tenantId = getTenantId()
     const db = getGlobalDB()
 
-    const { email, _id, userGroups = [], roles } = user
+    const { email, _id, roles } = user
 
     if (!email && !_id) {
       throw new Error("_id or email is required")
@@ -291,19 +280,6 @@ export class UserDB {
         builtUser.roles = { ...roles }
       }
 
-      // make sure we set the _id field for a new user
-      // Also if this is a new user, associate groups with them
-      const groupPromises = []
-      if (!_id) {
-        if (userGroups.length > 0) {
-          for (let groupId of userGroups) {
-            groupPromises.push(
-              UserDB.groups.addUsers(groupId, [builtUser._id!])
-            )
-          }
-        }
-      }
-
       try {
         // save the user to db
         let response = await db.put(builtUser)
@@ -322,8 +298,6 @@ export class UserDB {
           builtUser.ssoId
         )
         await cache.user.invalidateUser(response.id)
-
-        await Promise.all(groupPromises)
 
         // finally returned the saved user from the db
         return db.get(builtUser._id!)
@@ -360,7 +334,6 @@ export class UserDB {
         unsuccessful.push({ email: newUser.email, reason: `Unavailable` })
         continue
       }
-      newUser.userGroups = groups || []
       newUsers.push(newUser)
       if (await isCreatorAsync(newUser)) {
         newCreators.push(newUser)
@@ -407,16 +380,6 @@ export class UserDB {
             email: user.email,
           }
         })
-
-        // now update the groups
-        if (Array.isArray(saved) && groups) {
-          const groupPromises = []
-          const createdUserIds = saved.map(user => user._id!)
-          for (let groupId of groups) {
-            groupPromises.push(UserDB.groups.addUsers(groupId, createdUserIds))
-          }
-          await Promise.all(groupPromises)
-        }
 
         return {
           successful: saved,
@@ -582,13 +545,5 @@ export class UserDB {
       skipPasswordValidation: opts?.skipPasswordValidation,
       isAccountHolder: true,
     })
-  }
-
-  static async getGroups(groupIds: string[]) {
-    return await this.groups.getBulk(groupIds)
-  }
-
-  static async getGroupBuilderAppIds(user: User) {
-    return await this.groups.getGroupBuilderAppIds(user)
   }
 }
