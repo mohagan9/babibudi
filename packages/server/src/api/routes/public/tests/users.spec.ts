@@ -1,6 +1,6 @@
 import * as setup from "../../tests/utilities"
 import { User } from "@budibase/types"
-import { generator, mocks } from "@budibase/backend-core/tests"
+import { generator } from "@budibase/backend-core/tests"
 import nock from "nock"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import { mockWorkerUserAPI } from "./utils"
@@ -80,10 +80,6 @@ describe("public users API", () => {
     })
 
     describe("role creation on business tier", () => {
-      beforeAll(() => {
-        mocks.licenses.useExpandedPublicApi()
-      })
-
       it("should allow 'roles' to be updated", async () => {
         const newUser = await config.api.public.user.create({
           email: generator.email({ domain: "example.com" }),

@@ -158,16 +158,7 @@ async function createInstance(appId: string, template: AppTemplate) {
   await createRoutingView()
   await createAllSearchIndex()
 
-  if (template?.useTemplate || template.file) {
-    const opts = {
-      importObjStoreContents: true,
-      updateAttachmentColumns: !template.key, // preserve attachments when using Budibase templates
-    }
-    await sdk.backups.importApp(appId, db, template, opts)
-  } else {
-    // create the users table
-    await db.put(USERS_TABLE_SCHEMA)
-  }
+  await db.put(USERS_TABLE_SCHEMA)
 
   return { _id: appId }
 }
@@ -335,23 +326,6 @@ export async function fetchAppPackage(
     getLayouts(),
     sdk.screens.fetch(),
   ])
-
-  // Enrich plugin URLs
-  application.usedPlugins = await objectStore.enrichPluginURLs(
-    application.usedPlugins
-  )
-
-  // Ensure used plugins include schema metadata (e.g. schema.metadata.svelteMajor)
-  application.usedPlugins = await sdk.plugins.enrichUsedPluginSvelteMajors(
-    application.usedPlugins
-  )
-
-  // Enrich PWA icon URLs if they exist
-  if (application.pwa?.icons && application.pwa.icons.length > 0) {
-    application.pwa.icons = await objectStore.enrichPWAImages(
-      application.pwa.icons
-    )
-  }
 
   // Only filter screens if the user is not a builder call
   const isBuilder = users.isBuilder(ctx.user, appId) && !utils.isClient(ctx)
@@ -554,22 +528,17 @@ async function performWorkspaceCreate(
       }
     }
 
-    await disableAllAppsAndAutomations()
+    await disableAllApps()
 
     await cache.workspace.invalidateWorkspaceMetadata(workspaceId, newWorkspace)
     return newWorkspace
   })
 }
 
-async function disableAllAppsAndAutomations() {
+async function disableAllApps() {
   const workspaceApps = await sdk.workspaceApps.fetch()
   for (const workspaceApp of workspaceApps.filter(a => !a.disabled)) {
     await sdk.workspaceApps.update({ ...workspaceApp, disabled: true })
-  }
-
-  const automations = await sdk.automations.fetch()
-  for (const automation of automations.filter(a => !a.disabled)) {
-    await sdk.automations.update({ ...automation, disabled: true })
   }
 }
 
@@ -762,7 +731,7 @@ async function unpublishWorkspace() {
   const prodWorkspaceId = context.getProdWorkspaceId()
 
   await context.doInWorkspaceContext(prodWorkspaceId, async () => {
-    await disableAllAppsAndAutomations()
+    await disableAllApps()
 
     // Remove metadata doc so the workspace is treated as unpublished, without
     // deleting production data.
@@ -774,7 +743,7 @@ async function unpublishWorkspace() {
   })
 
   await context.doInWorkspaceContext(devWorkspaceId, async () => {
-    await disableAllAppsAndAutomations()
+    await disableAllApps()
   })
 
   await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
@@ -919,19 +888,10 @@ export async function duplicateWorkspace(
   const url = sdk.workspaces.getAppUrl({ name: appName, url: possibleUrl })
   checkWorkspaceUrl(ctx, workspaces, url)
 
-  const tmpPath = await sdk.backups.exportApp(sourceAppId, {
-    excludeRows: false,
-    tar: false,
-  })
-
   const createRequestBody: CreateWorkspaceRequest = {
     name: appName,
     url: possibleUrl,
     useTemplate: "true",
-    // The app export path
-    file: {
-      path: tmpPath,
-    },
   }
 
   // Build a new request

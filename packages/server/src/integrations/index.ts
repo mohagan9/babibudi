@@ -17,14 +17,10 @@ import oracle from "./oracle"
 import {
   SourceName,
   Integration,
-  PluginType,
   IntegrationBase,
   DatasourcePlus,
 } from "@budibase/types"
-import { getDatasourcePlugin } from "../utilities/fileSystem"
-import env from "../environment"
 import cloneDeep from "lodash/cloneDeep"
-import sdk from "../sdk"
 
 const DEFINITIONS: Record<SourceName, Integration | undefined> = {
   [SourceName.POSTGRES]: postgres.schema,
@@ -93,24 +89,8 @@ export async function getDefinition(
 }
 
 export async function getDefinitions() {
-  const pluginSchemas: { [key: string]: Integration } = {}
-  if (env.SELF_HOSTED) {
-    const plugins = await sdk.plugins.fetch(PluginType.DATASOURCE)
-    // extract the actual schema from each custom
-    for (let plugin of plugins) {
-      const sourceId = plugin.name
-      pluginSchemas[sourceId] = {
-        ...plugin.schema["schema"],
-        custom: true,
-      }
-      if (plugin.iconUrl) {
-        pluginSchemas[sourceId].iconUrl = plugin.iconUrl
-      }
-    }
-  }
   return {
     ...cloneDeep(DEFINITIONS),
-    ...pluginSchemas,
   }
 }
 
@@ -119,20 +99,6 @@ export async function getIntegration(
 ): Promise<IntegrationBaseConstructor> {
   if (INTEGRATIONS[integration]) {
     return INTEGRATIONS[integration]
-  }
-  if (env.SELF_HOSTED) {
-    const plugins = await sdk.plugins.fetch(PluginType.DATASOURCE)
-    for (let plugin of plugins) {
-      if (plugin.name === integration) {
-        // need to use commonJS require due to its dynamic runtime nature
-        const retrieved = await getDatasourcePlugin(plugin)
-        if (retrieved.integration) {
-          return retrieved.integration
-        } else {
-          return retrieved
-        }
-      }
-    }
   }
   throw new Error(`No datasource implementation found called: "${integration}"`)
 }

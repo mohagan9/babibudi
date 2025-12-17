@@ -23,7 +23,6 @@ export type PublishStatusResource = {
 
 export interface PublishStatusResponse {
   workspaceApps: Record<string, PublishStatusResource>
-  automations: Record<string, PublishStatusResource>
   tables: Record<string, PublishStatusResource>
 }
 

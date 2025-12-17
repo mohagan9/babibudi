@@ -104,14 +104,6 @@ export async function buildSchemaFromSource(
 
   const { tables, errors } = await buildFilteredSchema(datasource, tablesFilter)
 
-  const oldTables = datasource.entities || {}
-  const tablesToRemove = Object.keys(oldTables).filter(
-    t => !Object.keys(tables).includes(t)
-  )
-  for (const table of tablesToRemove) {
-    await sdk.rowActions.deleteAll(oldTables[table]._id!)
-  }
-
   datasource.entities = tables
 
   datasources.setDefaultDisplayColumns(datasource)

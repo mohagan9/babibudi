@@ -20,7 +20,6 @@ if (describes.length > 0) {
     beforeAll(async () => {
       await config.init()
       restoreEnv = setEnv({ ENCRYPTION_KEY: "budibase" })
-      mocks.licenses.useEnvironmentVariables()
 
       const ds = await dsProvider()
       rawDatasource = ds.rawDatasource!

@@ -1,6 +1,5 @@
 import { context } from "@budibase/backend-core"
 import {
-  Automation,
   PublishResourceState,
   PublishStatusResource,
   Screen,
@@ -26,31 +25,26 @@ export async function status() {
   const productionExists =
     await sdk.workspaces.isWorkspacePublished(prodWorkspaceId)
   type State = {
-    automations: Automation[]
     workspaceApps: WorkspaceApp[]
     screens: Screen[]
     tables: Table[]
   }
   const developmentState: State = {
-    automations: [],
     workspaceApps: [],
     screens: [],
     tables: [],
   }
   const productionState: State = {
-    automations: [],
     workspaceApps: [],
     screens: [],
     tables: [],
   }
   const updateState = async (state: State) => {
-    const [automations, workspaceApps, screens, tables] = await Promise.all([
-      sdk.automations.fetch(),
+    const [workspaceApps, screens, tables] = await Promise.all([
       sdk.workspaceApps.fetch(),
       sdk.screens.fetch(),
       sdk.tables.getAllInternalTables(),
     ])
-    state.automations = automations
     state.workspaceApps = workspaceApps
     state.screens = screens
     state.tables = tables
@@ -71,7 +65,6 @@ export async function status() {
   }
 
   // Create maps of production state for quick lookup
-  const prodAutomationIds = new Set(productionState.automations.map(a => a._id))
   const prodWorkspaceAppIds = new Set(
     productionState.workspaceApps.map(w => w._id)
   )
@@ -101,12 +94,6 @@ export async function status() {
     }
   }
 
-  // Build response maps comparing development vs production
-  const automations: Record<string, PublishStatusResource> = {}
-  for (const automation of developmentState.automations) {
-    processResource(automations, prodAutomationIds, automation)
-  }
-
   const tables: Record<string, PublishStatusResource> = {}
   for (const table of developmentState.tables) {
     processResource(tables, prodTableIds, table)
@@ -132,5 +119,5 @@ export async function status() {
     }
   }
 
-  return { automations, workspaceApps, tables }
+  return { workspaceApps, tables }
 }

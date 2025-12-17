@@ -32,9 +32,6 @@ describe("/api/deploy", () => {
     it("returns empty state when unpublished", async () => {
       await config.api.workspace.unpublish(config.devWorkspaceId!)
       const res = await config.api.deploy.publishStatus()
-      for (const automation of Object.values(res.automations)) {
-        expect(automation.published).toBe(false)
-      }
       // default screens will appear here
       for (const workspaceApp of Object.values(res.workspaceApps)) {
         expect(workspaceApp.published).toBe(false)

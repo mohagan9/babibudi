@@ -2,7 +2,7 @@ import { constants, context, logging } from "@budibase/backend-core"
 import { DocUpdateEvent, WorkspaceResourceEvents } from "@budibase/types"
 import sdk from "../../sdk"
 
-const { AUTOMATION, DATASOURCE, TABLE, WORKSPACE_APP, QUERY, MEM_VIEW } =
+const { DATASOURCE, TABLE, WORKSPACE_APP, QUERY, MEM_VIEW } =
   constants.DocumentType
 
 export default function process() {
@@ -12,7 +12,6 @@ export default function process() {
       const appId = update.appId
 
       const isWSResource = [
-        AUTOMATION,
         DATASOURCE,
         TABLE,
         WORKSPACE_APP,

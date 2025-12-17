@@ -1,5 +1,4 @@
 import {
-  Automation,
   Datasource,
   Query,
   Table,
@@ -10,7 +9,6 @@ import {
 } from "@budibase/types"
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
 import {
-  basicAutomation,
   basicQuery,
   basicTable,
   basicView,
@@ -27,7 +25,6 @@ describe("/workspace", () => {
   let datasource: Datasource
   let query: Query
   let viewV2: ViewV2
-  let automation: Automation
   let workspaceApp: WorkspaceApp
 
   afterAll(setup.afterAll)
@@ -52,10 +49,6 @@ describe("/workspace", () => {
     [WorkspaceResource.QUERY]: async () =>
       await config.api.query.save(basicQuery(datasource?._id!)),
 
-    [WorkspaceResource.AUTOMATION]: async () => {
-      const resp = await config.api.automation.post(basicAutomation())
-      return resp.automation
-    },
     [WorkspaceResource.WORKSPACE_APP]: async () => {
       const resp = await config.api.workspaceApp.create(
         structures.workspaceApps.createRequest({
@@ -114,11 +107,6 @@ describe("/workspace", () => {
     await favouriteAndVerify(query._id!, WorkspaceResource.QUERY)
   })
 
-  it("should be able to favourite a valid automation", async () => {
-    automation = await createResource(WorkspaceResource.AUTOMATION)
-    await favouriteAndVerify(automation._id!, WorkspaceResource.AUTOMATION)
-  })
-
   it("should be able to favourite a valid workspace app", async () => {
     workspaceApp = await createResource(WorkspaceResource.WORKSPACE_APP)
     await favouriteAndVerify(workspaceApp._id!, WorkspaceResource.WORKSPACE_APP)
@@ -131,7 +119,6 @@ describe("/workspace", () => {
       { resource: table, type: WorkspaceResource.TABLE },
       { resource: viewV2, type: WorkspaceResource.VIEW },
       { resource: query, type: WorkspaceResource.QUERY },
-      { resource: automation, type: WorkspaceResource.AUTOMATION },
       { resource: workspaceApp, type: WorkspaceResource.WORKSPACE_APP },
     ]
 
@@ -162,7 +149,7 @@ describe("/workspace", () => {
   })
 
   it("should fetch all the users favourited resources", async () => {
-    const resources = [table, viewV2, query, automation, workspaceApp]
+    const resources = [table, viewV2, query, workspaceApp]
     const resp = await config.api.workspaceFavourites.fetchAll()
 
     expect(resp.favourites.length).toBe(5)
@@ -181,26 +168,6 @@ describe("/workspace", () => {
       const resp = await config.api.workspaceFavourites.fetchAll()
       // This user shouldn't have any, even though the default user has 5
       expect(resp.favourites.length).toBe(0)
-    })
-  })
-
-  it("should allow different users to favourite the same resources", async () => {
-    await config.withUser(altUser, async () => {
-      // Favourite existing, favourite resources
-      await config.api.workspaceFavourites.save({
-        resourceType: WorkspaceResource.WORKSPACE_APP,
-        resourceId: workspaceApp._id!,
-      })
-
-      await config.api.workspaceFavourites.save({
-        resourceType: WorkspaceResource.AUTOMATION,
-        resourceId: automation._id!,
-      })
-
-      const resp = await config.api.workspaceFavourites.fetchAll()
-
-      // The alt user, should now have their own favourites
-      expect(resp.favourites.length).toBe(2)
     })
   })
 

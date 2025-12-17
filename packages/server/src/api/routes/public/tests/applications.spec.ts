@@ -1,4 +1,3 @@
-import { mocks } from "@budibase/backend-core/tests"
 import { User } from "@budibase/types"
 import { join } from "path"
 import * as setup from "../../tests/utilities"
@@ -72,7 +71,6 @@ describe("check export/import", () => {
   })
 
   it("should be able to export app", async () => {
-    mocks.licenses.useExpandedPublicApi()
     const res = await runExport()
     expect(res.headers["content-disposition"]).toMatch(
       /attachment; filename=".*-export-.*\.tar.gz"/g
@@ -82,7 +80,6 @@ describe("check export/import", () => {
   })
 
   it("should be able to import app", async () => {
-    mocks.licenses.useExpandedPublicApi()
     const res = await runImport()
     expect(Object.keys(res.body).length).toBe(0)
     // check screens imported correctly

@@ -1,4 +1,4 @@
-import { generator, mocks, structures } from "@budibase/backend-core/tests"
+import { generator, structures } from "@budibase/backend-core/tests"
 
 // init the licensing mock
 import {
@@ -16,17 +16,14 @@ import {
 import { init as dbInit } from "../../db"
 import env from "../../environment"
 import {
-  automation as automationController,
   deploy as deployController,
   layout as layoutController,
   query as queryController,
   role as roleController,
   view as viewController,
-  webhook as webhookController,
   workspace as workspaceController,
 } from "./controllers"
 import {
-  basicAutomation,
   basicDatasource,
   basicLayout,
   basicQuery,
@@ -40,7 +37,6 @@ import {
 
 import {
   AuthToken,
-  Automation,
   CreateViewRequest,
   Datasource,
   DevInfo,
@@ -74,9 +70,6 @@ import API from "./api"
 
 const newid = utils.newid
 
-// use unlimited license by default
-mocks.licenses.useUnlimited()
-
 dbInit()
 
 export interface TableToBuild extends Omit<Table, "sourceId" | "sourceType"> {
@@ -98,7 +91,6 @@ export default class TestConfiguration {
   user?: User
   userMetadataId?: string
   table?: Table
-  automation?: Automation
   datasource?: Datasource
   tenantId?: string
   api: API
@@ -186,15 +178,6 @@ export default class TestConfiguration {
       firstName: user.firstName,
       lastName: user.lastName,
     }
-  }
-
-  getAutomation() {
-    if (!this.automation) {
-      throw new Error(
-        "automation has not been initialised, call config.init() first"
-      )
-    }
-    return this.automation
   }
 
   getDatasource() {
@@ -851,42 +834,6 @@ export default class TestConfiguration {
     }
 
     return await this.api.viewV2.create(view)
-  }
-
-  // AUTOMATION
-
-  async createAutomation(config?: Automation) {
-    config = config || basicAutomation()
-    if (config._rev) {
-      delete config._rev
-    }
-    const res = await this._req(automationController.create, config)
-    this.automation = res.automation
-    return this.automation
-  }
-
-  async getAllAutomations() {
-    return this._req(automationController.fetch)
-  }
-
-  async deleteAutomation(automation?: Automation) {
-    automation = automation || this.automation
-    if (!automation) {
-      return
-    }
-    return this._req(automationController.destroy, undefined, {
-      id: automation._id,
-      rev: automation._rev,
-    })
-  }
-
-  async createWebhook(config?: Webhook) {
-    if (!this.automation) {
-      throw "Must create an automation before creating webhook."
-    }
-    config = config || basicWebhook(this.automation._id!)
-
-    return (await this._req(webhookController.save, config)).webhook
   }
 
   // DATASOURCE

@@ -13,13 +13,6 @@ describe("run misc tests", () => {
     await config.init()
   })
 
-  describe("/bbtel", () => {
-    it("check if analytics enabled", async () => {
-      const { enabled } = await config.api.misc.bbtel()
-      expect(enabled).toEqual(true)
-    })
-  })
-
   describe("/health", () => {
     it("should confirm healthy", async () => {
       await config.api.misc.health()

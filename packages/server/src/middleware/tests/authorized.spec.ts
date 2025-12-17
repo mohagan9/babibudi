@@ -88,7 +88,6 @@ describe("Authorization middleware", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mocks.licenses.useCloudFree()
     config = new TestConfiguration()
   })
 

@@ -1,5 +1,5 @@
 import { roles } from "@budibase/backend-core"
-import { generator, mocks } from "@budibase/backend-core/tests"
+import { generator } from "@budibase/backend-core/tests"
 import {
   BuiltinPermissionID,
   Document,
@@ -26,10 +26,6 @@ describe("/permission", () => {
 
   beforeAll(async () => {
     await config.init()
-  })
-
-  beforeEach(async () => {
-    mocks.licenses.useCloudFree()
   })
 
   describe("levels", () => {

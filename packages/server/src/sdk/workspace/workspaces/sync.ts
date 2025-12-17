@@ -183,10 +183,6 @@ export async function syncWorkspace(
     })
     try {
       const replOpts = replication.appReplicateOpts()
-      if (opts?.automationOnly) {
-        replOpts.filter = (doc: any) =>
-          doc._id.startsWith(dbCore.DocumentType.AUTOMATION)
-      }
       await replication.replicate(replOpts)
     } catch (err) {
       error = err

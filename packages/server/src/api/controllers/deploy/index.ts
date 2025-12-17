@@ -200,10 +200,9 @@ export async function deploymentProgress(
 }
 
 export async function publishStatus(ctx: UserCtx<void, PublishStatusResponse>) {
-  const { automations, workspaceApps, tables } = await sdk.deployment.status()
+  const { workspaceApps, tables } = await sdk.deployment.status()
 
   ctx.body = {
-    automations,
     workspaceApps,
     tables,
   }
@@ -254,15 +253,6 @@ export const publishWorkspace = async function (
             }
 
             await sdk.workspaceApps.update({ ...workspaceApp, disabled: true })
-          }
-
-          const allAutomations = await sdk.automations.fetch()
-          for (const automation of allAutomations) {
-            if (automation.disabled !== undefined) {
-              continue
-            }
-
-            await sdk.automations.update({ ...automation, disabled: true })
           }
         }
 

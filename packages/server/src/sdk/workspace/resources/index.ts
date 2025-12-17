@@ -31,7 +31,6 @@ import { getRowParams } from "../../../db/utils"
 export async function getResourcesInfo(): Promise<
   Record<string, { dependencies: UsedResource[] }>
 > {
-  const automations = await sdk.automations.fetch()
   const workspaceApps = await sdk.workspaceApps.fetch()
 
   const dependencies: Record<string, { dependencies: UsedResource[] }> = {}
@@ -115,11 +114,6 @@ export async function getResourcesInfo(): Promise<
   // Search in tables
   for (const table of internalTables) {
     searchForUsages(table._id!, table)
-  }
-
-  // Search in automations
-  for (const automation of automations) {
-    searchForUsages(automation._id, automation)
   }
 
   // Search in queries

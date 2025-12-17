@@ -1,4 +1,3 @@
-import { AnalyticsEnabledResponse } from "@budibase/types"
 import { Expectations, TestAPI } from "./base"
 
 export class MiscAPI extends TestAPI {
@@ -8,11 +7,5 @@ export class MiscAPI extends TestAPI {
 
   version = async (expectations?: Expectations) => {
     return (await this._requestRaw("get", "/version", { expectations })).text
-  }
-
-  bbtel = async (expectations?: Expectations) => {
-    return await this._get<AnalyticsEnabledResponse>("/api/bbtel", {
-      expectations,
-    })
   }
 }

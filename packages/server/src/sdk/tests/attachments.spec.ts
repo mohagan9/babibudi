@@ -39,9 +39,6 @@ describe("should be able to re-write attachment URLs", () => {
     }
 
     const db = dbCore.getDB(config.getDevWorkspaceId())
-    await config.doInContext(config.getDevWorkspaceId(), () =>
-      sdk.backups.updateAttachmentColumns(db.name, db)
-    )
 
     return {
       db,

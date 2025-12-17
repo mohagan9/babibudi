@@ -118,7 +118,7 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
     )
     return response
   }
-  const { row, table, squashed } = tableId.includes("datasource_plus")
+  const { row, table } = tableId.includes("datasource_plus")
     ? await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
     : await saveQuery()
 
@@ -130,9 +130,8 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
     user: sdk.users.getUserContextBindings(ctx.user),
   })
   ctx.message = `${table.name} saved successfully`
-  // prefer squashed for response
-  ctx.body = row || squashed
-  gridSocket?.emitRowUpdate(ctx, row || squashed)
+  ctx.body = row
+  gridSocket?.emitRowUpdate(ctx, row)
 }
 
 export async function fetchLegacyView(ctx: any) {
