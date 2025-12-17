@@ -6,7 +6,6 @@ import {
   SystemStatusResponse,
 } from "@budibase/types"
 import { get } from "svelte/store"
-import Analytics from "../../analytics"
 import { BudiStore } from "../BudiStore"
 import { auth } from "./auth"
 
@@ -35,7 +34,6 @@ export class AdminStore extends BudiStore<AdminState> {
     // enable system status checks in the cloud
     if (get(this.store).cloud) {
       // in cloud allow this
-      Analytics.enableSessionRecording()
       await this.getSystemStatus()
       this.checkStatus()
     }

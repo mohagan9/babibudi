@@ -3,7 +3,6 @@ import { endpointGroupList } from "./endpointGroups"
 
 // just need to import routes, they'll include themselves in the
 // various groups they need to be included in
-import "./analytics"
 import "./apikeys"
 import "./auth"
 import "./backup"
