@@ -1,10 +1,8 @@
-import { api as pro } from "@budibase/pro"
 import Router from "@koa/router"
 import { endpointGroupList } from "./endpointGroups"
 
 // just need to import routes, they'll include themselves in the
 // various groups they need to be included in
-import "./ai"
 import "./analytics"
 import "./apikeys"
 import "./auth"
@@ -46,8 +44,6 @@ export { default as assetRoutes } from "./assets"
 export { default as publicRoutes } from "./public"
 export { default as staticRoutes } from "./static"
 
-const appBackupRoutes = pro.appBackups
-const environmentVariableRoutes = pro.environmentVariables
 const endpoints = endpointGroupList.listAllEndpoints()
 
 const appRoutes = new Router()
@@ -57,6 +53,4 @@ for (let endpoint of endpoints) {
 
 export const mainRoutes: Router[] = [
   appRoutes,
-  appBackupRoutes,
-  environmentVariableRoutes,
 ]

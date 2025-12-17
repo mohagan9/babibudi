@@ -1,14 +1,12 @@
 import {
   cache,
   env as coreEnv,
-  events,
   features,
   installation,
   logging,
   tenancy,
   users,
 } from "@budibase/backend-core"
-import * as pro from "@budibase/pro"
 import bson from "bson"
 import fs from "fs"
 import { Server } from "http"
@@ -48,18 +46,6 @@ async function initRoutes(app: Koa) {
   // api routes
   app.use(api.router.routes())
   app.use(api.router.allowedMethods())
-}
-
-async function initPro() {
-  await pro.init({
-    backups: {
-      processing: {
-        exportAppFn: sdk.backups.exportApp,
-        importAppFn: sdk.backups.importApp,
-        statsFn: sdk.backups.calculateBackupStats,
-      },
-    },
-  })
 }
 
 export async function startup(
@@ -123,15 +109,11 @@ export async function startup(
   // get the references to the queue promises, don't await as
   // they will never end, unless the processing stops
   let queuePromises = []
-  // configure events to use the pro audit log write
-  // can't integrate directly into backend-core due to cyclic issues
-  queuePromises.push(events.processors.init(pro.sdk.auditLogs.write))
   // app migrations and automations on other service
   if (automationsEnabled()) {
     queuePromises.push(automations.init())
     queuePromises.push(workspaceMigrations.init())
   }
-  queuePromises.push(initPro())
   queuePromises.push(sdk.dev.init())
   if (app) {
     console.log("Initialising routes")

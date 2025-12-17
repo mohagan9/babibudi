@@ -4,11 +4,9 @@ import {
   platform,
   tenancy,
 } from "@budibase/backend-core"
-import { quotas } from "@budibase/pro"
 import { ConfigType, LockReason, SettingsConfig } from "@budibase/types"
 
 export async function deleteTenant(tenantId: string) {
-  await quotas.bustCache()
   await removeTenantUsers(tenantId)
   await removeTenantApps(tenantId)
   await removeGlobalDB(tenantId)

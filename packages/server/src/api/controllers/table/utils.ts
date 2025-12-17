@@ -1,5 +1,4 @@
 import { context, events, HTTPError } from "@budibase/backend-core"
-import { quotas } from "@budibase/pro"
 import {
   AutoFieldSubType,
   Database,
@@ -229,9 +228,7 @@ export async function handleDataImport(
       })
   }
 
-  await quotas.addRows(newRowCount, () => db.bulkDocs(finalData), {
-    tableId: table._id,
-  })
+  await db.bulkDocs(finalData)
 
   await events.rows.imported(table, finalData.length)
   return table

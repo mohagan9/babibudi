@@ -15,7 +15,6 @@ import {
   redis,
   timers,
 } from "@budibase/backend-core"
-import { sdk as proSdk } from "@budibase/pro"
 import { bootstrap } from "global-agent"
 import http from "http"
 import gracefulShutdown from "http-graceful-shutdown"
@@ -154,7 +153,4 @@ export default server.listen(parseInt(env.PORT || "4002"), async () => {
   }
 
   cache.docWritethrough.init()
-  // configure events to use the pro audit log write
-  // can't integrate directly into backend-core due to cyclic issues
-  await events.processors.init(proSdk.auditLogs.write)
 })

@@ -1,5 +1,4 @@
 import { constants, logging, queue } from "@budibase/backend-core"
-import { sdk as proSdk } from "@budibase/pro"
 import { DocUpdateEvent, WorkspaceUserSyncEvents } from "@budibase/types"
 import { syncUsersAcrossWorkspaces } from "../../sdk/workspace/workspaces/sync"
 
@@ -67,9 +66,6 @@ export default function process() {
         if ("userIds" in update.properties) {
           userIds.push(...update.properties.userIds)
         }
-
-        const group = await proSdk.groups.get(docId)
-        userIds.push(...(group.users?.map(user => user._id) || []))
       } else {
         userIds.push(docId)
       }

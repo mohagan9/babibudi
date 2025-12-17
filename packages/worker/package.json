@@ -30,7 +30,6 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@budibase/backend-core": "*",
-    "@budibase/pro": "*",
     "@budibase/shared-core": "*",
     "@budibase/string-templates": "*",
     "@budibase/types": "*",
@@ -90,9 +89,6 @@
     "superagent": "^10.1.1",
     "supertest": "6.3.3",
     "timekeeper": "2.2.0"
-  },
-  "resolutions": {
-    "@budibase/pro": "npm:@budibase/pro@latest"
   },
   "nx": {
     "targets": {

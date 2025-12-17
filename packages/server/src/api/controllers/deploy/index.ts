@@ -5,7 +5,6 @@ import {
   errors,
   events,
 } from "@budibase/backend-core"
-import { backups } from "@budibase/pro"
 import {
   Automation,
   BackupTrigger,
@@ -319,12 +318,6 @@ export const publishWorkspace = async function (
         }
 
         const isPublished = await sdk.workspaces.isWorkspacePublished(prodId)
-
-        if (await backups.isEnabled()) {
-          await backups.triggerAppBackup(prodId, BackupTrigger.PUBLISH, {
-            createdBy: ctx.user._id,
-          })
-        }
         const config = {
           source: devId,
           target: prodId,

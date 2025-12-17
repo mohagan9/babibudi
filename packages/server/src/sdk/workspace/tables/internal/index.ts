@@ -1,5 +1,4 @@
 import { context, HTTPError } from "@budibase/backend-core"
-import { quotas } from "@budibase/pro"
 import { findDuplicateInternalColumns } from "@budibase/shared-core"
 import {
   FieldType,
@@ -210,11 +209,6 @@ export async function destroy(table: Table) {
     )
   ).rows.map(data => data.doc!)
   await db.bulkDocs(rows.map((row: Row) => ({ ...row, _deleted: true })))
-
-  // remove rows from quota
-  await quotas.removeRows(rows.length, {
-    tableId,
-  })
 
   // update linked rows
   await updateLinks({

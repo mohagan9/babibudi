@@ -4,7 +4,6 @@ const compress = require("koa-compress")
 
 import zlib from "zlib"
 import { routes } from "./routes"
-import { middleware as pro } from "@budibase/pro"
 import { auth, middleware } from "@budibase/backend-core"
 
 const PUBLIC_ENDPOINTS = [
@@ -152,7 +151,6 @@ router
   .use(auth.buildTenancyMiddleware(PUBLIC_ENDPOINTS, NO_TENANCY_ENDPOINTS))
   .use(middleware.activeTenant())
   .use(auth.buildCsrfMiddleware({ noCsrfPatterns: NO_CSRF_ENDPOINTS }))
-  .use(pro.licensing())
   // for now no public access is allowed to worker (bar health check)
   .use((ctx, next) => {
     if (ctx.publicEndpoint) {

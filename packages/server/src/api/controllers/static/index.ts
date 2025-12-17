@@ -7,7 +7,6 @@ import {
   objectStore,
   utils,
 } from "@budibase/backend-core"
-import * as pro from "@budibase/pro"
 import { InvalidFileExtensions } from "@budibase/shared-core"
 import { processString } from "@budibase/string-templates"
 import {
@@ -210,7 +209,6 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
     configs.getSettingsConfigDoc(),
     configs.getRecaptchaConfig(),
   ])
-  const branding = await pro.branding.getBrandingConfig(settingsConfig.config)
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
   if (!fs.existsSync(appHbsPath)) {
@@ -245,22 +243,18 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
       const appName = workspaceApp?.name || `${appInfo.name}`
       const nonce = ctx.state.nonce || ""
       let props: BudibaseAppProps = {
-        title: branding?.platformTitle || appName,
+        title: appName,
         showSkeletonLoader: appInfo.features?.skeletonLoader ?? false,
         hideDevTools,
         sideNav,
         hideFooter,
         metaImage:
-          branding?.metaImageUrl ||
           "https://res.cloudinary.com/daog6scxm/image/upload/v1698759482/meta-images/plain-branded-meta-image-coral_ocxmgu.png",
-        metaDescription: branding?.metaDescription || "",
-        metaTitle: branding?.metaTitle || `${appName} - built with Budibase`,
+        metaDescription: "",
+        metaTitle: `${appName} - built with Budibase`,
         clientCacheKey: await objectStore.getClientCacheKey(appInfo.version),
         usedPlugins: plugins,
-        favicon:
-          branding.faviconUrl !== ""
-            ? await objectStore.getGlobalFileUrl("settings", "faviconUrl")
-            : "",
+        favicon: "",
         appMigrating: !fullyMigrated,
         recaptchaKey: recaptchaConfig?.config.siteKey,
         nonce,
@@ -277,40 +271,6 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
       const appHbs = loadHandlebarsFile(appHbsPath)
 
       let extraHead = ""
-      const pwaEnabled = await pro.features.isPWAEnabled()
-      if (hasPWA && appInfo.pwa && pwaEnabled) {
-        extraHead = `<link rel="manifest" href="${manifestUrl}">`
-        extraHead += `<meta name="mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content=${
-          appInfo.pwa.theme_color
-        }>
-        <meta name="apple-mobile-web-app-title" content="${
-          appInfo.pwa.short_name || appInfo.name
-        }">`
-
-        if (appInfo.pwa.icons && appInfo.pwa.icons.length > 0) {
-          try {
-            // Enrich all icons
-            const enrichedIcons = await objectStore.enrichPWAImages(
-              appInfo.pwa.icons
-            )
-
-            let appleTouchIcon = enrichedIcons.find(
-              icon => icon.sizes === "180x180"
-            )
-
-            if (!appleTouchIcon && enrichedIcons.length > 0) {
-              appleTouchIcon = enrichedIcons[0]
-            }
-
-            if (appleTouchIcon) {
-              extraHead += `<link rel="apple-touch-icon" sizes="${appleTouchIcon.sizes}" href="${appleTouchIcon.src}">`
-            }
-          } catch (error) {
-            throw new Error("Error enriching PWA icons: " + error)
-          }
-        }
-      }
 
       ctx.body = await processString(appHbs, {
         head: `${head}${extraHead}`,

@@ -1,6 +1,4 @@
 import { context } from "@budibase/backend-core"
-import { ai } from "@budibase/pro"
-import { OperationFields } from "@budibase/shared-core"
 import { processStringSync } from "@budibase/string-templates"
 import {
   AutoColumnFieldMetadata,
@@ -8,13 +6,11 @@ import {
   FieldSchema,
   FieldType,
   FormulaType,
-  OperationFieldTypeEnum,
   Row,
   Table,
 } from "@budibase/types"
 import tracer from "dd-trace"
 import { AutoFieldDefaultNames } from "../../constants"
-import { isAIColumn } from "../../db/utils"
 import { coerce } from "./index"
 
 interface FormulaOpts {
@@ -108,69 +104,6 @@ export async function processFormulas<T extends Row | Row[]>(
           }
         }
       }
-    }
-    return Array.isArray(inputRows) ? rows : rows[0]
-  })
-}
-
-/**
- * Looks through the rows provided and finds AI columns - which it then processes.
- */
-export async function processAIColumns<T extends Row | Row[]>(
-  table: Table,
-  inputRows: T,
-  { contextRows }: FormulaOpts
-): Promise<T> {
-  const aiColumns = Object.values(table.schema).filter(isAIColumn)
-  if (!aiColumns.length) {
-    return inputRows
-  }
-
-  return tracer.trace("processAIColumns", {}, async span => {
-    const numRows = Array.isArray(inputRows) ? inputRows.length : 1
-    span?.addTags({ table_id: table._id, numRows })
-    const rows = Array.isArray(inputRows) ? inputRows : [inputRows]
-
-    const llm = await ai.getLLM()
-    if (rows && llm) {
-      // Ensure we have snippet context
-      await context.ensureSnippetContext()
-
-      const aiColumns = Object.values(table.schema).filter(isAIColumn)
-
-      const rowUpdates = rows.flatMap((row, i) => {
-        const contextRow = contextRows ? contextRows[i] : row
-
-        return aiColumns.map(aiColumn => {
-          const column = aiColumn.name
-
-          // Check if the type is bindable and pass through HBS if so
-          const operationField = OperationFields[aiColumn.operation]
-          for (const key in aiColumn) {
-            const fieldType = operationField[key as keyof typeof operationField]
-            if (fieldType === OperationFieldTypeEnum.BINDABLE_TEXT) {
-              // @ts-expect-error: keys are not casted
-              aiColumn[key] = processStringSync(aiColumn[key], contextRow)
-            }
-          }
-
-          return tracer.trace("processAIColumn", {}, async span => {
-            span?.addTags({ table_id: table._id, column })
-            const llmResponse = await llm.operation(aiColumn, row)
-            return {
-              rowIndex: i,
-              columnName: column,
-              value: llmResponse.message,
-            }
-          })
-        })
-      })
-
-      const processedAIColumns = await Promise.all(rowUpdates)
-
-      processedAIColumns.forEach(aiColumn => {
-        rows[aiColumn.rowIndex][aiColumn.columnName] = aiColumn.value
-      })
     }
     return Array.isArray(inputRows) ? rows : rows[0]
   })

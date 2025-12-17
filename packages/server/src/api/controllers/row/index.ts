@@ -2,7 +2,6 @@ import archiver from "archiver"
 import stream from "stream"
 
 import { context, events, objectStore } from "@budibase/backend-core"
-import { quotas } from "@budibase/pro"
 import { dataFilters } from "@budibase/shared-core"
 import {
   Ctx,
@@ -68,13 +67,14 @@ export async function patch(
   }
   try {
     const api = pickApi(tableId)
-    const { row, table, oldRow } = isExternalTableID(tableId)
-      ? await api.patch(ctx)
-      : await quotas.addAction(async () => {
+    const runQuery = async () => {
           const response = await api.patch(ctx)
           events.action.crudExecuted({ type: "update" })
           return response
-        })
+        }
+    const { row, table, oldRow } = isExternalTableID(tableId)
+      ? await api.patch(ctx)
+      : await runQuery()
     if (!row) {
       ctx.throw(404, "Row not found")
     }
@@ -111,15 +111,14 @@ export const save = async (ctx: UserCtx<SaveRowRequest, SaveRowResponse>) => {
   if (body && body._id) {
     return patch(ctx as UserCtx<PatchRowRequest, PatchRowResponse>)
   }
-  const { row, table, squashed } = tableId.includes("datasource_plus")
-    ? await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
-    : await quotas.addAction(async () => {
-        const response = await quotas.addRow(() =>
-          sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
-        )
+  const saveQuery = async () => {
+        const response = await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
         events.action.crudExecuted({ type: "create" })
         return response
-      })
+      }
+  const { row, table, squashed } = tableId.includes("datasource_plus")
+    ? await sdk.rows.save(sourceId, ctx.request.body, ctx.user?._id)
+    : await saveQuery()
 
   ctx.eventEmitter?.emitRow({
     eventName: EventType.ROW_SAVE,
@@ -195,17 +194,8 @@ async function deleteRows(ctx: UserCtx<DeleteRowRequest>) {
 
   deleteRequest.rows = await processDeleteRowsRequest(ctx)
 
-  const { rows } = isExternalTableID(tableId)
-    ? await pickApi(tableId).bulkDestroy(ctx)
-    : await quotas.addAction(async () => {
-        const response = await pickApi(tableId).bulkDestroy(ctx)
-        events.action.crudExecuted({ type: "delete" })
-        return response
-      })
 
-  if (!tableId.includes("datasource_plus")) {
-    await quotas.removeRows(rows.length)
-  }
+  const { rows } = await pickApi(tableId).bulkDestroy(ctx)
 
   for (let row of rows) {
     ctx.eventEmitter?.emitRow({
@@ -223,16 +213,7 @@ async function deleteRow(ctx: UserCtx<DeleteRowRequest>) {
   const appId = ctx.appId
   const { tableId } = utils.getSourceId(ctx)
   const api = pickApi(tableId)
-  const resp = isExternalTableID(tableId)
-    ? await api.destroy(ctx)
-    : await quotas.addAction(async () => {
-        const response = await api.destroy(ctx)
-        events.action.crudExecuted({ type: "delete" })
-        return response
-      })
-  if (!tableId.includes("datasource_plus")) {
-    await quotas.removeRow()
-  }
+  const resp = await api.destroy(ctx)
 
   ctx.eventEmitter?.emitRow({
     eventName: EventType.ROW_DELETE,

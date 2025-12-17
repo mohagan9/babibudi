@@ -1,5 +1,4 @@
 import { context, db as dbCore } from "@budibase/backend-core"
-import { sdk as proSdk } from "@budibase/pro"
 import { UserCtx } from "@budibase/types"
 import { Next } from "koa"
 import { Application } from "../../../definitions/common"
@@ -95,14 +94,6 @@ export async function publish(ctx: UserCtx, next: Next) {
   })
 }
 
-// get licensed endpoints from pro
-export const importToApp = proSdk.publicApi.applications.buildImportFn(
-  controller.importToWorkspace
-)
-export const exportApp = proSdk.publicApi.applications.buildExportFn(
-  backupController.exportAppDump
-)
-
 export default {
   create,
   update,
@@ -111,6 +102,4 @@ export default {
   search,
   unpublish,
   publish,
-  importToApp,
-  exportApp,
 }

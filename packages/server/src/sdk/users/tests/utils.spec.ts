@@ -1,6 +1,4 @@
 import { db, roles } from "@budibase/backend-core"
-import { structures } from "@budibase/backend-core/tests"
-import { sdk as proSdk } from "@budibase/pro"
 import tk from "timekeeper"
 
 import TestConfiguration from "../../../tests/utilities/TestConfiguration"
@@ -172,86 +170,6 @@ describe("syncGlobalUsers", () => {
           _id: db.generateUserMetadataID(user._id!),
         })
       )
-    })
-  })
-
-  it("workspace users are added when group is assigned to workspace", async () => {
-    await config.doInTenant(async () => {
-      const group = await proSdk.groups.save(structures.userGroups.userGroup())
-      const user1 = await config.createUser({
-        admin: { global: false },
-        builder: { global: false },
-      })
-      const user2 = await config.createUser({
-        admin: { global: false },
-        builder: { global: false },
-      })
-      await proSdk.groups.addUsers(group.id, [user1._id!, user2._id!])
-
-      await config.doInContext(config.devWorkspaceId, async () => {
-        await syncGlobalUsers()
-        expect(await rawUserMetadata()).toHaveLength(1)
-
-        await proSdk.groups.updateGroupApps(group.id, {
-          appsToAdd: [
-            {
-              appId: config.prodWorkspaceId!,
-              roleId: roles.BUILTIN_ROLE_IDS.BASIC,
-            },
-          ],
-        })
-        await syncGlobalUsers()
-
-        const metadata = await rawUserMetadata()
-
-        expect(metadata).toHaveLength(2 + 1) // ADMIN user created in test bootstrap still in the application
-        expect(metadata).toContainEqual(
-          expect.objectContaining({
-            _id: db.generateUserMetadataID(user1._id!),
-          })
-        )
-        expect(metadata).toContainEqual(
-          expect.objectContaining({
-            _id: db.generateUserMetadataID(user2._id!),
-          })
-        )
-      })
-    })
-  })
-
-  it("workspace users are removed when workspace is removed from user group", async () => {
-    await config.doInTenant(async () => {
-      const group = await proSdk.groups.save(structures.userGroups.userGroup())
-      const user1 = await config.createUser({
-        admin: { global: false },
-        builder: { global: false },
-      })
-      const user2 = await config.createUser({
-        admin: { global: false },
-        builder: { global: false },
-      })
-      await proSdk.groups.updateGroupApps(group.id, {
-        appsToAdd: [
-          {
-            appId: config.prodWorkspaceId!,
-            roleId: roles.BUILTIN_ROLE_IDS.BASIC,
-          },
-        ],
-      })
-      await proSdk.groups.addUsers(group.id, [user1._id!, user2._id!])
-
-      await config.doInContext(config.devWorkspaceId, async () => {
-        await syncGlobalUsers()
-        expect(await rawUserMetadata()).toHaveLength(3)
-
-        await proSdk.groups.updateGroupApps(group.id, {
-          appsToRemove: [{ appId: config.prodWorkspaceId! }],
-        })
-        await syncGlobalUsers()
-
-        const metadata = await rawUserMetadata()
-        expect(metadata).toHaveLength(1) // ADMIN user created in test bootstrap still in the application
-      })
     })
   })
 })

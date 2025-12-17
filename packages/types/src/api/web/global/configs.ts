@@ -1,7 +1,6 @@
 import {
   Config,
   ConfigType,
-  SettingsBrandingConfig,
   SettingsConfig,
   SettingsInnerConfig,
 } from "../../../documents"
@@ -53,7 +52,6 @@ export interface ConfigChecklistResponse {
   smtp: SmtpChecklistItem
   adminUser: ChecklistItem
   sso: ChecklistItem
-  branding: SettingsBrandingConfig
 }
 
 export type FindConfigResponse = Config | {}

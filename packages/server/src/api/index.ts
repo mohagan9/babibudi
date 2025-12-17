@@ -4,7 +4,6 @@ import {
   env as envCore,
   middleware,
 } from "@budibase/backend-core"
-import { middleware as pro } from "@budibase/pro"
 import Router from "@koa/router"
 import zlib from "zlib"
 import { automationQueue } from "../automations"
@@ -74,7 +73,6 @@ if (apiEnabled()) {
       })
     )
     .use(middleware.activeTenant())
-    .use(pro.licensing())
     .use(currentWorkspace)
 
   // Add CSP as soon as possible - depends on licensing and currentApp

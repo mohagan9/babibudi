@@ -2,7 +2,6 @@ import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 
 import { context, events, roles } from "@budibase/backend-core"
 import { generator, utils } from "@budibase/backend-core/tests"
-import { sdk as proSdk } from "@budibase/pro"
 import { User, UserGroup, UserMetadata } from "@budibase/types"
 import {
   UserSyncProcessor,
@@ -172,69 +171,6 @@ describe("app user/group sync", () => {
       expect.objectContaining({
         roleId: roles.BUILTIN_ROLE_IDS.BASIC,
         builder: expect.objectContaining({ global: false }),
-      })
-    )
-  })
-
-  it("should promote group builders to admin role", async () => {
-    const email = generator.email({})
-    await createGroupAndUser(email)
-    const prodWorkspaceId = config.getProdWorkspaceId()
-    await config.doInTenant(async () => {
-      await proSdk.groups.save({
-        ...group,
-        builder: {
-          apps: [prodWorkspaceId],
-        },
-      })
-    })
-    group = {
-      ...group,
-      builder: {
-        apps: [prodWorkspaceId],
-      },
-    }
-    expect(await getMetadata(email)).toEqual(
-      expect.objectContaining({
-        roleId: roles.BUILTIN_ROLE_IDS.ADMIN,
-        builder: expect.objectContaining({ apps: [prodWorkspaceId] }),
-      })
-    )
-  })
-
-  it("should remove builder role when group no longer builder", async () => {
-    const email = generator.email({})
-    await createGroupAndUser(email)
-    const prodWorkspaceId = config.getProdWorkspaceId()
-    await config.doInTenant(async () => {
-      const response = await proSdk.groups.save({
-        ...group,
-        builder: {
-          apps: [prodWorkspaceId],
-        },
-      })
-
-      group = await proSdk.groups.get(response.id)
-    })
-    expect(await getMetadata(email)).toEqual(
-      expect.objectContaining({
-        roleId: roles.BUILTIN_ROLE_IDS.ADMIN,
-        builder: {
-          apps: [prodWorkspaceId],
-        },
-      })
-    )
-
-    await config.doInTenant(async () => {
-      await proSdk.groups.save({
-        ...group,
-        builder: undefined,
-      })
-    })
-    expect(await getMetadata(email)).toEqual(
-      expect.objectContaining({
-        roleId: roles.BUILTIN_ROLE_IDS.BASIC,
-        builder: { global: false },
       })
     )
   })

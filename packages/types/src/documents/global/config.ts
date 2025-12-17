@@ -21,21 +21,6 @@ export interface SMTPInnerConfig {
 
 export interface SMTPConfig extends Config<SMTPInnerConfig> {}
 
-/**
- * Accessible only via pro.
- */
-export interface SettingsBrandingConfig {
-  faviconUrl?: string
-  faviconUrlEtag?: string
-  emailBrandingEnabled?: boolean
-  platformTitle?: string
-  loginHeading?: string
-  loginButton?: string
-  metaDescription?: string
-  metaImageUrl?: string
-  metaTitle?: string
-}
-
 export enum LockReason {
   FREE_TIER = "free_tier", // Locked because grace period in free tier has ended
 }

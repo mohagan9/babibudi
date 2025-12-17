@@ -4,14 +4,12 @@ import { InternalTemplateBinding, LOGO_URL } from "../constants"
 import { checkSlashesInUrl } from "./index"
 
 const BASE_COMPANY = "Budibase"
-import * as pro from "@budibase/pro"
 
 export async function getSettingsTemplateContext(
   purpose: EmailTemplatePurpose,
   code?: string | null
 ) {
   const settings = await configs.getSettingsConfig()
-  const branding = await pro.branding.getBrandingConfig(settings)
   const URL = settings.platformUrl
   const context: any = {
     [InternalTemplateBinding.LOGO_URL]:
@@ -26,7 +24,7 @@ export async function getSettingsTemplateContext(
     [InternalTemplateBinding.CURRENT_YEAR]: new Date().getFullYear(),
   }
 
-  context["enableEmailBranding"] = branding.emailBrandingEnabled === true
+  context["enableEmailBranding"] = false
 
   // attach purpose specific context
   switch (purpose) {

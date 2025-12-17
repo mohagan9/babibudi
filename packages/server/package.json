@@ -52,7 +52,6 @@
     "@budibase/client": "*",
     "@budibase/frontend-core": "*",
     "@budibase/nano": "10.1.5",
-    "@budibase/pro": "*",
     "@budibase/shared-core": "*",
     "@budibase/string-templates": "*",
     "@budibase/types": "*",
@@ -181,9 +180,6 @@
     "undici": "^5.28.4",
     "yargs": "^17.7.2",
     "zod": "^4.1.12"
-  },
-  "resolutions": {
-    "@budibase/pro": "npm:@budibase/pro@latest"
   },
   "nx": {
     "targets": {

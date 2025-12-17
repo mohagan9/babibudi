@@ -1,7 +1,6 @@
 import { context, db as dbCore, logging, roles } from "@budibase/backend-core"
-import { sdk as proSdk } from "@budibase/pro"
 import { utils } from "@budibase/shared-core"
-import { ContextUser, User, UserGroup } from "@budibase/types"
+import { ContextUser, User } from "@budibase/types"
 import sdk from "../.."
 import { generateUserMetadataID, InternalTables } from "../../../db/utils"
 import env from "../../../environment"
@@ -15,8 +14,7 @@ function userSyncEnabled() {
 
 async function syncUsersToWorkspace(
   workspaceId: string,
-  users: (User | DeletedUser)[],
-  groups: UserGroup[]
+  users: (User | DeletedUser)[]
 ) {
   if (!(await dbCore.dbExists(workspaceId))) {
     return
@@ -33,7 +31,7 @@ async function syncUsersToWorkspace(
 
       // make sure role is correct
       if (!deletedUser) {
-        ctxUser = await processUser(ctxUser, { appId: workspaceId, groups })
+        ctxUser = await processUser(ctxUser, { appId: workspaceId })
       }
       let roleId = ctxUser.roleId
       if (roleId === roles.BUILTIN_ROLE_IDS.PUBLIC) {
@@ -83,7 +81,6 @@ async function syncUsersToWorkspace(
 async function buildSyncUsers(userIds: string[]) {
   // list of users, if one has been deleted it will be undefined in array
   const users = await getRawGlobalUsers(userIds)
-  const groups = await proSdk.groups.fetch()
   const finalUsers: (User | DeletedUser)[] = []
   for (let userId of userIds) {
     const user = users.find(user => user._id === userId)
@@ -93,7 +90,7 @@ async function buildSyncUsers(userIds: string[]) {
       finalUsers.push(user)
     }
   }
-  return { finalUsers, groups }
+  return { finalUsers }
 }
 
 export async function syncUsersAgainstWorkspaces(
@@ -123,7 +120,7 @@ export async function syncUsersAgainstWorkspaces(
     return
   }
 
-  const { finalUsers, groups } = await buildSyncUsers(userIds)
+  const { finalUsers } = await buildSyncUsers(userIds)
   let promises: Promise<void>[] = []
   await utils.parallelForeach(
     [...workspaceIds],
@@ -132,7 +129,7 @@ export async function syncUsersAgainstWorkspaces(
         return
       }
       try {
-        const syncAction = syncUsersToWorkspace(id, finalUsers, groups)
+        const syncAction = syncUsersToWorkspace(id, finalUsers)
         promises.push(syncAction)
         await syncAction
       } catch {

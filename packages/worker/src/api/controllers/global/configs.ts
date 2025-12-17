@@ -5,11 +5,9 @@ import {
   env as coreEnv,
   db as dbCore,
   events,
-  ForbiddenError,
   objectStore,
   tenancy,
 } from "@budibase/backend-core"
-import * as pro from "@budibase/pro"
 import { BUILDER_URLS } from "@budibase/shared-core"
 import {
   AIInnerConfig,
@@ -28,13 +26,10 @@ import {
   isRecaptchaConfig,
   isSettingsConfig,
   isSMTPConfig,
-  OIDCConfigs,
   OIDCLogosConfig,
   PASSWORD_REPLACEMENT,
-  RecaptchaInnerConfig,
   SaveConfigRequest,
   SaveConfigResponse,
-  SettingsBrandingConfig,
   SettingsInnerConfig,
   SMTPInnerConfig,
   SSOConfig,
@@ -179,8 +174,8 @@ async function processSMTPConfig(
 }
 
 async function processSettingsConfig(
-  config: SettingsInnerConfig & SettingsBrandingConfig,
-  existingConfig?: SettingsInnerConfig & SettingsBrandingConfig
+  config: SettingsInnerConfig,
+  existingConfig?: SettingsInnerConfig
 ) {
   if (config.isSSOEnforced) {
     const valid = await hasActivatedConfig()
@@ -196,10 +191,6 @@ async function processSettingsConfig(
   if (existingConfig && config.logoUrl !== "") {
     config.logoUrl = existingConfig.logoUrl
     config.logoUrlEtag = existingConfig.logoUrlEtag
-  }
-  if (existingConfig && config.faviconUrl !== "") {
-    config.faviconUrl = existingConfig.faviconUrl
-    config.faviconUrlEtag = existingConfig.faviconUrlEtag
   }
 }
 
@@ -234,29 +225,6 @@ async function processGoogleConfig(
   }
 }
 
-async function processOIDCConfig(config: OIDCConfigs, existing?: OIDCConfigs) {
-  await verifySSOConfig(ConfigType.OIDC, config.configs[0])
-
-  const anyPkceSettings = config.configs.find(cfg => cfg.pkce)
-  if (anyPkceSettings && !(await pro.features.isPkceOidcEnabled())) {
-    throw new Error("License does not allow OIDC PKCE method support")
-  }
-
-  config.configs.filter(c => c.pkce === null).forEach(c => delete c.pkce)
-
-  if (existing) {
-    for (const c of config.configs) {
-      const existingConfig = existing.configs.find(e => e.uuid === c.uuid)
-      if (!existingConfig) {
-        continue
-      }
-      if (c.clientSecret === PASSWORD_REPLACEMENT) {
-        c.clientSecret = existingConfig.clientSecret
-      }
-    }
-  }
-}
-
 export async function processAIConfig(
   newConfig: AIInnerConfig,
   existingConfig: AIInnerConfig
@@ -281,21 +249,6 @@ export async function processAIConfig(
         )
       }
     }
-  }
-}
-
-export async function processRecaptchaConfig(
-  config: RecaptchaInnerConfig,
-  existingConfig?: RecaptchaInnerConfig
-) {
-  if (!(await pro.features.isRecaptchaEnabled())) {
-    throw new ForbiddenError("License does not allow use of recaptcha")
-  }
-  if (config.secretKey === PASSWORD_REPLACEMENT && !existingConfig) {
-    throw new BadRequestError("No secret key provided")
-  }
-  if (config.secretKey === PASSWORD_REPLACEMENT && existingConfig) {
-    config.secretKey = existingConfig.secretKey
   }
 }
 
@@ -340,11 +293,8 @@ export async function save(
     ctx.throw(400, err)
   }
 
-  // Ignore branding changes if the license does not permit it
-  // Favicon and Logo Url are excluded.
   try {
-    const brandingEnabled = await pro.features.isBrandingEnabled()
-    if (existingConfig?.config && !brandingEnabled) {
+    if (existingConfig?.config) {
       const {
         emailBrandingEnabled,
         platformTitle,
@@ -431,9 +381,6 @@ export async function find(ctx: UserCtx<void, FindConfigResponse>) {
     case ConfigType.OIDC_LOGOS:
       await enrichOIDCLogos(config)
       break
-    case ConfigType.AI:
-      await pro.sdk.ai.enrichAIConfig(config)
-      break
   }
 
   stripSecrets(config)
@@ -499,8 +446,6 @@ export async function publicSettings(
     ])
     const config = configDoc.config
 
-    const brandingPromise = pro.branding.getBrandingConfig(config)
-
     const getLogoUrl = () => {
       // enrich the logo url - empty url means deleted
       if (config.logoUrl && config.logoUrl !== "") {
@@ -522,38 +467,21 @@ export async function publicSettings(
     const oidcConfigPromise = configs.getOIDCConfig()
     const oidcCallbackUrlPromise = auth.oidcCallbackUrl()
 
-    // sso enforced
-    const isSSOEnforcedPromise = pro.features.isSSOEnforced({ config })
-
     // performance all async work at same time, there is no need for all of these
     // operations to occur in sync, slowing the endpoint down significantly
     const [
-      branding,
       googleDatasource,
       googleCallbackUrl,
       oidcConfig,
       oidcCallbackUrl,
-      isSSOEnforced,
       logoUrl,
     ] = await Promise.all([
-      brandingPromise,
       googleDatasourcePromise,
       googleCallbackUrlPromise,
       oidcConfigPromise,
       oidcCallbackUrlPromise,
-      isSSOEnforcedPromise,
       getLogoUrl(),
     ])
-
-    // enrich the favicon url - empty url means deleted
-    const faviconUrl =
-      branding.faviconUrl && branding.faviconUrl !== ""
-        ? await objectStore.getGlobalFileUrl(
-            "settings",
-            "faviconUrl",
-            branding.faviconUrlEtag
-          )
-        : undefined
 
     const oidc = oidcConfig?.activated || false
     const googleDatasourceConfigured = !!googleDatasource
@@ -567,12 +495,9 @@ export async function publicSettings(
       _rev: configDoc._rev,
       config: {
         ...config,
-        ...branding,
-        ...{ faviconUrl },
         google,
         googleDatasourceConfigured,
         oidc,
-        isSSOEnforced,
         oidcCallbackUrl,
         googleCallbackUrl,
       },
@@ -668,11 +593,6 @@ export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
         // They have set up a global user
         const userExists = await checkAnyUserExists()
 
-        // They have set up branding
-        const configDoc = await configs.getSettingsConfigDoc()
-        const config = configDoc.config
-        const branding = await pro.branding.getBrandingConfig(config)
-
         return {
           apps: {
             checked: workspaces.length > 0,
@@ -695,7 +615,6 @@ export async function configChecklist(ctx: Ctx<void, ConfigChecklistResponse>) {
             label: "Set up single sign-on",
             link: BUILDER_URLS.SETTINGS_AUTH,
           },
-          branding,
         }
       }
     )

@@ -13,7 +13,6 @@ import {
   tenancy,
   utils,
 } from "@budibase/backend-core"
-import * as pro from "@budibase/pro"
 import { init as dbInit } from "../../db"
 import env from "../../environment"
 import {
@@ -28,7 +27,6 @@ import {
 } from "./controllers"
 import {
   basicAutomation,
-  basicAutomationResults,
   basicDatasource,
   basicLayout,
   basicQuery,
@@ -60,7 +58,6 @@ import {
   TableSourceType,
   User,
   UserCtx,
-  UserGroup,
   View,
   Webhook,
   WithRequired,
@@ -76,8 +73,6 @@ import jwt, { Secret } from "jsonwebtoken"
 import API from "./api"
 
 const newid = utils.newid
-
-mocks.licenses.init(pro)
 
 // use unlimited license by default
 mocks.licenses.useUnlimited()
@@ -363,44 +358,6 @@ export default class TestConfiguration {
 
   async createUser(user: Partial<User> = {}): Promise<User> {
     return await this.globalUser(user)
-  }
-
-  async createGroup(roleId: string = roles.BUILTIN_ROLE_IDS.BASIC) {
-    return context.doInTenant(this.tenantId!, async () => {
-      const baseGroup = structures.userGroups.userGroup()
-      baseGroup.roles = {
-        [this.getProdWorkspaceId()]: roleId,
-      }
-      const { id, rev } = await pro.sdk.groups.save(baseGroup)
-      return {
-        _id: id,
-        _rev: rev,
-        ...baseGroup,
-      }
-    })
-  }
-
-  async updateGroup(group: UserGroup) {
-    return context.doInTenant(this.tenantId!, async () => {
-      const { id, rev } = await pro.sdk.groups.save(group)
-      return {
-        _id: id,
-        _rev: rev,
-        ...group,
-      }
-    })
-  }
-
-  async addUserToGroup(groupId: string, userId: string) {
-    return context.doInTenant(this.tenantId!, async () => {
-      await pro.sdk.groups.addUsers(groupId, [userId])
-    })
-  }
-
-  async removeUserFromGroup(groupId: string, userId: string) {
-    return context.doInTenant(this.tenantId!, async () => {
-      await pro.sdk.groups.removeUsers(groupId, [userId])
-    })
   }
 
   sessionIdForUser(userId: string): string {
@@ -983,27 +940,6 @@ export default class TestConfiguration {
       },
     })
     return { datasource, query: basedOnQuery }
-  }
-
-  // AUTOMATION LOG
-
-  async createAutomationLog(automation: Automation, appId?: string) {
-    appId = appId || this.getProdWorkspaceId()
-    return await context.doInWorkspaceContext(appId!, async () => {
-      return await pro.sdk.automations.logs.storeLog(
-        automation,
-        basicAutomationResults(automation._id!)
-      )
-    })
-  }
-
-  async getAutomationLogs() {
-    return context.doInWorkspaceContext(this.getDevWorkspaceId(), async () => {
-      const now = new Date()
-      return await pro.sdk.automations.logs.logSearch({
-        startDate: new Date(now.getTime() - 100000).toISOString(),
-      })
-    })
   }
 
   // QUERY

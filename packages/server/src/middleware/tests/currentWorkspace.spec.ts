@@ -3,7 +3,6 @@ import * as db from "../../db"
 db.init()
 mockAuthWithNoCookie()
 mockWorker()
-mockUserGroups()
 
 function mockWorker() {
   jest.mock("../../utilities/workerRequests", () => ({
@@ -22,16 +21,6 @@ function mockWorker() {
 function mockReset() {
   jest.resetModules()
   mockWorker()
-}
-
-function mockUserGroups() {
-  jest.mock("@budibase/pro", () => ({
-    groups: {
-      getGroupRoleId: () => {
-        return "BASIC"
-      },
-    },
-  }))
 }
 
 function mockAuthWithNoCookie() {

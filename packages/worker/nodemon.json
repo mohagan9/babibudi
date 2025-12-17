@@ -2,7 +2,6 @@
   "watch": [
     "src",
     "../backend-core",
-    "../pro",
     "../types",
     "../shared-core",
     "../string-templates",

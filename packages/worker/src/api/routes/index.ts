@@ -1,4 +1,3 @@
-import { api as pro } from "@budibase/pro"
 import Router from "@koa/router"
 import { endpointGroupList } from "./endpointGroups"
 
@@ -26,7 +25,4 @@ for (let endpoint of endpointGroupList.listAllEndpoints()) {
 
 export const routes: Router[] = [
   endpointGroupsRouter,
-  pro.groups,
-  pro.auditLogs,
-  pro.scim,
 ]

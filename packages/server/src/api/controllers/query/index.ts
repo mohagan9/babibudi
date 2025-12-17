@@ -1,5 +1,4 @@
 import { constants, context, events, utils } from "@budibase/backend-core"
-import { quotas } from "@budibase/pro"
 import { utils as JsonUtils, ValidQueryNameRegex } from "@budibase/shared-core"
 import { findHBSBlocks } from "@budibase/string-templates"
 import {
@@ -475,14 +474,15 @@ async function execute(
       schema: query.schema,
     }
 
-    const { rows, pagination, extra, info } =
-      query.queryVerb === "read" || opts.isAutomation
-        ? await Runner.run<QueryResponse>(inputs)
-        : await quotas.addAction(async () => {
+    const runQuery = async () => {
             const response = await Runner.run<QueryResponse>(inputs)
             events.action.crudExecuted({ type: query.queryVerb })
             return response
-          })
+          }
+    const { rows, pagination, extra, info } =
+      query.queryVerb === "read" || opts.isAutomation
+        ? await Runner.run<QueryResponse>(inputs)
+        : await runQuery()
     // remove the raw from execution incase transformer being used to hide data
     if (extra?.raw) {
       delete extra.raw

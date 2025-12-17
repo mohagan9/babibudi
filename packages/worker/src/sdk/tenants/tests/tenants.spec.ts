@@ -31,24 +31,6 @@ jest.mock("@budibase/backend-core", () => {
   }
 })
 
-// Mock the pro module
-jest.mock("@budibase/pro", () => ({
-  quotas: {
-    bustCache: jest.fn(),
-  },
-  constants: {
-    licenses: {
-      CLOUD_FREE_LICENSE: "CLOUD_FREE_LICENSE",
-      UNLIMITED_LICENSE: "UNLIMITED_LICENSE",
-    },
-  },
-  licensing: {
-    cache: {
-      getCachedLicense: jest.fn(),
-    },
-  },
-}))
-
 const mockDb = {
   put: jest.fn(),
   tryGet: jest.fn(),

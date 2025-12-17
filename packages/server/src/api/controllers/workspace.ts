@@ -13,7 +13,6 @@ import {
   users,
   utils,
 } from "@budibase/backend-core"
-import { groups, licensing, quotas } from "@budibase/pro"
 import { DefaultAppTheme, sdk as sharedCoreSDK } from "@budibase/shared-core"
 import type { File, Files } from "formidable"
 import {
@@ -337,12 +336,11 @@ export async function fetchAppPackage(
   ctx: UserCtx<void, FetchAppPackageResponse>
 ) {
   const appId = context.getWorkspaceId()
-  let [application, layouts, screens, license, recaptchaConfig] =
+  let [application, layouts, screens, recaptchaConfig] =
     await Promise.all([
       sdk.workspaces.metadata.get(),
       getLayouts(),
       sdk.screens.fetch(),
-      licensing.cache.getCachedLicense(),
       configs.getRecaptchaConfig(),
     ])
 
@@ -687,28 +685,6 @@ async function workspacePostCreate(
 ) {
   await creationEvents(ctx.request, workspace)
 
-  // app import, template creation and duplication
-  if (ctx.request.body.useTemplate) {
-    const { rows } = await getUniqueRows([workspace.appId])
-    const rowCount = rows ? rows.length : 0
-    if (rowCount) {
-      try {
-        await context.doInWorkspaceContext(workspace.appId, () => {
-          return quotas.addRows(rowCount)
-        })
-      } catch (err: any) {
-        if (err.code && err.code === APIWarningCode.USAGE_LIMIT_EXCEEDED) {
-          // this import resulted in row usage exceeding the quota
-          // delete the app
-          // skip pre and post-steps as no rows have been added to quotas yet
-          ctx.params.appId = workspace.appId
-          await destroyWorkspace(ctx)
-        }
-        throw err
-      }
-    }
-  }
-
   // If the user is a creator, we need to give them access to the new app
   if (sharedCoreSDK.users.hasCreatorPermissions(ctx.user)) {
     const globalId = dbCore.getGlobalIDFromUserMetadataID(ctx.user._id!)
@@ -720,7 +696,7 @@ async function workspacePostCreate(
 export async function create(
   ctx: UserCtx<CreateWorkspaceRequest, CreateWorkspaceResponse>
 ) {
-  const newApplication = await quotas.addApp(() => performWorkspaceCreate(ctx))
+  const newApplication = await performWorkspaceCreate(ctx)
   await workspacePostCreate(ctx, newApplication)
   await cache.bustCache(cache.CacheKey.CHECKLIST)
   ctx.body = newApplication
@@ -900,7 +876,6 @@ async function destroyWorkspace(ctx: UserCtx) {
   const db = dbCore.getDB(devWorkspaceId)
   // standard app deletion flow
   const result = await db.destroy()
-  await quotas.removeApp()
   await events.app.deleted(app)
 
   await deleteAppFiles(prodWorkspaceId)
@@ -920,18 +895,9 @@ async function preDestroyWorkspace(ctx: UserCtx) {
   ctx.rowCount = rows.length
 }
 
-async function postDestroyWorkspace(ctx: UserCtx) {
-  const rowCount = ctx.rowCount
-  await groups.cleanupApp(ctx.params.appId)
-  if (rowCount) {
-    await quotas.removeRows(rowCount)
-  }
-}
-
 export async function destroy(ctx: UserCtx<void, DeleteWorkspaceResponse>) {
   await preDestroyWorkspace(ctx)
   const result = await destroyWorkspace(ctx)
-  await postDestroyWorkspace(ctx)
   ctx.body = result
 }
 

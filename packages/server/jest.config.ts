@@ -1,6 +1,4 @@
 import { Config } from "jest"
-
-import * as fs from "fs"
 import { join } from "path"
 
 const baseConfig: Config = {
@@ -33,11 +31,6 @@ const baseConfig: Config = {
     "@budibase/string-templates/(.*)": ["<rootDir>/../string-templates/$1"],
     "@budibase/string-templates": ["<rootDir>/../string-templates/src"],
   },
-}
-
-// add pro sources if they exist
-if (fs.existsSync("../pro/src")) {
-  baseConfig.moduleNameMapper!["@budibase/pro"] = "<rootDir>/../pro/src"
 }
 
 const config: Config = {

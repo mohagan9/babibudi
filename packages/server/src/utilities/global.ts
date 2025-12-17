@@ -6,15 +6,14 @@ import {
   tenancy,
   users,
 } from "@budibase/backend-core"
-import { groups } from "@budibase/pro"
-import { ContextUser, User, UserCtx, UserGroup } from "@budibase/types"
+import { ContextUser, User, UserCtx } from "@budibase/types"
 import cloneDeep from "lodash/cloneDeep"
 import { getGlobalIDFromUserMetadataID } from "../db/utils"
 import env from "../environment"
 
 export async function processUser(
   user: ContextUser,
-  opts: { appId?: string; groups?: UserGroup[] } = {}
+  opts: { appId?: string; } = {}
 ) {
   if (!user || (!user.roles && !user.userGroups)) {
     return user
@@ -35,23 +34,6 @@ export async function processUser(
     user.roleId = roles.BUILTIN_ROLE_IDS.PUBLIC
     return user
   }
-  let groupList: UserGroup[] = []
-  if (workspaceId && user?.userGroups?.length) {
-    groupList = opts.groups
-      ? opts.groups
-      : await groups.getBulk(user.userGroups)
-  }
-  // check if a group provides builder access
-  const builderAppIds = await groups.getGroupBuilderAppIds(user, {
-    appId: workspaceId,
-    groups: groupList,
-  })
-  if (builderAppIds.length && !users.isBuilder(user, workspaceId)) {
-    const existingApps = user.builder?.apps || []
-    user.builder = {
-      apps: [...new Set(existingApps.concat(builderAppIds))],
-    }
-  }
   // builders are always admins within the app
   if (users.isBuilder(user, workspaceId)) {
     user.roleId = roles.BUILTIN_ROLE_IDS.ADMIN
@@ -59,12 +41,6 @@ export async function processUser(
   // try to get the role from the user list
   if (!user.roleId && workspaceId && user.roles) {
     user.roleId = user.roles[dbCore.getProdWorkspaceID(workspaceId)]
-  }
-  // try to get the role from the group list
-  if (!user.roleId && groupList) {
-    user.roleId = await groups.getGroupRoleId(user, workspaceId, {
-      groups: groupList,
-    })
   }
   // final fallback, simply couldn't find a role - user must be public
   if (!user.roleId) {
@@ -125,9 +101,8 @@ export async function getGlobalUsers(
   userIds?: string[]
 ): Promise<ContextUser[]> {
   const users = await getRawGlobalUsers(userIds)
-  const allGroups = await groups.fetch()
   return Promise.all(
-    users.map(user => processUser(user, { groups: allGroups }))
+    users.map(user => processUser(user))
   )
 }
 

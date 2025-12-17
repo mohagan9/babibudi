@@ -12,12 +12,9 @@ import {
 import { generator, mocks } from "@budibase/backend-core/tests"
 import env from "../../environment"
 import sdk from "../../sdk"
-import { initProMocks } from "../../tests/utilities/mocks/pro"
 import { authorizedMiddleware } from "../authorized"
 
 const APP_ID = ""
-
-initProMocks()
 
 class TestConfiguration {
   middleware: (ctx: any, next: any) => Promise<void>
