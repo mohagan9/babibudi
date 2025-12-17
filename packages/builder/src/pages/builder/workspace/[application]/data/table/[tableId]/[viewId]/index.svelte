@@ -1,16 +1,14 @@
 <script lang="ts">
   import {
     viewsV2,
-    rowActions,
     dataEnvironmentStore,
     dataAPI,
     tables,
     datasources,
   } from "@/stores/builder"
   import { gridClipboard } from "@budibase/frontend-core"
-  import { admin, themeStore, licensing } from "@/stores/portal"
+  import { admin, themeStore } from "@/stores/portal"
   import { Grid } from "@budibase/frontend-core"
-  import { notifications } from "@budibase/bbui"
   import GridCreateEditRowModal from "@/components/backend/DataTable/modals/grid/GridCreateEditRowModal.svelte"
   import GridFilterButton from "@/components/backend/DataTable/buttons/grid/GridFilterButton.svelte"
   import GridManageAccessButton from "@/components/backend/DataTable/buttons/grid/GridManageAccessButton.svelte"
@@ -40,8 +38,6 @@
   $: tableDatasource = $datasources.list.find(datasource => {
     return datasource._id === $tables.selected?.sourceId
   })
-  $: buttons = makeRowActionButtons($rowActions[id])
-  $: rowActions.refreshRowActions(id)
   $: currentTheme = $themeStore?.theme
   $: darkMode = !currentTheme.includes("light")
   $: canSwitchToProduction =
@@ -62,16 +58,6 @@
     },
   }
 
-  const makeRowActionButtons = (actions: any[]) => {
-    return (actions || []).map(action => ({
-      text: action.name,
-      onClick: async (row: Row) => {
-        await rowActions.trigger(id, action.id, row._id!)
-        notifications.success("Row action triggered successfully")
-      },
-    }))
-  }
-
   const handleGridViewUpdate = async (e: any) => {
     viewsV2.replaceView(id, e.detail)
   }
@@ -82,11 +68,8 @@
     API={$dataAPI}
     {darkMode}
     {datasource}
-    {buttons}
     allowAddRows
     allowDeleteRows
-    aiEnabled={$licensing.customAIConfigsEnabled ||
-      $licensing.budibaseAIEnabled}
     showAvatars={false}
     externalClipboard={externalClipboardData}
     on:updatedatasource={handleGridViewUpdate}

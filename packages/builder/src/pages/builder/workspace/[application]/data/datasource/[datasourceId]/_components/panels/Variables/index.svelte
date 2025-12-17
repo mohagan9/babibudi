@@ -2,8 +2,7 @@
   import { Heading, Layout, notifications } from "@budibase/bbui"
   import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
   import ViewDynamicVariables from "./ViewDynamicVariables.svelte"
-  import { getEnvironmentBindings } from "@/dataBinding"
-  import { environment, licensing } from "@/stores/portal"
+  import { environment } from "@/stores/portal"
   import { queries } from "@/stores/builder"
   import { cloneDeep, isEqual } from "lodash/fp"
   import Panel from "../Panel.svelte"
@@ -78,9 +77,6 @@
         object={localUpdatedDatasource?.config?.staticVariables || {}}
         lockedKeys={templateStaticVariableKeys}
         on:change={({ detail }) => handleStaticChange(detail)}
-        bindings={$licensing.environmentVariablesEnabled
-          ? getEnvironmentBindings()
-          : []}
       />
     </Layout>
     <Layout noPadding gap="XS">

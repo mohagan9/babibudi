@@ -1,17 +1,9 @@
 <script lang="ts">
   import { onMount } from "svelte"
-  import {
-    ModalContent,
-    Layout,
-    Select,
-    Body,
-    Input,
-    notifications,
-  } from "@budibase/bbui"
+  import { ModalContent, Layout, Select, Body, Input } from "@budibase/bbui"
   import { AUTH_TYPE_LABELS, AUTH_TYPES } from "./authTypes"
   import { BindableCombobox } from "@/components/common/bindings"
-  import { getAuthBindings, getEnvironmentBindings } from "@/dataBinding"
-  import { environment, licensing } from "@/stores/portal"
+  import { getAuthBindings } from "@/dataBinding"
   import EnvVariableInput from "@/components/portal/environment/EnvVariableInput.svelte"
 
   interface FormData {
@@ -185,14 +177,6 @@
   const onConfirmInternal = () => {
     onConfirm(constructConfig())
   }
-
-  onMount(async () => {
-    try {
-      await environment.loadVariables()
-    } catch (error) {
-      notifications.error(`Error getting environment variables - ${error}`)
-    }
-  })
 </script>
 
 <ModalContent
@@ -249,12 +233,7 @@
       <BindableCombobox
         label="Token"
         value={form.bearer.token}
-        bindings={[
-          ...getAuthBindings(),
-          ...($licensing.environmentVariablesEnabled
-            ? getEnvironmentBindings()
-            : []),
-        ]}
+        bindings={[...getAuthBindings()]}
         on:change={e => {
           form.bearer.token = e.detail
           onFieldChange()
