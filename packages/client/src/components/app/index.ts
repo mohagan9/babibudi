@@ -27,14 +27,12 @@ export const gridblock = () => import("./GridBlock.svelte")
 export const textv2 = () => import("./Text.svelte")
 export const filter = () => import("./filter/Filter.svelte")
 export const accordion = () => import("./Accordion.svelte")
-export const chatbox = () => import("./Chatbox.svelte")
 export const singlerowprovider = () => import("./SingleRowProvider.svelte")
 export const codegenerator = () => import("./CodeGenerator.svelte")
 export * from "./blocks"
 export * from "./charts"
 export * from "./dynamic-filter"
 export * from "./forms"
-export * from "./pdf"
 
 // Deprecated component left for compatibility in old apps
 export * from "./deprecated/table"
