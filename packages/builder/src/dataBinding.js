@@ -28,7 +28,7 @@ import {
 import { TableNames } from "./constants"
 import { JSONUtils, Constants, SchemaUtils } from "@budibase/frontend-core"
 import ActionDefinitions from "@/components/design/settings/controls/ButtonActionEditor/manifest.json"
-import { environment, licensing } from "@/stores/portal"
+import { environment } from "@/stores/portal"
 import { convertOldFieldFormat } from "@/components/design/settings/controls/FieldConfiguration/utils"
 import { FIELDS, DB_TYPE_INTERNAL } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
@@ -75,13 +75,8 @@ export const getBindableProperties = (asset, componentId) => {
  * Gets all rest bindable data fields
  */
 export const getRestBindings = () => {
-  const environmentVariablesEnabled = get(licensing).environmentVariablesEnabled
   const userBindings = getUserBindings()
-  return [
-    ...userBindings,
-    ...getAuthBindings(),
-    ...(environmentVariablesEnabled ? getEnvironmentBindings() : []),
-  ]
+  return [...userBindings, ...getAuthBindings()]
 }
 
 /**

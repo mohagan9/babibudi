@@ -1,10 +1,7 @@
-import { get } from "svelte/store"
 import { API } from "@/api"
-import { licensing } from "@/stores/portal"
 import { BudiStore } from "../BudiStore"
 import {
   CreateEnvironmentVariableRequest,
-  EventPublishType,
   StatusEnvironmentVariableResponse,
   UpdateEnvironmentVariableRequest,
 } from "@budibase/types"
@@ -36,18 +33,6 @@ class EnvironmentStore extends BudiStore<EnvironmentState> {
     })
   }
 
-  async loadVariables() {
-    if (get(licensing).environmentVariablesEnabled) {
-      const envVars: string[] = (await API.fetchEnvironmentVariables())
-        .variables
-      const mappedVars = envVars.map(name => ({ name }))
-      this.update(store => {
-        store.variables = mappedVars
-        return store
-      })
-    }
-  }
-
   async createVariable(data: CreateEnvironmentVariableRequest) {
     await API.createEnvironmentVariable(data)
     let mappedVar = { name: data.name }
@@ -67,12 +52,6 @@ class EnvironmentStore extends BudiStore<EnvironmentState> {
 
   async updateVariable(name: string, data: UpdateEnvironmentVariableRequest) {
     await API.updateEnvironmentVariable(name, data)
-  }
-
-  async upgradePanelOpened() {
-    await API.publishEvent(
-      EventPublishType.ENVIRONMENT_VARIABLE_UPGRADE_PANEL_OPENED
-    )
   }
 }
 

@@ -98,7 +98,6 @@ export enum BuilderSocketEvent {
   AppMetadataChange = "AppMetadataChange",
   SelectResource = "SelectResource",
   AppPublishChange = "AppPublishChange",
-  AutomationChange = "AutomationChange",
   RoleChange = "RoleChange",
   WorkspaceAppChange = "WorkspaceAppChange",
 }

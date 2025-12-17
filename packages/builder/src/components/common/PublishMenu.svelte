@@ -11,7 +11,6 @@
   } from "@budibase/bbui"
   import {
     deploymentStore,
-    automationStore,
     workspaceAppStore,
     workspaceDeploymentStore,
     tables,
@@ -194,10 +193,6 @@
       size="L"
     />
     <Body size="S">
-      {#if $automationStore.automations.length}
-        Automations published: {$automationStore.automations.length}
-        <br />
-      {/if}
       {#if $workspaceAppStore.workspaceApps.length}
         Apps published: {$workspaceAppStore.workspaceApps.length}
       {/if}

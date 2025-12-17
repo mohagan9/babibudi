@@ -1,20 +1,12 @@
 <script lang="ts">
-  import { ActionButton, ListItem, notifications } from "@budibase/bbui"
+  import { ActionButton, ListItem } from "@budibase/bbui"
   import { getContext } from "svelte"
-  import {
-    automationStore,
-    tables,
-    builderStore,
-    viewsV2,
-  } from "@/stores/builder"
-  import { TriggerStepID } from "@/constants/backend/automations"
+  import { tables, viewsV2 } from "@/stores/builder"
   import { goto } from "@roxi/routify"
   import DetailPopover from "@/components/common/DetailPopover.svelte"
   import MagicWand from "./magic-wand.svg"
   import { AutoScreenTypes } from "@/constants"
   import CreateScreenModal from "@/pages/builder/workspace/[application]/design/_components/NewScreen/CreateScreenModal.svelte"
-  import { getSequentialName } from "@/helpers/duplicate"
-  import { BlockDefinitionTypes } from "@budibase/types"
 
   $goto
 
@@ -23,62 +15,10 @@
   let popover: DetailPopover
   let createScreenModal: CreateScreenModal
 
-  $: triggers = $automationStore.blockDefinitions.CREATABLE_TRIGGER
   $: table = $tables.list.find(table => table._id === $datasource.tableId)
 
   export const show = () => popover?.show()
   export const hide = () => popover?.hide()
-
-  async function createAutomation(type: TriggerStepID) {
-    const triggerType = triggers[type]
-    if (!triggerType) {
-      console.error("Invalid trigger type", type)
-      notifications.error("Invalid automation trigger type")
-      return
-    }
-
-    if (!table) {
-      notifications.error("Invalid table, cannot create automation")
-      return
-    }
-
-    const suffixMap: Partial<Record<TriggerStepID, string>> = {
-      [TriggerStepID.ROW_SAVED]: "created",
-      [TriggerStepID.ROW_UPDATED]: "updated",
-      [TriggerStepID.ROW_DELETED]: "deleted",
-    }
-    const namePrefix = `Row ${suffixMap[type]} `
-    const automationName = getSequentialName(
-      $automationStore.automations,
-      namePrefix,
-      {
-        getName: x => x.name,
-      }
-    )
-    const triggerBlock = automationStore.actions.constructBlock(
-      BlockDefinitionTypes.TRIGGER,
-      triggerType.stepId,
-      triggerType
-    )
-
-    triggerBlock.inputs = { tableId: $datasource.tableId }
-
-    try {
-      const response = await automationStore.actions.create(
-        automationName,
-        triggerBlock
-      )
-      builderStore.setPreviousTopNavPath(
-        "/builder/workspace/:application/data",
-        window.location.pathname
-      )
-      $goto(`/builder/workspace/${response.appId}/automation/${response._id}`)
-      notifications.success(`Automation created successfully`)
-    } catch (e) {
-      console.error(e)
-      notifications.error("Error creating automation")
-    }
-  }
 
   const startScreenWizard = (autoScreenType: AutoScreenTypes) => {
     popover.hide()
@@ -131,41 +71,6 @@
       </div>
     </div>
   </div>
-
-  {#if $datasource.type === "table"}
-    <div class="generate-section">
-      <div class="generate-section__title">Automation triggers (When a...)</div>
-      <div class="generate-section__options">
-        <div>
-          <ListItem
-            title="Row is created"
-            icon="rows-plus-bottom"
-            hoverable
-            on:click={() => createAutomation(TriggerStepID.ROW_SAVED)}
-            iconColor="var(--spectrum-global-color-gray-600)"
-          />
-        </div>
-        <div>
-          <ListItem
-            title="Row is updated"
-            icon="arrow-clockwise"
-            hoverable
-            on:click={() => createAutomation(TriggerStepID.ROW_UPDATED)}
-            iconColor="var(--spectrum-global-color-gray-600)"
-          />
-        </div>
-        <div>
-          <ListItem
-            title="Row is deleted"
-            icon="trash-simple"
-            hoverable
-            on:click={() => createAutomation(TriggerStepID.ROW_DELETED)}
-            iconColor="var(--spectrum-global-color-gray-600)"
-          />
-        </div>
-      </div>
-    </div>
-  {/if}
 </DetailPopover>
 
 <CreateScreenModal bind:this={createScreenModal} />

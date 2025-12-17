@@ -1,6 +1,5 @@
 import { createWebsocket } from "@budibase/frontend-core"
 import {
-  automationStore,
   userStore,
   appStore,
   themeStore,
@@ -19,7 +18,6 @@ import { screenStore } from "./screens"
 import { SocketEvent, BuilderSocketEvent, helpers } from "@budibase/shared-core"
 import { notifications } from "@budibase/bbui"
 import {
-  Automation,
   Datasource,
   Role,
   Table,
@@ -129,14 +127,6 @@ export const createBuilderWebsocket = (appId: string) => {
       }
       const verb = published ? "published" : "unpublished"
       notifications.success(`${helpers.getUserLabel(user)} ${verb} this app`)
-    }
-  )
-
-  // Automation events
-  socket.onOther(
-    BuilderSocketEvent.AutomationChange,
-    ({ id, automation }: { id: string; automation: Automation }) => {
-      automationStore.actions.replace(id, automation)
     }
   )
 

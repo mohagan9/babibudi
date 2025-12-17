@@ -10,7 +10,6 @@
   import { API } from "@/api"
   import { goto, params, isActive } from "@roxi/routify"
   import {
-    automationStore,
     previewStore,
     builderStore,
     sortedScreens,
@@ -94,7 +93,6 @@
     ...viewV2Commands($viewsV2?.list || []),
     ...queryCommands($queries?.list || []),
     ...screenCommands($sortedScreens),
-    ...automationCommands($automationStore?.automations || []),
     ...themeCommands(),
     ...featureFlagCommands($featureFlags),
   ]
@@ -241,20 +239,6 @@
           application: $params.application,
           screenId: screen._id,
           componentId: `${screen._id}-screen`,
-        }),
-      requiresApp: true,
-    }))
-  }
-
-  const automationCommands = automations => {
-    return automations.map(automation => ({
-      type: "Automation",
-      name: automation.name,
-      icon: "share-network",
-      action: () =>
-        $goto(`/builder/workspace/:application/automation/:id`, {
-          application: $params.application,
-          id: automation._id,
         }),
       requiresApp: true,
     }))

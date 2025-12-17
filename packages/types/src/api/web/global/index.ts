@@ -1,5 +1,4 @@
 export * from "./environmentVariables"
-export * from "./events"
 export * from "./configs"
 export * from "./oldMigration"
 export * from "./email"

@@ -3,10 +3,8 @@
   import { TableNames } from "@/constants"
   import {
     appStore,
-    automationStore,
     datasources,
     queries,
-    rowActions,
     tables,
     workspaceAppStore,
   } from "@/stores/builder"
@@ -37,7 +35,6 @@
       [ResourceType.TABLE]: [],
       [ResourceType.ROW_ACTION]: [],
       [ResourceType.QUERY]: [],
-      [ResourceType.AUTOMATION]: [],
       [ResourceType.WORKSPACE_APP]: [],
       [ResourceType.SCREEN]: [],
     }
@@ -59,7 +56,6 @@
     [ResourceType.TABLE]: [],
     [ResourceType.ROW_ACTION]: [],
     [ResourceType.QUERY]: [],
-    [ResourceType.AUTOMATION]: [],
     [ResourceType.WORKSPACE_APP]: [],
     [ResourceType.SCREEN]: [],
   }
@@ -127,8 +123,6 @@
     }
   }
 
-  $: $tables.list.forEach(t => rowActions.refreshRowActions(t._id!))
-
   let resourceTypesToDisplay: {
     [K in ResourceType]: {
       displayName: string
@@ -152,11 +146,6 @@
       displayName: "Apps",
       data: $workspaceAppStore.workspaceApps.map(mapToDataType),
       type: ResourceType.WORKSPACE_APP,
-    },
-    [ResourceType.AUTOMATION]: {
-      displayName: "Automations",
-      data: $automationStore.automations.map(mapToDataType),
-      type: ResourceType.AUTOMATION,
     },
     [ResourceType.DATASOURCE]: {
       displayName: "Datasources",

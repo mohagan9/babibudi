@@ -10,7 +10,6 @@ import {
   SSOProfile,
   SSOProviderType,
   User,
-  PKCEMethod,
 } from "@budibase/types"
 import { generator } from "./generator"
 import { email, uuid } from "./common"
@@ -70,7 +69,7 @@ export function ssoProfile(user?: User): SSOProfile {
 
 // OIDC
 
-export function oidcConfig(pkce?: PKCEMethod): OIDCInnerConfig {
+export function oidcConfig(): OIDCInnerConfig {
   const config: OIDCInnerConfig = {
     uuid: uuid(),
     activated: true,
@@ -82,17 +81,7 @@ export function oidcConfig(pkce?: PKCEMethod): OIDCInnerConfig {
     scopes: [],
   }
 
-  if (pkce) {
-    config.pkce = pkce
-  }
-
   return config
-}
-
-export function oidcConfigWithPKCE(
-  method: PKCEMethod = PKCEMethod.S256
-): OIDCInnerConfig {
-  return oidcConfig(method)
 }
 
 // response from .well-known/openid-configuration
