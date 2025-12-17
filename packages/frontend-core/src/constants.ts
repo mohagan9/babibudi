@@ -6,7 +6,6 @@ export {
   OperatorOptions,
   SqlNumberTypeRangeMap,
 } from "@budibase/shared-core"
-export { Feature as Features } from "@budibase/types"
 import { BpmCorrelationKey } from "@budibase/shared-core"
 import { BBReferenceFieldSubType, FieldType } from "@budibase/types"
 
@@ -80,17 +79,6 @@ export const ExtendedBudibaseRoleOptions = [
   ...BudibaseRoleOptions,
   ...BudibaseRoleOptionsOld,
 ]
-
-export const PlanType = {
-  FREE: "free",
-  TEAM: "team",
-  PRO: "pro",
-  BUSINESS: "business",
-  PREMIUM: "premium",
-  PREMIUM_PLUS: "premium_plus",
-  ENTERPRISE: "enterprise",
-  ENTERPRISE_BASIC_TRIAL: "enterprise_basic_trial",
-}
 
 /**
  * API version header attached to all requests.

@@ -25,7 +25,6 @@ import {
   DeleteWorkspaceResponse,
   DuplicateWorkspaceRequest,
   DuplicateWorkspaceResponse,
-  APIWarningCode,
   FetchAppDefinitionResponse,
   FetchAppPackageResponse,
   FetchPublishedAppsResponse,
@@ -34,7 +33,6 @@ import {
   ImportToUpdateWorkspaceRequest,
   ImportToUpdateWorkspaceResponse,
   Layout,
-  PlanType,
   RevertAppClientResponse,
   Row,
   Screen,
@@ -46,7 +44,6 @@ import {
   UserCtx,
   Workspace,
 } from "@budibase/types"
-import { cleanupAutomations } from "../../automations/utils"
 import { DEFAULT_BB_DATASOURCE_ID, USERS_TABLE_SCHEMA } from "../../constants"
 import { defaultAppNavigator } from "../../constants/definitions"
 import { BASE_LAYOUT_PROP_IDS } from "../../constants/layouts"
@@ -336,13 +333,12 @@ export async function fetchAppPackage(
   ctx: UserCtx<void, FetchAppPackageResponse>
 ) {
   const appId = context.getWorkspaceId()
-  let [application, layouts, screens, recaptchaConfig] =
-    await Promise.all([
-      sdk.workspaces.metadata.get(),
-      getLayouts(),
-      sdk.screens.fetch(),
-      configs.getRecaptchaConfig(),
-    ])
+  let [application, layouts, screens, recaptchaConfig] = await Promise.all([
+    sdk.workspaces.metadata.get(),
+    getLayouts(),
+    sdk.screens.fetch(),
+    configs.getRecaptchaConfig(),
+  ])
 
   // Enrich plugin URLs
   application.usedPlugins = await objectStore.enrichPluginURLs(
@@ -402,7 +398,6 @@ export async function fetchAppPackage(
 
   ctx.body = {
     application: { ...application, upgradableVersion: envCore.VERSION },
-    licenseType: license?.plan.type || PlanType.FREE,
     screens,
     layouts,
     clientLibPath,
@@ -830,7 +825,6 @@ async function unpublishWorkspace() {
     if (metadata) {
       await db.remove(metadata)
     }
-    await cleanupAutomations(prodWorkspaceId)
   })
 
   await context.doInWorkspaceContext(devWorkspaceId, async () => {
@@ -867,7 +861,6 @@ async function destroyWorkspace(ctx: UserCtx) {
       automationOnly: true,
     })
     await events.app.unpublished({ appId: prodWorkspaceId } as Workspace)
-    await cleanupAutomations(prodWorkspaceId)
     const prodDb = dbCore.getDB(prodWorkspaceId, { skip_setup: true })
     await prodDb.destroy()
     await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)

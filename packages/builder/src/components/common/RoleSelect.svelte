@@ -1,7 +1,5 @@
 <script lang="ts">
-  import { capitalise } from "@/helpers"
   import { roles } from "@/stores/builder"
-  import { licensing } from "@/stores/portal"
   import type { PopoverAlignment } from "@budibase/bbui"
   import { FancySelect, Select } from "@budibase/bbui"
   import { Constants } from "@budibase/frontend-core"
@@ -33,16 +31,6 @@
 
   const dispatch = createEventDispatcher()
   const RemoveID = "remove"
-  const subType = $licensing.license?.plan?.type ?? null
-
-  $: isPremiumOrAbove = [
-    Constants.PlanType.PREMIUM,
-    Constants.PlanType.PREMIUM_PLUS,
-    Constants.PlanType.ENTERPRISE,
-    Constants.PlanType.ENTERPRISE_BASIC_TRIAL,
-    // @ts-expect-error this is not in the enum anymore, but it might be in some licences
-    Constants.PlanType.ENTERPRISE_BASIC,
-  ].includes(subType)
 
   $: enrichLabel = (label: string) =>
     labelPrefix ? `${labelPrefix} ${label}` : label
@@ -90,11 +78,11 @@
     }))
 
     // Add creator if required
-    if (allowCreator || isPremiumOrAbove) {
+    if (allowCreator) {
       options.unshift({
         _id: Constants.Roles.CREATOR,
         name: "Can edit",
-        tag: isPremiumOrAbove ? null : capitalise(Constants.PlanType.PREMIUM),
+        tag: null,
       })
     }
 
@@ -151,9 +139,6 @@
     getOptionValue={role => role._id}
     getOptionColour={getColor}
     isOptionEnabled={option => {
-      if (option._id === Constants.Roles.CREATOR) {
-        return isPremiumOrAbove
-      }
       return true
     }}
     {error}
@@ -173,9 +158,6 @@
     getOptionColour={getColor}
     getOptionIcon={getIcon}
     isOptionEnabled={option => {
-      if (option._id === Constants.Roles.CREATOR) {
-        return isPremiumOrAbove
-      }
       return option.enabled !== false
     }}
     {placeholder}

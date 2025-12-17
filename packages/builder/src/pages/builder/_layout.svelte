@@ -61,34 +61,12 @@
     hasAuthenticated = isAuthenticated
   }
 
-  $: updateBannerVisibility($auth.user, $licensing.license?.plan?.type, isOwner)
-
   $: processNavAction($navigationAction)
 
   navigation.init($redirect)
 
   const isOnPreLoginPage = () => {
     return $isActive("./auth") || $isActive("./invite") || $isActive("./admin")
-  }
-
-  // Determine if the user is on a trial and show the banner.
-  const updateBannerVisibility = (user, licenseType, isOwner) => {
-    if (!user && $licensing.showTrialBanner) {
-      licensing.update(store => {
-        store.showTrialBanner = false
-        return store
-      })
-    } else if (
-      user &&
-      !$licensing.showTrialBanner &&
-      licenseType === Constants.PlanType.ENTERPRISE_BASIC_TRIAL &&
-      isOwner
-    ) {
-      licensing.update(store => {
-        store.showTrialBanner = true
-        return store
-      })
-    }
   }
 
   // Handle navigation actions from derived store

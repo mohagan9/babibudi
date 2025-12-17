@@ -1,6 +1,5 @@
 import { ReadStream } from "fs"
 import type { Layout, Screen, Workspace } from "../../../documents"
-import type { PlanType } from "../../../sdk"
 
 export interface SyncWorkspaceResponse {
   message: string
@@ -38,7 +37,6 @@ export interface FetchAppDefinitionResponse {
 
 export interface FetchAppPackageResponse {
   application: Workspace
-  licenseType: PlanType
   screens: Screen[]
   layouts: Layout[]
   clientLibPath: string
