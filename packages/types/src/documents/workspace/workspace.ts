@@ -88,7 +88,6 @@ export interface WorkspaceFeatures {
   componentValidation?: boolean
   disableUserMetadata?: boolean
   skeletonLoader?: boolean
-  recaptchaEnabled?: boolean
 }
 
 export interface AutomationSettings {

@@ -20,7 +20,6 @@ import GeneralInfoPage from "@/settings/pages/general.svelte"
 import AutomationsPage from "@/settings/pages/automations/automations.svelte"
 import EmbedPage from "@/settings/pages/embed.svelte"
 import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
-import Recaptcha from "@/settings/pages/recaptcha.svelte"
 
 const componentMap = {
   profile: ProfilePage,
@@ -40,7 +39,6 @@ const componentMap = {
   automations: AutomationsPage,
   embed: EmbedPage,
   oauth2: OAuth2Page,
-  recaptcha: Recaptcha,
 } satisfies Record<string, Component<any>>
 
 export const Pages = {

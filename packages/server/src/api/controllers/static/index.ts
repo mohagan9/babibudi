@@ -13,7 +13,6 @@ import {
   BudibaseAppProps,
   Ctx,
   DocumentType,
-  Feature,
   GetSignedUploadUrlRequest,
   GetSignedUploadUrlResponse,
   ProcessAttachmentResponse,
@@ -204,10 +203,9 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
 
   const bbHeaderEmbed =
     ctx.request.get("x-budibase-embed")?.toLowerCase() === "true"
-  const [fullyMigrated, settingsConfig, recaptchaConfig] = await Promise.all([
+  const [fullyMigrated, settingsConfig] = await Promise.all([
     isWorkspaceFullyMigrated(workspaceId),
     configs.getSettingsConfigDoc(),
-    configs.getRecaptchaConfig(),
   ])
   // incase running direct from TS
   let appHbsPath = join(__dirname, "app.hbs")
@@ -223,14 +221,8 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
     const appInfo = await sdk.workspaces.metadata.get()
     const hideDevTools = !!ctx.params.appUrl
     const sideNav = workspaceApp?.navigation.navigation === "Left"
-    const hideFooter =
-      ctx?.user?.license?.features?.includes(Feature.BRANDING) || false
+    const hideFooter = false
     const themeVariables = getThemeVariables(appInfo.theme)
-    const hasPWA = Object.keys(appInfo.pwa || {}).length > 0
-    const manifestUrl = hasPWA ? `/api/apps/${workspaceId}/manifest.json` : ""
-    const addAppScripts =
-      ctx?.user?.license?.features?.includes(Feature.CUSTOM_APP_SCRIPTS) ||
-      false
 
     if (!env.isJest()) {
       const plugins = await objectStore.enrichPluginURLs(appInfo.usedPlugins)
@@ -256,15 +248,8 @@ export const serveApp = async function (ctx: UserCtx<void, ServeAppResponse>) {
         usedPlugins: plugins,
         favicon: "",
         appMigrating: !fullyMigrated,
-        recaptchaKey: recaptchaConfig?.config.siteKey,
         nonce,
         workspaceId,
-      }
-
-      // Add custom app scripts if enabled
-      if (addAppScripts) {
-        props.headAppScripts = getAppScriptHTML(appInfo, "Head", nonce)
-        props.bodyAppScripts = getAppScriptHTML(appInfo, "Body", nonce)
       }
 
       const { head, body } = await render(AppComponent, { props: { props } })
@@ -307,21 +292,12 @@ export const serveBuilderPreview = async function (
     const previewLoc = fs.existsSync(templateLoc) ? templateLoc : __dirname
     const previewHbs = loadHandlebarsFile(join(previewLoc, "preview.hbs"))
     const nonce = ctx.state.nonce || ""
-    const addAppScripts =
-      ctx?.user?.license?.features?.includes(Feature.CUSTOM_APP_SCRIPTS) ||
-      false
     let props: any = {
       clientLibPath: await objectStore.clientLibraryUrl(
         appId!,
         appInfo.version
       ),
       nonce,
-    }
-
-    // Add custom app scripts if enabled
-    if (addAppScripts) {
-      props.headAppScripts = getAppScriptHTML(appInfo, "Head", nonce)
-      props.bodyAppScripts = getAppScriptHTML(appInfo, "Body", nonce)
     }
 
     ctx.body = await processString(previewHbs, props)

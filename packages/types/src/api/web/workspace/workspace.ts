@@ -41,7 +41,6 @@ export interface FetchAppPackageResponse {
   layouts: Layout[]
   clientLibPath: string
   hasLock: boolean
-  recaptchaKey?: string
   clientCacheKey?: string
 }
 

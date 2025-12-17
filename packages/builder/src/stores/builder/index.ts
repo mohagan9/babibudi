@@ -33,7 +33,6 @@ import { queries } from "./queries"
 import { flags } from "./flags"
 import componentTreeNodesStore from "./componentTreeNodes"
 import { oauth2 } from "./oauth2"
-import { recaptchaStore } from "./recaptcha"
 import { dataEnvironmentStore, dataAPI } from "./dataEnvironment"
 
 import { FetchAppPackageResponse } from "@budibase/types"
@@ -77,7 +76,6 @@ export {
   selectedAppUrls,
   workspaceDeploymentStore,
   workspaceFavouriteStore,
-  recaptchaStore,
   dataEnvironmentStore,
   dataAPI,
   restTemplates,
@@ -111,7 +109,7 @@ const resetBuilderHistory = () => {
 }
 
 export const initialise = async (pkg: FetchAppPackageResponse) => {
-  const { application, recaptchaKey } = pkg
+  const { application } = pkg
   // must be first operation to make sure subsequent requests have correct app ID
   appStore.syncAppPackage(pkg)
   await Promise.all([
@@ -121,7 +119,6 @@ export const initialise = async (pkg: FetchAppPackageResponse) => {
   builderStore.init(application)
   navigationStore.syncAppNavigation(application?.navigation)
   themeStore.syncAppTheme(application)
-  recaptchaStore.syncRecaptcha(application, recaptchaKey)
   snippets.syncMetadata(application)
   screenStore.syncAppScreens(pkg)
   layoutStore.syncAppLayouts(pkg)

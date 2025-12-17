@@ -61,21 +61,10 @@ export const orgRoutes = (
       icon: "sliders",
       routes: [
         {
-          path: "usage",
-          title: "Usage",
-          comp: Pages.get("usage"),
-        },
-        {
           path: "org",
           access: () => isAdmin,
           title: "Organisation",
           comp: Pages.get("org"),
-        },
-        {
-          path: "branding",
-          access: () => isAdmin,
-          title: "Branding",
-          comp: Pages.get("branding"),
         },
       ],
     },
@@ -96,14 +85,6 @@ export const orgRoutes = (
           title: "Invites",
           comp: Pages.get("user_invites"),
         },
-        {
-          path: "groups",
-          title: "Groups",
-          comp: Pages.get("groups"),
-          routes: [
-            { path: ":groupId", comp: Pages.get("group"), title: "Group" },
-          ],
-        },
       ],
     },
     {
@@ -114,13 +95,6 @@ export const orgRoutes = (
       comp: Pages.get("plugins"),
     },
     {
-      section: "Environment",
-      access: () => isAdmin,
-      path: "environment",
-      icon: "shipping-container",
-      comp: Pages.get("environment"),
-    },
-    {
       section: "Email",
       path: "email",
       icon: "envelope",
@@ -128,32 +102,11 @@ export const orgRoutes = (
       routes: emailRoutes,
     },
     {
-      section: "AI",
-      access: () => isAdmin,
-      path: "ai",
-      icon: "sparkle",
-      comp: Pages.get("ai"),
-    },
-    {
       section: "Auth",
       access: () => isAdmin,
       path: "auth",
       icon: "key",
       comp: Pages.get("auth"),
-    },
-    {
-      section: "Recaptcha",
-      access: () => isAdmin,
-      path: "recaptcha",
-      icon: "shield-check",
-      comp: Pages.get("recaptcha"),
-    },
-    {
-      section: "Audit logs",
-      access: () => isAdmin,
-      path: "audit",
-      icon: "notepad",
-      comp: Pages.get("audit_logs"),
     },
     {
       section: "Self host",
@@ -186,14 +139,6 @@ export const orgRoutes = (
         url: accountPortalUpgradeUrl(admin?.accountPortalUrl),
         target: Target.Blank,
       },
-    },
-    {
-      section: "Upgrade plan",
-      access: () => !cloud && isAdmin,
-      icon: "arrow-circle-up",
-      path: "upgrade",
-      comp: Pages.get("upgrade"),
-      color: "var(--spectrum-global-color-blue-500)",
     },
     {
       section: "Billing",
@@ -236,12 +181,6 @@ export const appRoutes = (
       routes: [
         { path: "info", comp: Pages.get("general_info"), title: "Info" },
         {
-          path: "backups",
-          comp: Pages.get("backups"),
-          title: "Backups",
-          error: () => backupErrorCount > 0,
-        },
-        {
           title: "OAuth2",
           path: "oauth2",
           comp: Pages.get("oauth2"),
@@ -263,16 +202,7 @@ export const appRoutes = (
       section: "Apps",
       icon: "layout",
       path: "app",
-      routes: [
-        { path: "pwa", comp: Pages.get("pwa"), title: "PWA" },
-        { path: "embed", comp: Pages.get("embed"), title: "Embed" },
-        { path: "scripts", comp: Pages.get("scripts"), title: "Scripts" },
-        {
-          path: "translations",
-          comp: Pages.get("translations"),
-          title: "Translations",
-        },
-      ],
+      routes: [{ path: "embed", comp: Pages.get("embed"), title: "Embed" }],
     },
   ].map((entry: Route) => ({
     ...entry,

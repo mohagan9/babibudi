@@ -1,6 +1,5 @@
 import * as viewController from "../controllers/view"
 import * as rowController from "../controllers/row"
-import recaptcha from "../../middleware/recaptcha"
 import {
   authorizedMiddleware as authorized,
   authorizedResource,
@@ -12,7 +11,6 @@ import { builderRoutes, publicRoutes } from "./endpointGroups"
 publicRoutes
   .get(
     "/api/v2/views/:viewId",
-    recaptcha,
     authorizedResource(
       permissions.PermissionType.VIEW,
       permissions.PermissionLevel.READ,
@@ -22,7 +20,6 @@ publicRoutes
   )
   .get(
     "/api/views/:viewName",
-    recaptcha,
     paramResource("viewName"),
     authorized(
       permissions.PermissionType.TABLE,

@@ -14,7 +14,6 @@ import { PluginAPI } from "./plugin"
 import { RowPublicAPI } from "./public/row"
 import { UserPublicAPI } from "./public/user"
 import { QueryAPI } from "./query"
-import { RecaptchaAPI } from "./recaptcha"
 import { ResourceAPI } from "./resource"
 import { RoleAPI } from "./role"
 import { RoutingAPI } from "./routing"
@@ -56,7 +55,6 @@ export default class API {
   workspaceApp: WorkspaceAppAPI
   resource: ResourceAPI
   navigation: NavigationAPI
-  recaptcha: RecaptchaAPI
   routing: RoutingAPI
   workspaceFavourites: WorkspaceFavouriteAPI
 
@@ -91,7 +89,6 @@ export default class API {
     this.workspaceApp = new WorkspaceAppAPI(config)
     this.resource = new ResourceAPI(config)
     this.navigation = new NavigationAPI(config)
-    this.recaptcha = new RecaptchaAPI(config)
     this.routing = new RoutingAPI(config)
     this.workspaceFavourites = new WorkspaceFavouriteAPI(config)
     this.public = {

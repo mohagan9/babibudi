@@ -136,7 +136,6 @@ export enum ConfigType {
   OIDC_LOGOS = "logos_oidc",
   SCIM = "scim",
   AI = "ai",
-  RECAPTCHA = "recaptcha",
 }
 
 export type ConfigTypeToConfig<T extends ConfigType> =

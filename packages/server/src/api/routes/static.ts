@@ -2,7 +2,6 @@ import { permissions } from "@budibase/backend-core"
 import Router from "@koa/router"
 import { devAppIdPath } from "../../constants/paths"
 import { authorizedMiddleware as authorized } from "../../middleware/authorized"
-import recaptcha from "../../middleware/recaptcha"
 import { paramResource } from "../../middleware/resourceId"
 import * as controller from "../controllers/static"
 import { addFileManagement } from "../utils"
@@ -24,7 +23,6 @@ router
   .post("/api/pwa/process-zip", authorized(BUILDER), controller.processPWAZip)
   .post(
     "/api/attachments/:tableId/upload",
-    recaptcha,
     paramResource("tableId"),
     authorized(PermissionType.TABLE, PermissionLevel.WRITE),
     controller.uploadFile
@@ -37,10 +35,6 @@ router
   .get("/app/service-worker.js", controller.serveServiceWorker)
   .get("/app/:appUrl/:path*", controller.serveApp)
   .get(`/${devAppIdPath}/:path*`, controller.serveApp)
-  .post(
-    "/api/attachments/:datasourceId/url",
-    recaptcha,
-    controller.getSignedUploadURL
-  )
+  .post("/api/attachments/:datasourceId/url", controller.getSignedUploadURL)
 
 export default router

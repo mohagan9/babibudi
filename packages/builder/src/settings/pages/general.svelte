@@ -6,13 +6,7 @@
   import VersionModal from "@/components/deploy/VersionModal.svelte"
   import ExportAppModal from "@/components/start/ExportAppModal.svelte"
   import ImportAppModal from "@/components/start/ImportAppModal.svelte"
-  import {
-    appStore,
-    deploymentStore,
-    isOnlyUser,
-    recaptchaStore,
-  } from "@/stores/builder"
-  import { featureFlags } from "@/stores/portal"
+  import { appStore, deploymentStore, isOnlyUser } from "@/stores/builder"
   import { admin } from "@/stores/portal/admin"
   import {
     Body,
@@ -22,9 +16,7 @@
     Icon,
     Layout,
     Modal,
-    notifications,
   } from "@budibase/bbui"
-  import CloneResourcesModal from "../_components/CloneResourcesModal.svelte"
 
   let versionModal: VersionModal
   let exportModal: Modal
@@ -33,25 +25,13 @@
   let unpublishModal: ConfirmDialog
   let revertModal: RevertModal
   let deleteModal: DeleteModal
-  let cloneResourcesModal: CloneResourcesModal
 
   $: updateAvailable = $appStore.upgradableVersion !== $appStore.version
   $: revertAvailable = $appStore.revertableVersion != null
-  $: appRecaptchaEnabled = $recaptchaStore.enabled
 
   const exportApp = (opts: { published: any }) => {
     exportPublishedVersion = !!opts?.published
     exportModal.show()
-  }
-
-  const updateRecaptcha = async () => {
-    try {
-      const newState = !appRecaptchaEnabled
-      await recaptchaStore.setState(newState)
-      notifications.success(`Recaptcha ${newState ? "enabled" : "disabled"}`)
-    } catch (err: any) {
-      notifications.error(`Failed to set recaptcha state: ${err.message}`)
-    }
   }
 </script>
 
@@ -101,7 +81,7 @@
   <Divider noMargin id="version" />
   <Layout gap="XS" noPadding>
     <Heading size="S">Client version</Heading>
-    {#if $admin.isDev && !$featureFlags.DEV_USE_CLIENT_FROM_STORAGE}
+    {#if $admin.isDev}
       <Body size="S">
         You're running the latest client version from your file system, as
         you're in developer mode.
@@ -197,20 +177,6 @@
   <div class="row">
     <Button secondary on:click={importModal?.show}>Import workspace</Button>
   </div>
-  <Divider noMargin />
-  {#if $featureFlags.COPY_RESOURCES_BETWEEN_WORKSPACES}
-    <Layout noPadding gap="XS">
-      <Heading size="XS">Copy resources</Heading>
-      <Body size="S">Copy resources from this workspace to another one</Body>
-    </Layout>
-    <div class="row">
-      <Button secondary on:click={() => cloneResourcesModal.show()}>
-        Copy resources
-      </Button>
-      <CloneResourcesModal bind:this={cloneResourcesModal} />
-    </div>
-    <Divider noMargin />
-  {/if}
   <Divider noMargin />
   <Heading size="XS">Danger zone</Heading>
   <div class="row">

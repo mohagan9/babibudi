@@ -12,7 +12,6 @@ interface AppStoreState {
   layouts?: Layout[]
   application?: Workspace
   pageWidth?: string
-  recaptchaKey?: string
   clientCacheKey?: string
 }
 
