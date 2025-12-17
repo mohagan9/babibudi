@@ -1,7 +1,6 @@
 import {
   Database,
   IdentityContext,
-  License,
   Snippet,
   Table,
   Workspace,
@@ -177,18 +176,6 @@ export async function doInSelfHostTenantUsingCloud<T>(
 ): Promise<T> {
   const updates = { tenantId, isSelfHostUsingCloud: true }
   return newContext(updates, task)
-}
-
-export async function doInLicenseContext<T>(
-  license: License,
-  task: () => T
-): Promise<T> {
-  return newContext({ license }, task)
-}
-
-export function getLicense(): License | undefined {
-  const context = Context.get()
-  return context?.license
 }
 
 export function isSelfHostUsingCloud() {

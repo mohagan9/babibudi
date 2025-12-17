@@ -6,7 +6,6 @@ import "./global/auth"
 import "./global/configs"
 import "./global/email"
 import "./global/events"
-import "./global/license"
 import "./global/roles"
 import "./global/self"
 import "./global/templates"
@@ -23,6 +22,4 @@ for (let endpoint of endpointGroupList.listAllEndpoints()) {
   endpoint.apply(endpointGroupsRouter)
 }
 
-export const routes: Router[] = [
-  endpointGroupsRouter,
-]
+export const routes: Router[] = [endpointGroupsRouter]

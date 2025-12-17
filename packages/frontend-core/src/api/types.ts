@@ -1,5 +1,3 @@
-import { AIEndpoints } from "./ai"
-import { AnalyticsEndpoints } from "./analytics"
 import { AppEndpoints } from "./app"
 import { AttachmentEndpoints } from "./attachments"
 import { AuthEndpoints } from "./auth"
@@ -12,7 +10,6 @@ import { EventEndpoints } from "./events"
 import { FeatureFlagEndpoints } from "./features"
 import { FlagEndpoints } from "./flags"
 import { LayoutEndpoints } from "./layouts"
-import { LicensingEndpoints } from "./licensing"
 import { LogEndpoints } from "./logs"
 import { MigrationEndpoints } from "./migrations"
 import { OAuth2Endpoints } from "./oauth2"
@@ -32,14 +29,11 @@ import { TemplateEndpoints } from "./templates"
 import { UserEndpoints } from "./user"
 import { ViewEndpoints } from "./views"
 import { ViewV2Endpoints } from "./viewsV2"
-import { AgentEndpoints } from "./agents"
 import { NavigationEndpoints } from "./navigation"
 import { WorkspaceAppEndpoints } from "./workspaceApps"
 import { ResourceEndpoints } from "./resource"
 import { DeploymentEndpoints } from "./deploy"
 import { WorkspaceFavouriteEndpoints } from "./workspaceFavourites"
-import { RecaptchaEndpoints } from "./recaptcha"
-import { AIConfigEndpoints } from "./aiConfig"
 
 export enum HTTPMethod {
   POST = "POST",
@@ -109,9 +103,6 @@ export type APIError = {
 }
 
 export type APIClient = BaseAPIClient &
-  AIEndpoints &
-  AgentEndpoints &
-  AnalyticsEndpoints &
   AppEndpoints &
   AttachmentEndpoints &
   AuthEndpoints &
@@ -123,7 +114,6 @@ export type APIClient = BaseAPIClient &
   EventEndpoints &
   FlagEndpoints &
   LayoutEndpoints &
-  LicensingEndpoints &
   LogEndpoints &
   MigrationEndpoints &
   OtherEndpoints &
@@ -149,6 +139,4 @@ export type APIClient = BaseAPIClient &
     workspaceApp: WorkspaceAppEndpoints
     workspace: WorkspaceFavouriteEndpoints
     deployment: DeploymentEndpoints
-    recaptcha: RecaptchaEndpoints
-    aiConfig: AIConfigEndpoints
   }

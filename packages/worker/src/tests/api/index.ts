@@ -11,7 +11,6 @@ import { RestoreAPI } from "./restore"
 import { TenantAPI } from "./tenants"
 import { RolesAPI } from "./roles"
 import { TemplatesAPI } from "./templates"
-import { LicenseAPI } from "./license"
 
 export default class API {
   accounts: AccountAPI
@@ -26,7 +25,6 @@ export default class API {
   tenants: TenantAPI
   roles: RolesAPI
   templates: TemplatesAPI
-  license: LicenseAPI
 
   constructor(config: TestConfiguration) {
     this.accounts = new AccountAPI(config)
@@ -41,6 +39,5 @@ export default class API {
     this.tenants = new TenantAPI(config)
     this.roles = new RolesAPI(config)
     this.templates = new TemplatesAPI(config)
-    this.license = new LicenseAPI(config)
   }
 }

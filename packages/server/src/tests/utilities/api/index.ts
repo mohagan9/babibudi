@@ -1,5 +1,4 @@
 import TestConfiguration from "../TestConfiguration"
-import { AIAPI } from "./ai"
 import { AssetsAPI } from "./assets"
 import { AttachmentAPI } from "./attachment"
 import { AutomationAPI } from "./automation"
@@ -33,7 +32,6 @@ import { WorkspaceAppAPI } from "./workspaceApp"
 import { WorkspaceFavouriteAPI } from "./workspaceFavourite"
 
 export default class API {
-  ai: AIAPI
   workspace: WorkspaceAPI
   attachment: AttachmentAPI
   automation: AutomationAPI
@@ -70,7 +68,6 @@ export default class API {
   }
 
   constructor(config: TestConfiguration) {
-    this.ai = new AIAPI(config)
     this.workspace = new WorkspaceAPI(config)
     this.attachment = new AttachmentAPI(config)
     this.automation = new AutomationAPI(config)

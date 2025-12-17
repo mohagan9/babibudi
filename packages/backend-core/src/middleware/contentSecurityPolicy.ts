@@ -1,7 +1,6 @@
-import { Ctx, Feature } from "@budibase/types"
+import { Ctx } from "@budibase/types"
 import crypto from "crypto"
 import { Middleware, Next } from "koa"
-import { workspace } from "../cache"
 
 const CSP_DIRECTIVES = {
   "default-src": ["'self'"],
@@ -90,8 +89,6 @@ const CSP_DIRECTIVES = {
   "worker-src": ["blob:", "'self'"],
 }
 
-const CSPDomainRegex = /^[A-Za-z0-9-*:/.]+$/
-
 export const contentSecurityPolicy = (async (ctx: Ctx, next: Next) => {
   const nonce = crypto.randomBytes(16).toString("base64")
   ctx.state.nonce = nonce
@@ -100,32 +97,6 @@ export const contentSecurityPolicy = (async (ctx: Ctx, next: Next) => {
     ...CSP_DIRECTIVES["script-src"],
     `'nonce-${nonce}'`,
   ]
-
-  // Add custom app CSP whitelist
-  const licensed = ctx.user?.license?.features.includes(
-    Feature.CUSTOM_APP_SCRIPTS
-  )
-  if (licensed && ctx.appId) {
-    try {
-      const appMetadata = await workspace.getWorkspaceMetadata(ctx.appId)
-      if ("name" in appMetadata) {
-        for (let script of appMetadata.scripts || []) {
-          const inclusions = (script.cspWhitelist || "")
-            .split("\n")
-            .filter(domain => CSPDomainRegex.test(domain))
-          directives["default-src"] = [
-            ...directives["default-src"],
-            ...inclusions,
-          ]
-        }
-      }
-    } catch (err) {
-      // Log an error but always proceed using the default CSP
-      console.error(
-        `Error occurred in Content-Security-Policy middleware: ${err}`
-      )
-    }
-  }
 
   const cspHeader = Object.entries(directives)
     .map(([key, sources]) => `${key} ${sources.join(" ")}`)

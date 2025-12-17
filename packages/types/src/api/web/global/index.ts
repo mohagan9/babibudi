@@ -1,7 +1,6 @@
 export * from "./environmentVariables"
 export * from "./events"
 export * from "./configs"
-export * from "./license"
 export * from "./oldMigration"
 export * from "./email"
 export * from "./role"

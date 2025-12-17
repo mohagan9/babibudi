@@ -9,7 +9,7 @@ import {
   User,
   UserSSO,
 } from "../documents"
-import { FeatureFlag, License } from "../sdk"
+import { FeatureFlag } from "../sdk"
 import { Files } from "formidable"
 import { EventType } from "../core"
 import { UserAgentContext } from "koa-useragent"
@@ -21,7 +21,6 @@ export enum LoginMethod {
 
 export interface ContextUser extends Omit<User & Partial<UserSSO>, "roles"> {
   globalId?: string
-  license?: License
   userId?: string
   roleId?: string | null
   role?: Role

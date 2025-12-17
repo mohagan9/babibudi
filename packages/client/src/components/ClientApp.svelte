@@ -48,12 +48,10 @@
   import KeyboardManager from "./preview/KeyboardManager.svelte"
   import DevToolsHeader from "./devtools/DevToolsHeader.svelte"
   import DevTools from "./devtools/DevTools.svelte"
-  import FreeFooter from "./FreeFooter.svelte"
   import MaintenanceScreen from "./MaintenanceScreen.svelte"
   import SnippetsProvider from "./context/SnippetsProvider.svelte"
   import EmbedProvider from "./context/EmbedProvider.svelte"
   import DNDSelectionIndicators from "./preview/DNDSelectionIndicators.svelte"
-  import RecaptchaV2 from "./RecaptchaV2.svelte"
   import { ActionTypes } from "@/constants"
 
   // Provide contexts

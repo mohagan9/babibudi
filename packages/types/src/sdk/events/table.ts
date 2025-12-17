@@ -1,5 +1,4 @@
 import { BaseEvent, TableExportFormat } from "./event"
-import { AIOperationEnum } from "../ai"
 
 export interface TableCreatedEvent extends BaseEvent {
   tableId: string
@@ -11,7 +10,6 @@ export interface TableCreatedEvent extends BaseEvent {
 export interface TableUpdatedEvent extends BaseEvent {
   tableId: string
   defaultValues: boolean | undefined
-  aiColumn: AIOperationEnum | undefined
   audited: {
     name: string
   }

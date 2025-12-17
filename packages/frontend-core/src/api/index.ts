@@ -11,8 +11,6 @@ import {
 import { Helpers } from "@budibase/bbui"
 import { Header } from "@budibase/shared-core"
 import { ApiVersion } from "../constants"
-import { buildAnalyticsEndpoints } from "./analytics"
-import { buildAIEndpoints } from "./ai"
 import { buildAppEndpoints } from "./app"
 import { buildAttachmentEndpoints } from "./attachments"
 import { buildAuthEndpoints } from "./auth"
@@ -35,7 +33,6 @@ import { buildUserEndpoints } from "./user"
 import { buildSelfEndpoints } from "./self"
 import { buildViewEndpoints } from "./views"
 import { buildViewV2Endpoints } from "./viewsV2"
-import { buildLicensingEndpoints } from "./licensing"
 import { buildPluginEndpoints } from "./plugins"
 import { buildBackupEndpoints } from "./backups"
 import { buildEnvironmentVariableEndpoints } from "./environmentVariables"
@@ -44,15 +41,12 @@ import { buildLogsEndpoints } from "./logs"
 import { buildMigrationEndpoints } from "./migrations"
 import { buildRowActionEndpoints } from "./rowActions"
 import { buildOAuth2Endpoints } from "./oauth2"
-import { buildAgentEndpoints } from "./agents"
 import { buildFeatureFlagEndpoints } from "./features"
 import { buildNavigationEndpoints } from "./navigation"
 import { buildWorkspaceAppEndpoints } from "./workspaceApps"
 import { buildResourceEndpoints } from "./resource"
 import { buildDeploymentEndpoints } from "./deploy"
 import { buildWorkspaceFavouriteEndpoints } from "./workspaceFavourites"
-import { buildRecaptchaEndpoints } from "./recaptcha"
-import { buildAIConfigEndpoints } from "./aiConfig"
 
 export type { APIClient } from "./types"
 
@@ -278,8 +272,6 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
   // Attach all endpoints
   return {
     ...API,
-    ...buildAIEndpoints(API),
-    ...buildAnalyticsEndpoints(API),
     ...buildAppEndpoints(API),
     ...buildAttachmentEndpoints(API),
     ...buildAuthEndpoints(API),
@@ -301,14 +293,12 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     ...buildUserEndpoints(API),
     ...buildViewEndpoints(API),
     ...buildSelfEndpoints(API),
-    ...buildLicensingEndpoints(API),
     ...buildPluginEndpoints(API),
     ...buildBackupEndpoints(API),
     ...buildEnvironmentVariableEndpoints(API),
     ...buildEventEndpoints(API),
     ...buildLogsEndpoints(API),
     ...buildMigrationEndpoints(API),
-    ...buildAgentEndpoints(API),
     ...buildFeatureFlagEndpoints(API),
     deployment: buildDeploymentEndpoints(API),
     viewV2: buildViewV2Endpoints(API),
@@ -318,7 +308,5 @@ export const createAPIClient = (config: APIClientConfig = {}): APIClient => {
     workspaceApp: buildWorkspaceAppEndpoints(API),
     workspace: buildWorkspaceFavouriteEndpoints(API),
     resource: buildResourceEndpoints(API),
-    recaptcha: buildRecaptchaEndpoints(API),
-    aiConfig: buildAIConfigEndpoints(API),
   }
 }
