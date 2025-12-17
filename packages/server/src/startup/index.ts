@@ -1,7 +1,6 @@
 import {
   cache,
   env as coreEnv,
-  features,
   installation,
   logging,
   tenancy,
@@ -15,7 +14,6 @@ import { AddressInfo } from "net"
 import * as api from "../api"
 import env from "../environment"
 import { default as eventEmitter, init as eventInit } from "../events"
-import { printFeatures } from "../features"
 import * as jsRunner from "../jsRunner"
 import sdk from "../sdk"
 import * as fileSystem from "../utilities/fileSystem"
@@ -49,7 +47,6 @@ export async function startup(
     return
   }
   STATE = "starting"
-  printFeatures()
   if (env.BUDIBASE_ENVIRONMENT) {
     console.log(`service running environment: "${env.BUDIBASE_ENVIRONMENT}"`)
   }
@@ -73,9 +70,6 @@ export async function startup(
 
   console.log("Initialising events")
   eventInit()
-
-  console.log("Initialising feature flags")
-  features.init()
 
   if (app && server) {
     console.log("Initialising websockets")
