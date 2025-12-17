@@ -777,7 +777,6 @@
       <CodeEditor
         value={requestURL}
         mode={EditorModes.Handlebars}
-        aiEnabled={false}
         readonly
         lineWrapping={false}
       />
@@ -899,7 +898,6 @@
                       <CodeEditor
                         value={query?.transformer}
                         mode={EditorModes.JS}
-                        aiEnabled={false}
                         on:change={e => {
                           if (!query) return
                           query.transformer = e.detail

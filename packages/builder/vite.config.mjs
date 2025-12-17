@@ -95,7 +95,6 @@ export default defineConfig(({ mode }) => {
         "process.env.NODE_ENV": JSON.stringify(
           isProduction ? "production" : "development"
         ),
-        "process.env.POSTHOG_TOKEN": JSON.stringify(process.env.POSTHOG_TOKEN),
       }),
       copyFonts("fonts"),
       ...(isProduction ? [] : devOnlyPlugins),

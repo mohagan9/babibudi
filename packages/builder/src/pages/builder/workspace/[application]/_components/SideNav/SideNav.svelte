@@ -78,13 +78,11 @@
 
   // Default icon mapping
   const ResourceIcons: Record<WorkspaceResource, string> = {
-    [WorkspaceResource.AUTOMATION]: "path",
     [WorkspaceResource.DATASOURCE]: "plugs-connected",
     [WorkspaceResource.TABLE]: "table",
     [WorkspaceResource.WORKSPACE_APP]: "browser",
     [WorkspaceResource.QUERY]: "database", // regular db queries
     [WorkspaceResource.VIEW]: "table",
-    [WorkspaceResource.AGENT]: "cpu",
   }
 
   const datasourceLookup = datasources.lookup
@@ -208,8 +206,6 @@
   const resourceLink = (favourite: WorkspaceFavourite) => {
     const appPrefix = `/builder/workspace/${appId}`
     const link: Record<WorkspaceResource, ResourceLinkFn> = {
-      [WorkspaceResource.AUTOMATION]: (id: string) =>
-        `${appPrefix}/automation/${id}`,
       [WorkspaceResource.DATASOURCE]: (id: string) => {
         const datasourceMap = get(datasourceLookup) || {}
         const datasource = datasourceMap[id]
@@ -244,8 +240,6 @@
         const view = $viewsV2.list.find(v => v.id === id)
         return `${appPrefix}/data/table/${view?.tableId}/${id}`
       },
-      [WorkspaceResource.AGENT]: (id: string) =>
-        `${appPrefix}/agent/${id}/config`,
     }
     if (!link[favourite.resourceType]) return null
     return link[favourite.resourceType]?.(favourite.resourceId)

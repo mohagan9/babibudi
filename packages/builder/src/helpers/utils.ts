@@ -1,13 +1,11 @@
 import {
   AutoFieldSubType,
-  Automation,
   DateFieldMetadata,
   FieldType,
   NumberFieldMetadata,
   RelationshipFieldMetadata,
   RelationshipType,
 } from "@budibase/types"
-import { ActionStepID } from "@/constants/backend/automations"
 import { TableNames } from "@/constants"
 import {
   AUTO_COLUMN_DISPLAY_NAMES,
@@ -87,10 +85,4 @@ export function buildAutoColumn(
         message: "Cannot build auto column with supplied subtype",
       })
   }
-}
-
-export function checkForCollectStep(automation: Automation) {
-  return automation.definition.steps.some(
-    step => step.stepId === ActionStepID.COLLECT
-  )
 }

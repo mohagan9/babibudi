@@ -194,7 +194,6 @@ const environment = {
   SELF_HOSTED: selfHosted,
   COOKIE_DOMAIN: process.env.COOKIE_DOMAIN,
   PLATFORM_URL: process.env.PLATFORM_URL || "",
-  POSTHOG_TOKEN: process.env.POSTHOG_TOKEN,
   POSTHOG_PERSONAL_TOKEN: process.env.POSTHOG_PERSONAL_TOKEN,
   POSTHOG_API_HOST: process.env.POSTHOG_API_HOST || "https://us.i.posthog.com",
   POSTHOG_FEATURE_FLAGS_ENABLED: process.env.POSTHOG_FEATURE_FLAGS_ENABLED,

@@ -369,7 +369,6 @@
             bind:getCaretPosition
             bind:insertAtPos
             {completions}
-            {bindings}
             {validations}
             mode={editorMode}
             autofocus={autofocusEditor}
@@ -383,7 +382,6 @@
             on:change={onChangeJSValue}
             on:ai_suggestion={() => (sidePanel = "Evaluation")}
             {completions}
-            {bindings}
             {validations}
             mode={EditorModes.JS}
             bind:getCaretPosition

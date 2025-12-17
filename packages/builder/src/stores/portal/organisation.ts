@@ -4,7 +4,6 @@ import { auth } from "@/stores/portal"
 import {
   ConfigType,
   PublicSettingsInnerConfig,
-  SettingsBrandingConfig,
   SettingsInnerConfig,
 } from "@budibase/types"
 import { BudiStore } from "../BudiStore"
@@ -13,15 +12,13 @@ interface LocalOrganisationState {
   loaded: boolean
 }
 
-type SavedOrganisationState = SettingsInnerConfig & SettingsBrandingConfig
+type SavedOrganisationState = SettingsInnerConfig
 type OrganisationState = SavedOrganisationState &
   PublicSettingsInnerConfig &
   LocalOrganisationState
 
 const DEFAULT_STATE: OrganisationState = {
   platformUrl: "",
-  emailBrandingEnabled: true,
-  platformTitle: "Budibase",
   company: "Budibase",
   google: false,
   googleDatasourceConfigured: false,

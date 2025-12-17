@@ -145,7 +145,6 @@
         value={jsValue || ""}
         on:blur={onBlurJSValue}
         completions={jsCompletions}
-        {bindings}
         mode={EditorModes.JS}
         bind:getCaretPosition
         bind:insertAtPos
