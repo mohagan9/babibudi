@@ -1,7 +1,6 @@
 <script lang="ts">
   import { API } from "@/api"
   import RoleSelect from "@/components/common/RoleSelect.svelte"
-  import UpgradeModal from "@/components/common/users/UpgradeModal.svelte"
   import { appStore, builderStore, deploymentStore } from "@/stores/builder"
   import { admin, appsStore, auth, users } from "@/stores/portal"
   import {
@@ -15,7 +14,6 @@
     Icon,
     Input,
     Layout,
-    Modal,
     PopoverAlignment,
     clickOutside,
     notifications,
@@ -59,7 +57,6 @@
   let filteredInvites: InviteWithCode[] = []
   let filteredUsers: ExtendedUser[] = []
   let userOnboardResponse: InviteUsersResponse | null = null
-  let userLimitReachedModal: Modal
 
   let inviteFailureResponse = ""
   $: query = query?.trim() ?? null
@@ -632,9 +629,6 @@
       </Layout>
     </div>
   {/if}
-  <Modal bind:this={userLimitReachedModal}>
-    <UpgradeModal {isOwner} />
-  </Modal>
 </div>
 
 <style>

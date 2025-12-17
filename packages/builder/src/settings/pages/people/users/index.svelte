@@ -7,7 +7,6 @@
     Search,
     notifications,
     Pagination,
-    InlineAlert,
     ActionButton,
     Icon,
   } from "@budibase/bbui"
@@ -18,7 +17,6 @@
   import { admin } from "@/stores/portal/admin"
   import { onMount } from "svelte"
   import DeleteRowsButton from "@/components/backend/DataTable/buttons/DeleteRowsButton.svelte"
-  import UpgradeModal from "@/components/common/users/UpgradeModal.svelte"
   import AppsTableRenderer from "./_components/AppsTableRenderer.svelte"
   import RoleTableRenderer from "./_components/RoleTableRenderer.svelte"
   import EmailTableRenderer from "./_components/EmailTableRenderer.svelte"
@@ -74,8 +72,7 @@
     inviteConfirmationModal: Modal,
     onboardingTypeModal: Modal,
     passwordModal: Modal,
-    importUsersModal: Modal,
-    userLimitReachedModal: Modal
+    importUsersModal: Modal
   let searchEmail: string | undefined = undefined
   let selectedRows: User[] = []
   let bulkSaveResponse: BulkUserCreated
@@ -382,10 +379,6 @@
 
 <Modal bind:this={importUsersModal}>
   <ImportUsersModal {createUsersFromCsv} />
-</Modal>
-
-<Modal bind:this={userLimitReachedModal}>
-  <UpgradeModal {isOwner} />
 </Modal>
 
 <style>
