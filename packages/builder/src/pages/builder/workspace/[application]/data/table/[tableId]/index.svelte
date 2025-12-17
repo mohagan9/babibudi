@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { Banner, notifications } from "@budibase/bbui"
+  import { Banner } from "@budibase/bbui"
   import {
     datasources,
     tables,
     integrations,
     appStore,
-    rowActions,
     roles,
     dataEnvironmentStore,
     dataAPI,
     deploymentStore,
   } from "@/stores/builder"
-  import { themeStore, admin, licensing } from "@/stores/portal"
+  import { themeStore, admin } from "@/stores/portal"
   import { TableNames } from "@/constants"
   import { Grid, gridClipboard } from "@budibase/frontend-core"
   import type { Store as GridStore } from "@budibase/frontend-core/src/components/grid/stores"
@@ -26,7 +25,6 @@
   import GridUsersTableButton from "@/components/backend/DataTable/buttons/grid/GridUsersTableButton.svelte"
   import GridGenerateButton from "@/components/backend/DataTable/buttons/grid/GridGenerateButton.svelte"
   import GridScreensButton from "@/components/backend/DataTable/buttons/grid/GridScreensButton.svelte"
-  import GridAutomationsButton from "@/components/backend/DataTable/buttons/grid/GridAutomationsButton.svelte"
   import GridRowActionsButton from "@/components/backend/DataTable/buttons/grid/GridRowActionsButton.svelte"
   import GridDevProdSwitcher from "@/components/backend/DataTable/buttons/grid/GridDevProdSwitcher.svelte"
   import GridDevWarning from "@/components/backend/DataTable/alert/grid/GridDevWarning.svelte"
@@ -35,7 +33,6 @@
   import {
     DataEnvironmentMode,
     type Table,
-    type Row,
     type Datasource,
     type UIDatasource,
     type UIInternalDatasource,
@@ -97,8 +94,6 @@
   $: relationshipsEnabled = relationshipSupport(tableDatasource)
   $: currentTheme = $themeStore?.theme
   $: darkMode = !currentTheme.includes("light")
-  $: buttons = makeRowActionButtons($rowActions[id])
-  $: rowActions.refreshRowActions(id)
   $: canSwitchToProduction =
     isInternal || tableDatasource?.usesEnvironmentVariables
   $: isProductionMode =
@@ -119,18 +114,6 @@
         data.viewId
       )
     },
-  }
-
-  const makeRowActionButtons = (actions: any[]) => {
-    return (actions || [])
-      .filter(action => action.allowedSources?.includes(id))
-      .map(action => ({
-        text: action.name,
-        onClick: async (row: Row) => {
-          await rowActions.trigger(id, action.id, row._id!)
-          notifications.success("Row action triggered successfully")
-        },
-      }))
   }
 
   $: {
@@ -212,9 +195,6 @@
       schemaOverrides={isUsersTable ? userSchemaOverrides : null}
       showAvatars={false}
       isCloud={$admin.cloud}
-      aiEnabled={$licensing.customAIConfigsEnabled ||
-        $licensing.budibaseAIEnabled}
-      {buttons}
       buttonsCollapsed
       canHideColumns={false}
       externalClipboard={externalClipboardData}
@@ -237,7 +217,6 @@
             <GridExportButton />
             <GridRowActionsButton />
             <GridScreensButton on:generate={() => generateButton?.show()} />
-            <GridAutomationsButton on:generate={() => generateButton?.show()} />
             <GridGenerateButton bind:this={generateButton} />
           {/if}
         {:else if !isUsersTable}

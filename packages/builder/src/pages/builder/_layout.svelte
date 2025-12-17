@@ -3,7 +3,6 @@
   import {
     admin,
     auth,
-    licensing,
     navigation,
     appsStore,
     organisation,
@@ -217,7 +216,6 @@
       if ($auth.user) {
         // We need to load apps to know if we need to show onboarding fullscreen
         await Promise.all([
-          licensing.init(),
           appsStore.load(),
           organisation.init(),
           groups.init(),

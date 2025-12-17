@@ -3,7 +3,7 @@
   import RoleSelect from "@/components/common/RoleSelect.svelte"
   import UpgradeModal from "@/components/common/users/UpgradeModal.svelte"
   import { appStore, builderStore, deploymentStore } from "@/stores/builder"
-  import { admin, appsStore, auth, licensing, users } from "@/stores/portal"
+  import { admin, appsStore, auth, users } from "@/stores/portal"
   import {
     Button,
     CopyInput,
@@ -287,9 +287,7 @@
     if (!email) {
       email = query
     }
-    $licensing.userLimitReached
-      ? userLimitReachedModal.show()
-      : (invitingFlow = true)
+    invitingFlow = true
   }
 
   const onInviteUser = async () => {

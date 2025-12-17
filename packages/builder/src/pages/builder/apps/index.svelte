@@ -1,13 +1,7 @@
 <script lang="ts">
   import { gradient } from "@/actions"
   import { API } from "@/api"
-  import {
-    admin,
-    auth,
-    clientAppsStore,
-    licensing,
-    organisation,
-  } from "@/stores/portal"
+  import { admin, auth, clientAppsStore, organisation } from "@/stores/portal"
   import type { EnrichedApp } from "@/types"
   import {
     ActionMenu,
@@ -31,7 +25,6 @@
   import type { PublishedWorkspaceData } from "@budibase/types"
   import { goto } from "@roxi/routify"
   import Logo from "assets/bb-emblem.svg"
-  import Spaceman from "assets/bb-space-man.svg"
   import { onMount } from "svelte"
 
   $goto // manually initialize the helper
@@ -121,17 +114,7 @@
             </Body>
           </Layout>
           <Divider />
-          {#if $licensing.errUserLimit}
-            <div>
-              <Layout gap="S" justifyItems="center">
-                <img class="spaceman" alt="spaceman" src={Spaceman} />
-                <Heading size="M">
-                  {"Your apps are currently offline."}
-                </Heading>
-                Please contact the account holder to get them back online.
-              </Layout>
-            </div>
-          {:else if userApps.length}
+          {#if userApps.length}
             <Heading>Apps</Heading>
             <div class="group">
               <Layout gap="S" noPadding>
