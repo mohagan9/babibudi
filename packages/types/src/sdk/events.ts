@@ -511,3 +511,31 @@ export type DocUpdateEvent = {
   appId?: string
   properties: any
 }
+
+// properties added at the final stage of the event pipeline
+export interface BaseEvent {
+  version?: string
+  service?: string
+  environment?: string
+  appId?: string
+  installationId?: string
+  tenantId?: string
+  hosting?: Hosting
+  // any props in the audited section will be removed before passing events
+  // up out of system (purely for use with auditing)
+  audited?: {
+    [key: string]: any
+  }
+}
+
+export interface EventProcessor {
+  processEvent(
+    event: Event,
+    identity: Identity,
+    properties: any,
+    timestamp?: string | number
+  ): Promise<void>
+  identify?(identity: Identity, timestamp?: string | number): Promise<void>
+  identifyGroup?(group: Group, timestamp?: string | number): Promise<void>
+  shutdown?(): Promise<void>
+}

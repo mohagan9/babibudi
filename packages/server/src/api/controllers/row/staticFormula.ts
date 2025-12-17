@@ -7,7 +7,6 @@ import { getRowParams } from "../../../db/utils"
 import sdk from "../../../sdk"
 import {
   outputProcessing,
-  processAIColumns,
   processFormulas,
 } from "../../../utilities/rowProcessor"
 
@@ -140,7 +139,7 @@ export async function finaliseRow(
   opts?: { updateFormula: boolean; updateAIColumns: boolean }
 ) {
   const db = context.getWorkspaceDB()
-  const { updateFormula = true, updateAIColumns = true } = opts || {}
+  const { updateFormula = true } = opts || {}
   const table = sdk.views.isView(source)
     ? await sdk.views.getTable(source.id)
     : source
@@ -155,12 +154,6 @@ export async function finaliseRow(
     dynamic: false,
     contextRows: [enrichedRow],
   })
-
-  if (updateAIColumns) {
-    row = await processAIColumns(table, row, {
-      contextRows: [enrichedRow],
-    })
-  }
 
   await db.put(row)
   const retrieved = await db.tryGet<Row>(row._id)

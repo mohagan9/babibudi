@@ -19,7 +19,6 @@ import sdk from "../sdk"
 import * as fileSystem from "../utilities/fileSystem"
 import * as redis from "../utilities/redis"
 import { generateApiKey, getChecklist } from "../utilities/workerRequests"
-import { watch } from "../watch"
 import { initialise as initialiseWebsockets } from "../websockets"
 
 export type State = "uninitialised" | "starting" | "ready"
@@ -84,7 +83,6 @@ export async function startup(
     fs.existsSync(env.PLUGINS_DIR)
   ) {
     console.log("Monitoring plugin directory")
-    watch()
   }
 
   // check for version updates

@@ -3,7 +3,6 @@ import {
   db as dbCore,
   configs,
   encryption,
-  features,
   tenancy,
   utils,
 } from "@budibase/backend-core"
@@ -88,7 +87,6 @@ export async function fetchAPIKey(ctx: UserCtx<void, FetchAPIKeyResponse>) {
  */
 const getUserSessionAttributes = (ctx: UserCtx) => ({
   account: ctx.user.account,
-  license: ctx.user.license!,
   budibaseAccess: !!ctx.user.budibaseAccess,
   accountPortalAccess: !!ctx.user.accountPortalAccess,
   csrfToken: ctx.user.csrfToken!,
@@ -109,15 +107,11 @@ export async function getSelf(ctx: UserCtx<void, GetGlobalSelfResponse>) {
   // add the attributes that are session based to the current user
   const sessionAttributes = getUserSessionAttributes(ctx)
 
-  // add the feature flags for this tenant
-  const flags = await features.flags.fetch()
-
   const settingsConfig = await configs.getSettingsConfig()
 
   ctx.body = {
     ...user,
     ...sessionAttributes,
-    flags,
     lockedBy: settingsConfig?.lockedBy,
   }
 }

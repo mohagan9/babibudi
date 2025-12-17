@@ -7,7 +7,6 @@ import {
   auth,
   cache,
   env as coreEnv,
-  features,
   logging,
   middleware,
   queue,
@@ -142,7 +141,6 @@ export default server.listen(parseInt(env.PORT || "4002"), async () => {
   console.log(startupLog)
 
   await redis.clients.init()
-  features.init()
 
   if (env.EMAIL_TEMPLATE_PATH) {
     await loadTemplateConfig(env.EMAIL_TEMPLATE_PATH)

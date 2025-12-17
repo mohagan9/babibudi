@@ -1,8 +1,5 @@
 import { auth, permissions } from "@budibase/backend-core"
 import {
-  AutomationActionStepId,
-  AutomationStep,
-  AutomationStepType,
   EmptyFilterOption,
   SearchFilters,
   Table,
@@ -321,83 +318,6 @@ export function screenValidator() {
         .required()
         .unknown(true),
       workspaceAppId: Joi.string().required(),
-    }).unknown(true)
-  )
-}
-
-function generateStepSchema(allowStepTypes: string[]) {
-  const branchSchema = Joi.object({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    condition: filterObject({ unknown: false }).required().min(1),
-    conditionUI: Joi.object(),
-  })
-
-  return Joi.object({
-    stepId: Joi.string().required(),
-    id: Joi.string().required(),
-    description: Joi.string().required(),
-    name: Joi.string().required(),
-    tagline: Joi.string().required(),
-    icon: Joi.string().required(),
-    params: Joi.object(),
-    inputs: Joi.when("stepId", {
-      is: AutomationActionStepId.BRANCH,
-      then: Joi.object({
-        branches: Joi.array().items(branchSchema).min(1).required(),
-        children: Joi.object()
-          .pattern(Joi.string(), Joi.array().items(Joi.link("#step")))
-          .required(),
-      }).required(),
-      otherwise: Joi.object(),
-    }),
-
-    args: Joi.object(),
-    type: Joi.string()
-      .required()
-      .valid(...allowStepTypes),
-  })
-    .unknown(true)
-    .id("step")
-}
-
-const validateStepsArray = (
-  steps: AutomationStep[],
-  helpers: Joi.CustomHelpers
-) => {
-  for (const step of steps.slice(0, -1)) {
-    if (step.stepId === AutomationActionStepId.BRANCH) {
-      return helpers.error("branchStepPosition")
-    }
-  }
-}
-
-export function automationValidator(existing = false) {
-  return auth.joiValidator.body(
-    Joi.object({
-      _id: existing ? Joi.string().required() : OPTIONAL_STRING,
-      _rev: existing ? Joi.string().required() : OPTIONAL_STRING,
-      name: Joi.string().required(),
-      type: Joi.string().valid("automation").required(),
-      definition: Joi.object({
-        steps: Joi.array()
-          .required()
-          .items(
-            generateStepSchema([
-              AutomationStepType.ACTION,
-              AutomationStepType.LOGIC,
-            ])
-          )
-          .custom(validateStepsArray)
-          .messages({
-            branchStepPosition:
-              "Branch steps are only allowed as the last step",
-          }),
-        trigger: generateStepSchema([AutomationStepType.TRIGGER]).allow(null),
-      })
-
-        .required()
-        .unknown(true),
     }).unknown(true)
   )
 }

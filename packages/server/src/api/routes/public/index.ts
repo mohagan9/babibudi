@@ -7,7 +7,6 @@ import { authorizedMiddleware as authorized } from "../../../middleware/authoriz
 import { publicApiMiddleware as publicApi } from "../../../middleware/publicApi"
 import { paramResource, paramSubResource } from "../../../middleware/resourceId"
 import appEndpoints_deprecated from "./applications"
-import metricEndpoints from "./metrics"
 import mapperMiddleware from "./middleware/mapper"
 import testErrorHandling from "./middleware/testErrorHandling"
 import queryEndpoints from "./queries"
@@ -153,7 +152,6 @@ function applyRoutes(
   addToRouter(endpoints.write)
 }
 
-applyAdminRoutes(metricEndpoints)
 applyAdminRoutes(roleEndpoints)
 applyRoutes(workspaceEndpoints, PermissionType.WORKSPACE, "workspaceId")
 applyRoutes(appEndpoints_deprecated, PermissionType.WORKSPACE, "appId")

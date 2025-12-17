@@ -1,6 +1,7 @@
 export * from "./hosting"
 export * from "./context"
 export * from "./events"
+export * from "./events/index"
 export * from "./datasources"
 export * from "./search"
 export * from "./koa"

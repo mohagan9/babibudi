@@ -39,7 +39,7 @@ jest.mock("../filesystem", () => ({
   TOP_LEVEL_PATH: "/mock/top/level/path",
 }))
 
-import { context, features, objectStore } from "@budibase/backend-core"
+import { context, objectStore } from "@budibase/backend-core"
 import fs from "fs"
 import { ObjectStoreBuckets } from "../../../constants"
 import env from "../../../environment"

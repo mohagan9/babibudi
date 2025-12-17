@@ -1,14 +1,6 @@
 import { db as dbCore, encryption, objectStore } from "@budibase/backend-core"
 import { utils } from "@budibase/shared-core"
-import {
-  Automation,
-  AutomationTriggerStepId,
-  Database,
-  FieldType,
-  Row,
-  RowAttachment,
-  WebhookTriggerInputs,
-} from "@budibase/types"
+import { Database, FieldType, Row, RowAttachment } from "@budibase/types"
 import fs from "fs"
 import fsp from "fs/promises"
 import { join } from "path"
@@ -16,7 +8,6 @@ import tar from "tar"
 import { v4 as uuid } from "uuid"
 import sdk from "../.."
 import { ObjectStoreBuckets } from "../../../constants"
-import { getAutomationParams } from "../../../db/utils"
 import { budibaseTempDir } from "../../../utilities/budibaseDir"
 import { downloadTemplate } from "../../../utilities/fileSystem"
 import {
@@ -83,34 +74,6 @@ export async function updateAttachmentColumns(prodAppId: string, db: Database) {
   }
   // write back the updated attachments
   await db.bulkDocs(updatedRows)
-}
-
-async function updateAutomations(prodAppId: string, db: Database) {
-  const automations = (
-    await db.allDocs(
-      getAutomationParams(null, {
-        include_docs: true,
-      })
-    )
-  ).rows.map(row => row.doc) as Automation[]
-  const devId = dbCore.getDevWorkspaceID(prodAppId)
-  let toSave: Automation[] = []
-  for (let automation of automations) {
-    const oldDevAppId = automation.appId,
-      oldProdAppId = dbCore.getProdWorkspaceID(automation.appId)
-    if (
-      automation.definition.trigger?.stepId === AutomationTriggerStepId.WEBHOOK
-    ) {
-      const old = automation.definition.trigger.inputs as WebhookTriggerInputs
-      automation.definition.trigger.inputs = {
-        schemaUrl: old.schemaUrl.replace(oldDevAppId, devId),
-        triggerUrl: old.triggerUrl.replace(oldProdAppId, prodAppId),
-      }
-    }
-    automation.appId = devId
-    toSave.push(automation)
-  }
-  await db.bulkDocs(toSave)
 }
 
 /**
@@ -279,7 +242,6 @@ export async function importApp(
   if (opts.updateAttachmentColumns) {
     await updateAttachmentColumns(prodAppId, db)
   }
-  await updateAutomations(prodAppId, db)
   // clear up afterward
   if (tmpPath) {
     await fsp.rm(tmpPath, { recursive: true, force: true })
