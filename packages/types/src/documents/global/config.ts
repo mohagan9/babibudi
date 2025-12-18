@@ -60,7 +60,6 @@ export interface SettingsInnerConfig {
   createdVersion?: string
   lockedBy?: LockReason
   active?: boolean
-  liteLLM?: { keyId: string; secretKey: string }
 }
 
 export interface SettingsConfig extends Config<SettingsInnerConfig> {}

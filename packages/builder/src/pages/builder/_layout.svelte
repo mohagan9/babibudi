@@ -198,10 +198,6 @@
     }
   )
 
-  async function analyticsPing() {
-    await API.analyticsPing({ source: "builder" })
-  }
-
   async function initBuilder() {
     loaded.set(false)
     try {
@@ -238,11 +234,6 @@
       notifications.info(invalidationMessage(invalidated), {
         duration: 5000,
       })
-    }
-    try {
-      await analyticsPing()
-    } catch (e) {
-      console.error("Analytics ping failed", e?.message)
     }
   }
 

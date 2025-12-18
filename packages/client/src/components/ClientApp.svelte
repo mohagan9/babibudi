@@ -124,10 +124,6 @@
 
     if (get(builderStore).inBuilder) {
       builderStore.actions.notifyLoaded()
-    } else {
-      builderStore.actions.analyticsPing({
-        embedded: !!$appStore.embedded,
-      })
     }
     const handleHashChange = () => {
       const { open: sidePanelOpen } = $sidePanelStore
