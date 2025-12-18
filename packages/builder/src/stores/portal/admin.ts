@@ -77,7 +77,6 @@ export class AdminStore extends BudiStore<AdminState> {
 
   async getChecklist() {
     const tenantId = get(auth).tenantId
-    console.log("GET CHECKLIST FOR TENANT >>> ", tenantId)
     const checklist = await API.getChecklist(tenantId)
     this.update(store => {
       store.checklist = checklist
