@@ -36,13 +36,6 @@ import {
   validateUniqueUser,
 } from "./utils"
 
-type QuotaUpdateFn = (
-  change: number,
-  creatorsChange: number,
-  cb?: () => Promise<any>
-) => Promise<any>
-type FeatureFn = () => Promise<Boolean>
-type QuotaFns = { addUsers: QuotaUpdateFn; removeUsers: QuotaUpdateFn }
 type CreateAdminUserOpts = {
   password?: string
   ssoId?: string
@@ -52,7 +45,6 @@ type CreateAdminUserOpts = {
   firstName?: string
   lastName?: string
 }
-type FeatureFns = { isSSOEnforced: FeatureFn; isAppBuildersEnabled: FeatureFn }
 
 const bulkDeleteProcessing = async (dbUser: User) => {
   const userId = dbUser._id as string
@@ -62,24 +54,11 @@ const bulkDeleteProcessing = async (dbUser: User) => {
 }
 
 export class UserDB {
-  static quotas: QuotaFns
-  static features: FeatureFns
-
-  static init(quotaFns: QuotaFns, featureFns: FeatureFns) {
-    UserDB.quotas = quotaFns
-    UserDB.features = featureFns
-  }
-
   static async isPreventPasswordActions(user: User, account?: Account) {
     // when in maintenance mode we allow sso users with the admin role
     // to perform any password action - this prevents lockout
     if (env.ENABLE_SSO_MAINTENANCE_MODE && isAdmin(user)) {
       return false
-    }
-
-    // SSO is enforced for all users
-    if (await UserDB.features.isSSOEnforced()) {
-      return true
     }
 
     // Check local sso
@@ -130,8 +109,7 @@ export class UserDB {
     }
 
     // passwords are never required if sso is enforced
-    const requirePasswords =
-      opts.requirePassword && !(await UserDB.features.isSSOEnforced())
+    const requirePasswords = opts.requirePassword
     if (!hashedPassword && requirePasswords) {
       throw "Password must be specified."
     }
@@ -263,7 +241,7 @@ export class UserDB {
       creatorsChange = isDbUserCreator !== isUserCreator ? 1 : 0
     }
 
-    return UserDB.quotas.addUsers(change, creatorsChange, async () => {
+    const addUsers = async () => {
       if (!opts.isAccountHolder) {
         await validateUniqueUser(email, tenantId)
       }
@@ -304,7 +282,8 @@ export class UserDB {
           throw err
         }
       }
-    })
+    }
+    return (await addUsers()) as User
   }
 
   static async bulkCreate(
@@ -337,51 +316,42 @@ export class UserDB {
     }
 
     const account = await accountSdk.getAccountByTenantId(tenantId)
-    const isSSOEnforced = await UserDB.features.isSSOEnforced()
-
-    return UserDB.quotas.addUsers(
-      newUsers.length,
-      newCreators.length,
-      async () => {
-        for (const user of newUsers) {
-          if (isSSOEnforced) {
-            delete user.password
-          }
-
-          usersToSave.push(
-            UserDB.buildUser(
-              user,
-              { hashPassword: true, requirePassword: !isSSOEnforced },
-              tenantId,
-              undefined,
-              account
-            )
+    const addUsers = async () => {
+      for (const user of newUsers) {
+        usersToSave.push(
+          UserDB.buildUser(
+            user,
+            { hashPassword: true },
+            tenantId,
+            undefined,
+            account
           )
-        }
-
-        const usersToBulkSave = await Promise.all(usersToSave)
-        await usersCore.bulkUpdateGlobalUsers(usersToBulkSave)
-
-        // Post-processing of bulk added users, e.g. events and cache operations
-        for (const user of usersToBulkSave) {
-          // TODO: Refactor to bulk insert users into the info db
-          // instead of relying on looping tenant creation
-          await platform.users.addUser(tenantId, user._id!, user.email)
-        }
-
-        const saved = usersToBulkSave.map(user => {
-          return {
-            _id: user._id,
-            email: user.email,
-          }
-        })
-
-        return {
-          successful: saved,
-          unsuccessful,
-        }
+        )
       }
-    )
+
+      const usersToBulkSave = await Promise.all(usersToSave)
+      await usersCore.bulkUpdateGlobalUsers(usersToBulkSave)
+
+      // Post-processing of bulk added users, e.g. events and cache operations
+      for (const user of usersToBulkSave) {
+        // TODO: Refactor to bulk insert users into the info db
+        // instead of relying on looping tenant creation
+        await platform.users.addUser(tenantId, user._id!, user.email)
+      }
+
+      const saved = usersToBulkSave.map(user => {
+        return {
+          _id: user._id,
+          email: user.email,
+        }
+      })
+
+      return {
+        successful: saved,
+        unsuccessful,
+      } as BulkUserCreated
+    }
+    return await addUsers()
   }
 
   static async bulkDelete(
@@ -451,8 +421,6 @@ export class UserDB {
     // Delete any associated SSO user docs
     await platform.getPlatformDB().bulkDocs(ssoUsersToDelete)
 
-    await UserDB.quotas.removeUsers(toDelete.length, creatorsToDeleteCount)
-
     // Build Response
     // index users by id
     const userIndex: { [key: string]: User } = {}
@@ -499,9 +467,6 @@ export class UserDB {
     await platform.users.removeUser(dbUser)
 
     await db.remove(userId, dbUser._rev!)
-
-    const creatorsToDelete = (await isCreatorAsync(dbUser)) ? 1 : 0
-    await UserDB.quotas.removeUsers(1, creatorsToDelete)
     await cache.user.invalidateUser(userId)
     await sessions.invalidateSessions(userId, { reason: "deletion" })
   }
