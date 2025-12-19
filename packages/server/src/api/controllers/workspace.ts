@@ -260,7 +260,6 @@ export const addSampleData = async (
 }
 
 export async function fetch(ctx: UserCtx<void, FetchWorkspacesResponse>) {
-  console.log("FETCH ???")
   const apps = await sdk.workspaces.fetch(
     ctx.query.status as WorkspaceStatus,
     ctx.user
