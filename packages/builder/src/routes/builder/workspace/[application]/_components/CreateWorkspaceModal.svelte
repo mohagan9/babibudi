@@ -165,7 +165,9 @@
         // Refresh for access to created applications
         await auth.getSelf()
       }
-      $goto(`/builder/workspace/${createdApp.instance._id}`)
+      $goto(`/builder/workspace/[application]`, {
+        application: createdApp.instance._id,
+      })
     } catch (error) {
       creating = false
       builderStore.appCreated(false)

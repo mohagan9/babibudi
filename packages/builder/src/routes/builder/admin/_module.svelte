@@ -5,11 +5,8 @@
 
   let loaded = false
 
-  $: cloud = $admin.cloud
-  $: useAccountPortal = cloud && !$admin.disableAccountPortal
-
   onMount(() => {
-    if ($admin?.checklist?.adminUser?.checked || useAccountPortal) {
+    if ($admin?.checklist?.adminUser?.checked) {
       $goto("../")
     } else {
       loaded = true

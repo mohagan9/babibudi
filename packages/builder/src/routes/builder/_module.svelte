@@ -43,10 +43,8 @@
 
   $: multiTenancyEnabled = $admin.multiTenancy
   $: hasAdminUser = $admin?.checklist?.adminUser?.checked
-  $: cloud = $admin?.cloud
   $: user = $auth.user
-  $: isOwner = $auth.accountPortalAccess && $admin.cloud
-  $: useAccountPortal = cloud && !$admin.disableAccountPortal
+  $: isOwner = sdk.users.hasAdminPermissions(user)
   $: isBuilder = sdk.users.hasBuilderPermissions(user)
   // Re-run initBuilder when user logs in
   $: {
@@ -84,8 +82,8 @@
         break
 
       case "redirect":
-        if (!$isActive(action.path)) {
-          $goto(action.path)
+        if (!$isActive(action.path, action.params)) {
+          $goto(action.path, action.params)
         }
         break
 
@@ -119,12 +117,12 @@
       }
 
       // if tenant is not set go to it
-      if (!useAccountPortal && multiTenancyEnabled && !$auth.tenantSet) {
+      if (multiTenancyEnabled && !$auth.tenantSet) {
         return { type: "redirect", path: "./auth/org" }
       }
 
       // Force creation of an admin user if one doesn't exist
-      if (!useAccountPortal && !hasAdminUser) {
+      if (!hasAdminUser) {
         return { type: "redirect", path: "./admin" }
       }
 
@@ -187,7 +185,8 @@
           if (defaultApp?.devId) {
             return {
               type: "redirect",
-              path: `./workspace/${defaultApp.devId}`,
+              path: `./workspace/[application]`,
+              params: { application: defaultApp.devId },
             }
           }
         }
@@ -209,9 +208,7 @@
       }
       if ($auth.user) {
         // We need to load apps to know if we need to show onboarding fullscreen
-        // TODO: Fix appStore load
-        //await Promise.all([appsStore.load(), organisation.init()])
-        await organisation.init()
+        await Promise.all([appsStore.load(), organisation.init()])
 
         await auth.getInitInfo()
       }

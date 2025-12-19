@@ -6,12 +6,11 @@
 
   $: tenantSet = $auth.tenantSet
   $: multiTenancyEnabled = $admin.multiTenancy
-  $: useAccountPortal = $admin.cloud && !$admin.disableAccountPortal
 
   let loaded = false
 
   $: {
-    if (loaded && multiTenancyEnabled && !tenantSet && !useAccountPortal) {
+    if (loaded && multiTenancyEnabled && !tenantSet) {
       $goto("./org")
     } else if (loaded) {
       $goto("../login")
