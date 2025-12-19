@@ -299,7 +299,10 @@
           allowEditRows={false}
           allowEditColumns={false}
           customRenderers={customAppTableRenderers}
-          on:click={e => $goto(`/builder/workspace/${e.detail.devId}`)}
+          on:click={e =>
+            $goto(`/builder/workspace/[application]`, {
+              application: e.detail.devId,
+            })}
         >
           <div class="placeholder" slot="placeholder">
             <Heading size="S">

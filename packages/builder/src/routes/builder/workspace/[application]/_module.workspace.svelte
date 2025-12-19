@@ -16,6 +16,8 @@
 
   export let application
 
+  $: console.log("WORKSPACE APP ??? ", application)
+
   let promise = getPackage(application)
   let sideNav = null
 
