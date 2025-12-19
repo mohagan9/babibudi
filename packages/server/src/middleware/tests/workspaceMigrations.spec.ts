@@ -1,6 +1,6 @@
 import { Header } from "@budibase/shared-core"
 import { UserCtx } from "@budibase/types"
-import { skipMigrationgoto } from "../workspaceMigrations"
+import { skipMigrationRedirect } from "../workspaceMigrations"
 
 describe("workspaceMigrations middleware", () => {
   describe("skipMigrationRedirect", () => {
