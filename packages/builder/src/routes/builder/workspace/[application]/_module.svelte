@@ -1,5 +1,5 @@
 <script>
-  import WorkspaceLayout from "./_layout.workspace.svelte"
+  import WorkspaceLayout from "./_module.workspace.svelte"
 
   export let application
 
