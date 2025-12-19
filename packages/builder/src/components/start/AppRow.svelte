@@ -1,5 +1,5 @@
 <script>
-  import FavouriteAppButton from "@/pages/builder/portal/workspaces/_components/FavouriteAppButton.svelte"
+  import FavouriteAppButton from "@/routes/builder/portal/workspaces/_components/FavouriteAppButton.svelte"
   import { contextMenuStore } from "@/stores/builder"
   import { auth } from "@/stores/portal"
   import { goto as gotoStore } from "@roxi/routify"

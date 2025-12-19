@@ -5,7 +5,7 @@
   import { createValidatedNameStore } from "./stores/validatedName"
   import { get } from "svelte/store"
   import type { UIIntegration } from "@budibase/types"
-  import InfoDisplay from "@/pages/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
+  import InfoDisplay from "@/routes/builder/workspace/[application]/design/[workspaceAppId]/[screenId]/[componentId]/_components/Component/InfoDisplay.svelte"
 
   export let integration: UIIntegration
   export let config: Record<string, any>

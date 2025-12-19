@@ -1,6 +1,6 @@
 <script>
   import { Router } from "@roxi/routify"
-  import { routes } from "../.routify/routes"
+  import routes from "../.routify/routes.default.js"
   import { NotificationDisplay, BannerDisplay, Context } from "@budibase/bbui"
   import { parse, stringify } from "qs"
   import { setContext } from "svelte"

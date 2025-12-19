@@ -1,5 +1,5 @@
 import { get } from "svelte/store"
-import { isChangingPage } from "@roxi/routify"
+import { pendingRoute } from "@roxi/routify"
 
 export const syncURLToState = options => {
   const {
@@ -140,7 +140,7 @@ export const syncURLToState = options => {
     log(`url.${urlParam} (${urlValue}) <= state.${stateKey} (${stateValue})`)
 
     // Navigate to the new URL
-    if (!get(isChangingPage)) {
+    if (!get(pendingRoute)) {
       const newUrlParams = {
         ...cachedParams,
         [urlParam]: stateValue,
@@ -163,8 +163,8 @@ export const syncURLToState = options => {
   const unsubscribeGoto = routify.goto.subscribe($goto => {
     cachedGoto = $goto
   })
-  const unsubscribeRedirect = routify.redirect.subscribe($redirect => {
-    cachedRedirect = $redirect
+  const unsubscribeRedirect = routify.redirect.subscribe($goto => {
+    cachedRedirect = $goto
   })
   const unsubscribePage = routify.page.subscribe($page => {
     cachedPage = $page
