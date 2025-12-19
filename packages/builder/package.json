@@ -4,10 +4,9 @@
   "license": "GPL-3.0",
   "private": true,
   "scripts": {
-    "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" vite build --emptyOutDir",
+    "build": "routify & NODE_OPTIONS=\"--max_old_space_size=4096\" vite build --emptyOutDir",
     "start": "rollup",
-    "dev": "yarn run dev:vite",
-    "dev:vite": "vite --host 0.0.0.0 --mode=dev",
+    "dev": "vite --host 0.0.0.0 --mode=dev",
     "rollup": "rollup -c -w",
     "test": "vitest run",
     "test:watch": "vitest",

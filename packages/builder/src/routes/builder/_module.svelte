@@ -3,7 +3,6 @@
   import {
     admin,
     auth,
-    navigation,
     appsStore,
     organisation,
     enrichedApps,
@@ -18,7 +17,6 @@
     invalidationMessage,
     derivedMemo,
   } from "@budibase/frontend-core"
-  import { API } from "@/api"
   import Branding from "./Branding.svelte"
   import ContextMenu from "@/components/ContextMenu.svelte"
   import CommandPalette from "@/components/commandPalette/CommandPalette.svelte"
@@ -198,24 +196,18 @@
   async function initBuilder() {
     loaded.set(false)
     try {
-      console.log("SELF ?")
       await auth.getSelf()
-
-      console.log("INIT ?")
       await admin.init()
 
       if ($admin.maintenance.length > 0) {
         $goto("./maintenance")
         return
       }
-      console.log("BEFORE AUTH ?")
       if ($auth.user) {
         // We need to load apps to know if we need to show onboarding fullscreen
         await Promise.all([appsStore.load(), organisation.init()])
 
-        console.log("USER ? ", $auth.user)
         await auth.getInitInfo()
-        console.log("AFTER INIT INFO???")
       }
 
       // Validate tenant if in a multi-tenant env
