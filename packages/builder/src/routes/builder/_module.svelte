@@ -32,6 +32,7 @@
   import { writable } from "svelte/store"
 
   $isActive
+  $goto
 
   let initPromise
   let loaded = writable(false)
@@ -172,8 +173,8 @@
 
         // Default workspace selection for builders
         const isOnWorkspaceRoute =
-          $isActive("./workspace/:application") ||
-          $isActive("./workspace/updating/:application")
+          $isActive("./workspace/[application]") ||
+          $isActive("./workspace/updating/[application]")
         if (
           isBuilder &&
           $appsStore.apps.length &&
@@ -184,7 +185,10 @@
           const defaultApp = $enrichedApps.find(app => app.editable)
           // Only redirect if enriched apps are loaded and app is editable
           if (defaultApp?.devId) {
-            return { type: "redirect", path: `./workspace/${defaultApp.devId}` }
+            return {
+              type: "redirect",
+              path: `./workspace/${defaultApp.devId}`,
+            }
           }
         }
       }
