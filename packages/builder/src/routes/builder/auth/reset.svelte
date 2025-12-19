@@ -47,7 +47,7 @@
         await auth.resetPassword(password, resetCode)
         notifications.success("Password reset successfully")
         // send them to login if reset successful
-        $goto("./login")
+        $goto("../login")
       }
     } catch (err) {
       loading = false

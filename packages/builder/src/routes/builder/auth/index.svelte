@@ -14,7 +14,7 @@
     if (loaded && multiTenancyEnabled && !tenantSet && !useAccountPortal) {
       $goto("./org")
     } else if (loaded) {
-      $goto("./login")
+      $goto("../login")
     }
   }
 

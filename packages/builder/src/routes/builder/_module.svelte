@@ -205,7 +205,9 @@
       }
       if ($auth.user) {
         // We need to load apps to know if we need to show onboarding fullscreen
-        await Promise.all([appsStore.load(), organisation.init()])
+        // TODO: Fix appStore load
+        //await Promise.all([appsStore.load(), organisation.init()])
+        await organisation.init()
 
         await auth.getInitInfo()
       }

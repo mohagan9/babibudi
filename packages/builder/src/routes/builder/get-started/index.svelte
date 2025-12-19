@@ -13,6 +13,8 @@
   let createWorkspaceModal: Modal
   let loading = false
 
+  $goto
+
   const initialise = async (event: CustomEvent<CreateWorkspaceResponse>) => {
     // Refresh auth if user is not yet a builder for the created app
     if (!sdk.users.isBuilder($auth.user, event.detail?.appId)) {
@@ -62,7 +64,7 @@
             cta
             disabled={loading}
             on:click={() => {
-              $goto("../apps")
+              $goto("../../apps")
             }}
           >
             View app portal
