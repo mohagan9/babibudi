@@ -4,5 +4,8 @@
 
   $goto
 
-  $goto(`./${$workspaceAppStore.selectedWorkspaceApp}`)
+  $goto("./[workspaceAppId]", {
+    application: $workspaceAppStore.selectedWorkspaceApp,
+  })
+  //TODO - fix this
 </script>

@@ -34,6 +34,7 @@
   } from "@budibase/types"
   import AppsHero from "assets/apps-hero-x1.png"
   import NoResults from "../_components/NoResults.svelte"
+  import { url } from "@roxi/routify"
 
   type ShowUI = { show: () => void }
 
@@ -111,21 +112,6 @@
       return
     }
     window.open(liveUrl, "_blank")
-  }
-
-  let isDuplicating = false
-
-  const duplicateWorkspaceApp = async (workspaceAppId: string) => {
-    isDuplicating = true
-
-    try {
-      await workspaceAppStore.duplicate(workspaceAppId)
-    } catch (e) {
-      notifications.error("Failed to duplicate app")
-    } finally {
-      isDuplicating = false
-    }
-    await appStore.refresh()
   }
 
   const getContextMenuOptions = (workspaceApp: UIWorkspaceApp) => {
@@ -310,7 +296,9 @@
         <a
           class="app"
           class:favourite={app.favourite?._id}
-          href={`./design/${app._id}`}
+          href={$url(`../[workspaceAppId]`, {
+            workspaceAppId: app._id ?? "",
+          })}
           on:contextmenu={e => openContextMenu(e, app)}
           class:active={showHighlight && selectedWorkspaceApp === app}
         >

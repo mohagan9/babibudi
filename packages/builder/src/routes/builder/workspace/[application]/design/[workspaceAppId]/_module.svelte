@@ -5,15 +5,13 @@
   import { onDestroy } from "svelte"
 
   // Extract stores from namespace for Svelte 5 compatibility
-  const { goto, params, url, isActive, page, layout } = routify
+  const { goto, params, url, isActive } = routify
 
   $goto
   $params
   $url
   $goto
   $isActive
-  $page
-  $layout
 
   // Keep URL and state in sync for selected screen ID
   const stopSyncing = syncURLToState({
