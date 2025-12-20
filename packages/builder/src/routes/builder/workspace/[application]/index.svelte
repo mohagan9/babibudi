@@ -1,17 +1,13 @@
 <script>
-  import { goto, params } from "@roxi/routify"
+  import { goto } from "@roxi/routify"
   import { screenStore, appStore } from "@/stores/builder"
   import { onMount } from "svelte"
 
   $goto
-  $params
 
   onMount(() => {
     const { screens } = $screenStore
-    //const { appId } = $appStore
-    // TODO - why is appId not loaded into the store?
-    const appId = $params.application
-    console.log("INDEX MOUNTED ??")
+    const { appId } = $appStore
     if (!appId) return
     if (screens && screens.length > 0) {
       $goto("../design")
