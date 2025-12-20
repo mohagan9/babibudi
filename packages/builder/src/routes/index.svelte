@@ -4,6 +4,8 @@
   import { onMount } from "svelte"
   import { notifications } from "@budibase/bbui"
 
+  $goto
+
   onMount(async () => {
     try {
       await auth.checkQueryString()

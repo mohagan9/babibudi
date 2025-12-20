@@ -11,6 +11,8 @@
   import BBLogo from "assets/BBLogo.svelte"
   import { appsStore } from "@/stores/portal"
 
+  $goto
+
   let loading = false
   let onboardingFailed = false
 

@@ -5,6 +5,8 @@
 
   let loaded = false
 
+  $goto
+
   onMount(() => {
     if ($admin?.checklist?.adminUser?.checked) {
       $goto("../")
