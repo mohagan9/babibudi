@@ -80,7 +80,9 @@
   $: refreshContent(json)
 
   // Determine if the add component menu is active
-  $: isAddingComponent = $isActive(`./${selectedComponentId}/new`)
+  $: isAddingComponent = $isActive(`../[componentId]/new`, {
+    componentId: selectedComponentId,
+  })
 
   // Register handler to send custom to the preview
   $: sendPreviewEvent = (name, payload) => {

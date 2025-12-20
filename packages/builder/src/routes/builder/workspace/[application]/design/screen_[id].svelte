@@ -7,5 +7,9 @@
 
   $: screen = $screenStore.screens.find(s => s._id === $params.id)
 
-  $: screen && $goto(`./${screen.workspaceAppId}/${screen._id}`)
+  $: screen &&
+    $goto(`./[workspaceAppId]/[screenId]`, {
+      workspaceAppId: screen.workspaceAppId,
+      screenId: screen._id,
+    })
 </script>
