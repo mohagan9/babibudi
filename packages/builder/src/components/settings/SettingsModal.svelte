@@ -206,7 +206,7 @@
                       settingsNav.keepCollapsed()
                       navItemClick(route)
                     }}
-                    forceActive={selected}
+                    isActive={selected}
                     iconColor={route.color ||
                       "var(--spectrum-global-color-gray-800)"}
                   >

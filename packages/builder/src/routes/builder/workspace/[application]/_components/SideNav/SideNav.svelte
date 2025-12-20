@@ -11,7 +11,7 @@
     StatusLight,
   } from "@budibase/bbui"
   import { createLocalStorageStore, derivedMemo } from "@budibase/frontend-core"
-  import { url, goto } from "@roxi/routify"
+  import { url, goto, isActive } from "@roxi/routify"
   import BBLogo from "assets/BBLogo.svelte"
   import {
     appStore,
@@ -58,6 +58,7 @@
 
   $goto
   $url
+  $isActive
 
   type ResourceLinkFn = (_id: string) => string
 
@@ -342,7 +343,8 @@
             <SideNavLink
               icon="browser"
               text="Apps"
-              url={$url("./design")}
+              url={$url("./design", { application: appId })}
+              isActive={$isActive("./design", { application: appId })}
               {collapsed}
               on:click={keepCollapsed}
             />
@@ -350,14 +352,16 @@
             <SideNavLink
               icon="webhooks-logo"
               text="APIs"
-              url={$url("./apis")}
+              url={$url("./apis", { application: appId })}
+              isActive={$isActive("./apis", { application: appId })}
               {collapsed}
               on:click={keepCollapsed}
             />
             <SideNavLink
               icon="database"
               text="Data"
-              url={$url("./data")}
+              url={$url("./data", { application: appId })}
+              isActive={$isActive("./data", { application: appId })}
               {collapsed}
               on:click={keepCollapsed}
             />
@@ -412,6 +416,7 @@
                       icon={lookup?.icon}
                       text={lookup?.name}
                       {collapsed}
+                      isActive={$isActive(resourceLink(favourite) ?? "")}
                       on:click={() => {
                         const targetLink = resourceLink(favourite)
                         if (targetLink) $goto(targetLink)
@@ -466,6 +471,7 @@
             icon="gear"
             text="Settings"
             {collapsed}
+            isActive={false}
             on:click={() => {
               bb.settings()
               keepCollapsed()
@@ -481,10 +487,11 @@
             </svelte:fragment>
           </SideNavLink>
         </span>
-        {#if $appStore.appId}
+        {#if appId}
           <SideNavLink
             icon="user-plus"
             text="Invite member"
+            isActive={false}
             on:click={() => {
               builderStore.showBuilderSidePanel()
               keepCollapsed()

@@ -1,18 +1,15 @@
 <script lang="ts">
   import { Icon } from "@budibase/bbui"
-  import { isActive } from "@roxi/routify"
-
-  $isActive
 
   export let text: string
   export let icon: string | undefined = undefined
   export let url: string | undefined = undefined
   export let collapsed = false
   export let target: string | undefined = undefined
-  export let forceActive: boolean | undefined = undefined
+  export let isActive: boolean
   export let iconColor: string = ""
 
-  $: active = forceActive ?? (url ? $isActive(url) : false)
+  $: active = isActive
 </script>
 
 <a
