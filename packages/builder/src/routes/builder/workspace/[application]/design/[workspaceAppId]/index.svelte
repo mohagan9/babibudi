@@ -1,10 +1,6 @@
 <script lang="ts">
   import { goto, params } from "@roxi/routify"
-  import {
-    screenStore,
-    selectedScreen,
-    workspaceAppStore,
-  } from "@/stores/builder"
+  import { screenStore, workspaceAppStore } from "@/stores/builder"
   import { onMount } from "svelte"
 
   $goto
@@ -19,8 +15,10 @@
     )
     // Fall back to the first screen if one exists
     if (workspaceAppScreens.length && workspaceAppScreens[0]._id) {
-      //$goto(`./[screenId]`, { screenId: workspaceAppScreens[0]._id ?? "" })
       screenStore.select(workspaceAppScreens[0]._id)
+      $goto("../[screenId]", {
+        screenId: workspaceAppScreens[0]._id,
+      })
       return
     }
 
@@ -28,20 +26,18 @@
     return
   }
 
-  if ($selectedScreen?._id) {
-    $goto("../[screenId]", {
-      screenId: $selectedScreen._id,
-    })
-  } else {
-    fallback()
-  }
-
   onMount(() => {
     const id = $params.workspaceAppId
+    const screenId = $params.screenId
     if (validate(id)) {
       workspaceAppStore.select(id)
     } else {
       $goto("../../design")
+      return
+    }
+
+    if (!screenId) {
+      fallback()
     }
   })
 </script>
