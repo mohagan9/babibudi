@@ -82,7 +82,7 @@
   icon={table._id === TableNames.USERS ? "users-three" : "table"}
   text={table.name}
   hovering={table._id === $contextMenuStore.id}
-  selected={$isActive("./table/:tableId") &&
+  selected={$isActive("./table/[tableId]") &&
     $tablesStore.selected?._id === table._id}
   selectedBy={$userSelectedResourceMap[table._id]}
   on:click

@@ -91,7 +91,7 @@
     <NavItem
       icon="users-three"
       text={appUsersTableName}
-      selected={$isActive("./table/:tableId") &&
+      selected={$isActive("./table/[tableId]") &&
         $tables.selected?._id === TableNames.USERS}
       on:click={() => selectTable(TableNames.USERS)}
       selectedBy={$userSelectedResourceMap[TableNames.USERS]}

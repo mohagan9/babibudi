@@ -24,9 +24,9 @@
       }
     }
     if ($datasources.hasData) {
-      $goto(`./table/${tableId}`)
+      $goto(`../table/[tableId]`, { tableId })
     } else {
-      $goto("./new")
+      $goto("../new")
     }
   })
 </script>
