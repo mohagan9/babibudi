@@ -11,7 +11,7 @@
 
   $: {
     if (loaded && multiTenancyEnabled && !tenantSet) {
-      $goto("./org")
+      $goto("../org")
     } else if (loaded) {
       $goto("../login")
     }

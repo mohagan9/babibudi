@@ -39,7 +39,6 @@
   let commandPaletteModal
   let settingsModal
   let hasAuthenticated = false
-  let lastExecutedAction = null
 
   $: multiTenancyEnabled = $admin.multiTenancy
   $: hasAdminUser = $admin?.checklist?.adminUser?.checked
@@ -55,50 +54,11 @@
     hasAuthenticated = isAuthenticated
   }
 
-  $: processNavAction($navigationAction)
-
   const isOnPreLoginPage = () => {
     return $isActive("./auth") || $isActive("./invite") || $isActive("./admin")
   }
 
-  // Handle navigation actions from derived store
-  const processNavAction = action => {
-    // Reset last executed action when there's no action to process
-    if (!action) {
-      lastExecutedAction = null
-      return
-    }
-
-    // Prevent executing the same action repeatedly
-    const actionKey = JSON.stringify(action)
-    if (actionKey === lastExecutedAction) {
-      return
-    }
-    lastExecutedAction = actionKey
-
-    switch (action.type) {
-      case "setReturnUrl":
-        CookieUtils.setCookie(Constants.Cookies.ReturnUrl, action.url)
-        break
-
-      case "redirect":
-        if (!$isActive(action.path, action.params)) {
-          $goto(action.path, action.params)
-        }
-        break
-
-      case "returnUrl":
-        CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
-        if (action.url.startsWith("/builder")) {
-          $goto(action.url)
-        } else {
-          window.location.assign(action.url)
-        }
-        break
-    }
-  }
-
-  const navigationAction = derivedMemo(
+  derivedMemo(
     [admin, auth, enrichedApps, isActive, appsStore, loaded],
     ([$admin, $auth, $enrichedApps, $isActive, $appsStore, $loaded]) => {
       // Only run remaining logic when fully loaded
@@ -107,43 +67,49 @@
       }
 
       // Set the return url on logout
-      if (
-        !$auth.user &&
-        !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
-        !$auth.postLogout &&
-        !isOnPreLoginPage()
-      ) {
-        return { type: "setReturnUrl", url: window.location.pathname }
-      }
+      // if (
+      //   !$auth.user &&
+      //   !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
+      //   !$auth.postLogout &&
+      //   !isOnPreLoginPage()
+      // ) {
+      //   return { type: "setReturnUrl", url: window.location.pathname }
+      // }
+      // TODO - how to handle return url?
 
       // if tenant is not set go to it
       if (multiTenancyEnabled && !$auth.tenantSet) {
-        return { type: "redirect", path: "./auth/org" }
+        $goto("./auth/org")
+        return
       }
 
       // Force creation of an admin user if one doesn't exist
       if (!hasAdminUser) {
-        return { type: "redirect", path: "./admin" }
+        $goto("./admin")
+        return
       }
 
       // Redirect to log in at any time if the user isn't authenticated
       if (!$auth.user && !isOnPreLoginPage()) {
-        return { type: "redirect", path: "./auth" }
+        $goto(`./auth`)
+        return
       }
 
       // Check if password reset required for user
       if ($auth.user?.forceResetPassword) {
-        return { type: "redirect", path: "./auth/reset" }
+        $goto(`./auth/reset`)
+        return
       }
 
       // Authenticated user navigation
       if ($auth.user) {
-        const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
+        // const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
 
-        // Return to saved URL first - skip onboarding check if user has a return URL
-        if (returnUrl) {
-          return { type: "returnUrl", url: returnUrl }
-        }
+        // // Return to saved URL first - skip onboarding check if user has a return URL
+        // if (returnUrl) {
+        //   return { type: "returnUrl", url: returnUrl }
+        // }
+        //TODO - how to handle return url?
 
         // Review if builder users have workspaces. If not, redirect them to get-started
         const hasEditableWorkspaces = $enrichedApps.some(app => app.editable)
@@ -156,17 +122,20 @@
         ) {
           // Tenant owners without apps should be redirected to onboarding
           if (isOwner) {
-            return { type: "redirect", path: "./onboarding" }
+            $goto("./onboarding")
+            return
           }
           // Regular builders without apps should be redirected to "get started"
           if (isBuilder && !isOwner) {
-            return { type: "redirect", path: "./get-started" }
+            $goto("./get-started")
+            return
           }
         }
 
         // Redirect non-builders to apps unless they're already there
         if (!isBuilder && !$isActive("./apps")) {
-          return { type: "redirect", path: "./apps" }
+          $goto(`./apps`)
+          return
         }
 
         // Default workspace selection for builders
@@ -183,16 +152,13 @@
           const defaultApp = $enrichedApps.find(app => app.editable)
           // Only redirect if enriched apps are loaded and app is editable
           if (defaultApp?.devId) {
-            return {
-              type: "redirect",
-              path: `./workspace/[application]`,
-              params: { application: defaultApp.devId },
-            }
+            $goto(`./workspace/[application]`, {
+              application: defaultApp.devId,
+            })
           }
+          return
         }
       }
-
-      return null
     }
   )
 

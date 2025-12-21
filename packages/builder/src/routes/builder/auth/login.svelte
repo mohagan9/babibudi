@@ -47,19 +47,6 @@
       } else {
         notifications.success("Logged in successfully")
         pushNumSessionsInvalidated(loginResult.invalidatedSessionCount || 0)
-
-        // Check for return URL cookie and redirect there if it exists
-        const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
-        if (returnUrl) {
-          CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
-          if (returnUrl.startsWith("/builder")) {
-            $goto(returnUrl)
-          } else {
-            window.location.assign(returnUrl)
-          }
-        } else {
-          $goto("/builder")
-        }
       }
     } catch (err) {
       notifications.error(err.message ? err.message : "Invalid credentials")
