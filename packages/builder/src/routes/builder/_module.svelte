@@ -67,15 +67,15 @@
       }
 
       // Set the return url on logout
-      // if (
-      //   !$auth.user &&
-      //   !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
-      //   !$auth.postLogout &&
-      //   !isOnPreLoginPage()
-      // ) {
-      //   return { type: "setReturnUrl", url: window.location.pathname }
-      // }
-      // TODO - how to handle return url?
+      if (
+        !$auth.user &&
+        !CookieUtils.getCookie(Constants.Cookies.ReturnUrl) &&
+        !$auth.postLogout &&
+        !isOnPreLoginPage()
+      ) {
+        CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
+        return
+      }
 
       // if tenant is not set go to it
       if (multiTenancyEnabled && !$auth.tenantSet) {
@@ -103,13 +103,14 @@
 
       // Authenticated user navigation
       if ($auth.user) {
-        // const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
+        const returnUrl = CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
 
-        // // Return to saved URL first - skip onboarding check if user has a return URL
-        // if (returnUrl) {
-        //   return { type: "returnUrl", url: returnUrl }
-        // }
-        //TODO - how to handle return url?
+        // Return to saved URL first - skip onboarding check if user has a return URL
+        if (returnUrl) {
+          CookieUtils.removeCookie(Constants.Cookies.ReturnUrl)
+          window.location.assign(returnUrl)
+          return
+        }
 
         // Review if builder users have workspaces. If not, redirect them to get-started
         const hasEditableWorkspaces = $enrichedApps.some(app => app.editable)

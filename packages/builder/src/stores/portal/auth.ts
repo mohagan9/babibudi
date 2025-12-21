@@ -137,7 +137,7 @@ class AuthStore extends BudiStore<PortalAuthStore> {
       !isPreLoginPage &&
       !CookieUtils.getCookie(Constants.Cookies.ReturnUrl)
     ) {
-      CookieUtils.setCookie(Constants.Cookies.ReturnUrl, currentPath)
+      CookieUtils.setCookie(Constants.Cookies.ReturnUrl, window.location.href)
     }
 
     await API.logOut()
