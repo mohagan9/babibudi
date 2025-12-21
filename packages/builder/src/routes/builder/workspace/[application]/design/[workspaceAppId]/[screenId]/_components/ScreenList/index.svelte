@@ -6,6 +6,7 @@
   import { type Screen } from "@budibase/types"
   import NewScreenModal from "../../../../_components/NewScreen/index.svelte"
   import ScreenNavItem from "./ScreenNavItem.svelte"
+  import { params } from "@roxi/routify"
 
   const [resizable, resizableHandle] = getVerticalResizeActions()
 
@@ -16,17 +17,16 @@
   let newScreenModal: NewScreenModal
 
   $: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
-  $: console.log(
-    "SELECTED WORKSPACE APP ?? ",
-    $workspaceAppStore.selectedWorkspaceApp
-  )
-  //TODO - Set this store value onboarding
   $: filteredScreens = getFilteredScreens(allScreens, searchValue)
 
   $: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""
 
   const handleOpenSearch = async () => {
     screensContainer.scroll({ top: 0, behavior: "smooth" })
+  }
+
+  const isValidScreenRoute = (allScreens: Screen[], id: string) => {
+    return allScreens.some(screen => screen._id === id)
   }
 
   $: {
@@ -57,7 +57,7 @@
     />
   </div>
   <div on:scroll={handleScroll} bind:this={screensContainer} class="content">
-    {#if filteredScreens?.length}
+    {#if filteredScreens?.length && isValidScreenRoute(filteredScreens, $params.screenId)}
       {#each filteredScreens as screen (screen._id)}
         <ScreenNavItem {screen} deletionAllowed />
       {/each}
