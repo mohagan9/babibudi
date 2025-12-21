@@ -2,10 +2,6 @@
   import { goto } from "@roxi/routify"
   import { Body, notifications, Layout, Button } from "@budibase/bbui"
   import { API } from "@/api"
-  import {
-    buildBuilderWorkspaceDesignRoute,
-    buildBuilderWorkspaceRoute,
-  } from "@/helpers/routes"
   import { onMount } from "svelte"
   import Spinner from "@/components/common/Spinner.svelte"
   import BBLogo from "assets/BBLogo.svelte"
@@ -34,20 +30,22 @@
       const pkg = await API.fetchAppPackage(createdWorkspace.instance._id)
       const homeScreen = pkg.screens.find(screen => screen.routing?.homeScreen)
 
-      // Send the user directly to the home screen
-      const targetRoute =
-        homeScreen?.workspaceAppId && homeScreen?._id
-          ? buildBuilderWorkspaceDesignRoute({
-              applicationId: createdWorkspace.instance._id,
-              workspaceAppId: homeScreen.workspaceAppId,
-              screenId: homeScreen._id,
-            })
-          : buildBuilderWorkspaceRoute({
-              applicationId: createdWorkspace.instance._id,
-            })
-
       notifications.success(`Workspace created successfully`)
-      $goto(targetRoute)
+      if (homeScreen?.workspaceAppId && homeScreen?._id) {
+        const screenId = homeScreen._id
+        $goto(
+          `/builder/workspace/[application]/design/[workspaceAppId]/[screenId]`,
+          {
+            application: createdWorkspace.instance._id,
+            workspaceAppId: homeScreen.workspaceAppId,
+            screenId,
+          }
+        )
+      } else {
+        $goto(`/builder/workspace/[application]`, {
+          application: createdWorkspace.instance._id,
+        })
+      }
     } catch (e: any) {
       loading = false
       onboardingFailed = true

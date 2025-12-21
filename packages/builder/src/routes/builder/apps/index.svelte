@@ -27,16 +27,13 @@
   import Logo from "assets/bb-emblem.svg"
   import { onMount } from "svelte"
 
-  $goto // manually initialize the helper
+  $goto
 
   let loaded: boolean = false
   let userInfoModal: Modal
   let changePasswordModal: Modal
 
-  const { accountPortalAccountUrl } = helpers
-
   $: userApps = $clientAppsStore.apps
-  $: isOwner = $auth.accountPortalAccess && $admin.cloud
 
   function getUrl(app: EnrichedApp | PublishedWorkspaceData) {
     if (app.url) {
@@ -85,13 +82,7 @@
               <MenuItem
                 icon="lock"
                 on:click={() => {
-                  if (isOwner) {
-                    window.location.href = accountPortalAccountUrl(
-                      $admin.accountPortalUrl
-                    )
-                  } else {
-                    changePasswordModal.show()
-                  }
+                  changePasswordModal.show()
                 }}
               >
                 Update password

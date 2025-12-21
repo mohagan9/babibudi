@@ -1,7 +1,7 @@
 <script>
-  import { goto } from "@roxi/routify"
-
-  $goto
-
-  $goto("../builder")
+  import { auth } from "@/stores/portal"
 </script>
+
+{#if $auth.user}
+  <slot />
+{/if}

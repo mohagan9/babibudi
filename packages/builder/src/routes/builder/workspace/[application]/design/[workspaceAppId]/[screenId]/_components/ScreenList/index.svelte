@@ -16,6 +16,11 @@
   let newScreenModal: NewScreenModal
 
   $: allScreens = $workspaceAppStore.selectedWorkspaceApp?.screens || []
+  $: console.log(
+    "SELECTED WORKSPACE APP ?? ",
+    $workspaceAppStore.selectedWorkspaceApp
+  )
+  //TODO - Set this store value onboarding
   $: filteredScreens = getFilteredScreens(allScreens, searchValue)
 
   $: workspaceAppId = $workspaceAppStore.selectedWorkspaceApp?._id || ""

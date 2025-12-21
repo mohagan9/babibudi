@@ -60,7 +60,7 @@
       if ($organisation.isSSOEnforced) {
         // auto accept invite and redirect to login
         await users.acceptInvite(inviteCode)
-        $goto("../auth")
+        $goto("../../auth")
       }
     } catch (error) {
       notifications.error(error.message)
