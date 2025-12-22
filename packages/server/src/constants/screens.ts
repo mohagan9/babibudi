@@ -64,9 +64,10 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
                 active: {},
               },
               _instanceName: "Welcome Icon",
-              icon: "hand-waving",
+              icon: "bird",
               size: 64,
-              weight: "regular",
+              weight: "duotone",
+              color: "#FFC433",
             },
             {
               _id: "c09edf7de69be44ce8f0215c3f62e43a7",
@@ -78,7 +79,7 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
               },
               size: "24px",
               _instanceName: "Welcome Title",
-              text: "# Welcome to Budibase",
+              text: "# Welcome to Babibudi",
             },
             {
               _id: "c09edf7de69be44ce8f0215c3f62e43a8",
@@ -143,55 +144,6 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
                       _instanceName: "App Building Text",
                       size: "18px",
                       text: "This is the app building interface where you build interfaces such as forms and internal tools.",
-                    },
-                  ],
-                },
-                {
-                  _id: "c09edf7de69be44ce8f0215c3f62e43a9",
-                  _component: "@budibase/standard-components/container",
-                  _styles: {
-                    normal: {
-                      display: "flex",
-                      "align-items": "flex-start",
-                      gap: "1rem",
-                    },
-                    hover: {},
-                    active: {},
-                    selected: {},
-                  },
-                  _instanceName: "Automation Row",
-                  _children: [
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43a9c",
-                      _component: "@budibase/standard-components/iconphosphor",
-                      _styles: {
-                        normal: {
-                          color: "#374151",
-                          "flex-shrink": "0",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "Automation Icon",
-                      icon: "path",
-                      size: 28,
-                      weight: "regular",
-                    },
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43a9b",
-                      _component: "@budibase/standard-components/textv2",
-                      _styles: {
-                        normal: {
-                          "font-size": "1.1rem",
-                          color: "#4b5563",
-                          "line-height": "1.5",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "Automation Text",
-                      size: "18px",
-                      text: "The automation section is for automating manual tasks.",
                     },
                   ],
                 },
@@ -369,60 +321,6 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
                   ],
                 },
                 {
-                  _id: "c09edf7de69be44ce8f0215c3f62e43b4",
-                  _component: "@budibase/standard-components/container",
-                  layout: "flex",
-                  direction: "row",
-                  gap: "M",
-                  _styles: {
-                    normal: {
-                      display: "flex",
-                      "align-items": "center",
-                      gap: "1rem",
-                    },
-                    hover: {},
-                    active: {},
-                    selected: {},
-                  },
-                  _instanceName: "Automations 101 Row",
-                  _children: [
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43b4a",
-                      _component: "@budibase/standard-components/iconphosphor",
-                      _styles: {
-                        normal: {
-                          color: "#1f2937",
-                          "flex-shrink": "0",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "Automations Icon",
-                      icon: "square",
-                      size: 28,
-                      weight: "regular",
-                    },
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43b4b",
-                      _component: "@budibase/standard-components/link",
-                      _styles: {
-                        normal: {
-                          color: "#6E6E6E",
-                        },
-                        hover: {
-                          "text-decoration": "underline",
-                        },
-                        active: {},
-                      },
-                      _instanceName: "Automations 101 Link",
-                      text: "Automations 101",
-                      url: "https://docs.budibase.com/docs/automation-steps",
-                      openInNewTab: true,
-                      size: "L",
-                    },
-                  ],
-                },
-                {
                   _id: "c09edf7de69be44ce8f0215c3f62e43b5",
                   _component: "@budibase/standard-components/container",
                   layout: "flex",
@@ -525,205 +423,6 @@ export function createOnboardingWelcomeScreen(workspaceAppId: string): Screen {
                       _instanceName: "Set up SMTP Link",
                       text: "Set up SMTP",
                       url: "https://docs.budibase.com/docs/email",
-                      openInNewTab: true,
-                      size: "L",
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              _id: "c09edf7de69be44ce8f0215c3f62e43b7",
-              _component: "@budibase/standard-components/textv2",
-              _styles: {
-                normal: {
-                  "font-size": "1.25rem",
-                  "font-weight": "600",
-                  color: "#111827",
-                },
-                hover: {},
-                active: {},
-              },
-              size: "18px",
-              _instanceName: "Community Title",
-              text: "### Join the community",
-            },
-            {
-              _id: "c09edf7de69be44ce8f0215c3f62e43b8",
-              _component: "@budibase/standard-components/container",
-              layout: "flex",
-              direction: "column",
-              gap: "M",
-              _styles: {
-                normal: {
-                  display: "flex",
-                  "flex-direction": "column",
-                  gap: "0.75rem",
-                  "margin-left": "8px",
-                },
-                hover: {},
-                active: {},
-                selected: {},
-              },
-              _instanceName: "Community Links",
-              _children: [
-                {
-                  _id: "c09edf7de69be44ce8f0215c3f62e43b9",
-                  _component: "@budibase/standard-components/container",
-                  layout: "flex",
-                  direction: "row",
-                  gap: "M",
-                  _styles: {
-                    normal: {
-                      display: "flex",
-                      "align-items": "center",
-                      gap: "1rem",
-                    },
-                    hover: {},
-                    active: {},
-                    selected: {},
-                  },
-                  _instanceName: "Discord Row",
-                  _children: [
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43b9a",
-                      _component: "@budibase/standard-components/iconphosphor",
-                      _styles: {
-                        normal: {
-                          color: "#1f2937",
-                          "flex-shrink": "0",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "Discord Icon",
-                      icon: "square",
-                      size: 28,
-                      weight: "regular",
-                    },
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43b9b",
-                      _component: "@budibase/standard-components/link",
-                      _styles: {
-                        normal: {
-                          color: "#6E6E6E",
-                        },
-                        hover: {
-                          "text-decoration": "underline",
-                        },
-                        active: {},
-                      },
-                      _instanceName: "Discord Link",
-                      text: "Discord",
-                      url: "https://discord.gg/ZepTmGbtfF",
-                      openInNewTab: true,
-                      size: "L",
-                    },
-                  ],
-                },
-                {
-                  _id: "c09edf7de69be44ce8f0215c3f62e43ba",
-                  _component: "@budibase/standard-components/container",
-                  layout: "flex",
-                  direction: "row",
-                  gap: "M",
-                  _styles: {
-                    normal: {
-                      display: "flex",
-                      "align-items": "center",
-                      gap: "1rem",
-                    },
-                    hover: {},
-                    active: {},
-                    selected: {},
-                  },
-                  _instanceName: "GitHub Discussions Row",
-                  _children: [
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43baa",
-                      _component: "@budibase/standard-components/iconphosphor",
-                      _styles: {
-                        normal: {
-                          color: "#1f2937",
-                          "flex-shrink": "0",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "GitHub Discussions Icon",
-                      icon: "square",
-                      size: 28,
-                      weight: "regular",
-                    },
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43bab",
-                      _component: "@budibase/standard-components/link",
-                      _styles: {
-                        normal: {
-                          color: "#6E6E6E",
-                        },
-                        hover: {
-                          "text-decoration": "underline",
-                        },
-                        active: {},
-                      },
-                      _instanceName: "GitHub Discussions Link",
-                      text: "Github Discussions",
-                      url: "https://github.com/Budibase/budibase/discussions",
-                      openInNewTab: true,
-                      size: "L",
-                    },
-                  ],
-                },
-                {
-                  _id: "c09edf7de69be44ce8f0215c3f62e43bb",
-                  _component: "@budibase/standard-components/container",
-                  layout: "flex",
-                  direction: "row",
-                  gap: "M",
-                  _styles: {
-                    normal: {
-                      display: "flex",
-                      "align-items": "center",
-                      gap: "1rem",
-                    },
-                    hover: {},
-                    active: {},
-                    selected: {},
-                  },
-                  _instanceName: "Public Roadmap Row",
-                  _children: [
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43bba",
-                      _component: "@budibase/standard-components/iconphosphor",
-                      _styles: {
-                        normal: {
-                          color: "#1f2937",
-                          "flex-shrink": "0",
-                        },
-                        hover: {},
-                        active: {},
-                      },
-                      _instanceName: "Public Roadmap Icon",
-                      icon: "square",
-                      size: 28,
-                      weight: "regular",
-                    },
-                    {
-                      _id: "c09edf7de69be44ce8f0215c3f62e43bbb",
-                      _component: "@budibase/standard-components/link",
-                      _styles: {
-                        normal: {
-                          color: "#6E6E6E",
-                        },
-                        hover: {
-                          "text-decoration": "underline",
-                        },
-                        active: {},
-                      },
-                      _instanceName: "Public Roadmap Link",
-                      text: "Public roadmap",
-                      url: "https://github.com/orgs/Budibase/projects/15",
                       openInNewTab: true,
                       size: "L",
                     },
