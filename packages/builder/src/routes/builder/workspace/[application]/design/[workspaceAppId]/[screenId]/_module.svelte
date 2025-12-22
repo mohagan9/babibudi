@@ -2,6 +2,7 @@
   import { goto, params } from "@roxi/routify"
   import {
     builderStore,
+    componentStore,
     screenStore,
     workspaceAppStore,
   } from "@/stores/builder"
@@ -12,6 +13,15 @@
 
   $goto
   $params
+
+  $: navigateToComponent($componentStore.selectedComponentId)
+
+  const navigateToComponent = (componentId: string | undefined) => {
+    if (!componentId) {
+      return
+    }
+    $goto("./[componentId]", { componentId })
+  }
 
   const validate = (id: string) =>
     $screenStore.screens.some(screen => screen._id === id)
