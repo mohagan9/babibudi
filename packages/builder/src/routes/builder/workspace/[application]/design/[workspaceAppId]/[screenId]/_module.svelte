@@ -30,6 +30,10 @@
     const screenId = $params.screenId
     if (validate(screenId)) {
       screenStore.select(screenId)
+      const componentId = $params.componentId
+      if (!componentId) {
+        componentStore.select(`${screenId}-screen`)
+      }
     }
   })
 </script>
