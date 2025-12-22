@@ -10,7 +10,6 @@
     selectedComponent,
   } from "@/stores/builder"
   import { onMount } from "svelte"
-  import { fly } from "svelte/transition"
   import { findComponentPath } from "@/helpers/components"
   import NewPill from "@/components/common/NewPill.svelte"
 
@@ -243,76 +242,65 @@
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<div class="container" transition:fly|local={{ x: 260, duration: 300 }}>
-  <Panel
-    title="Add component"
-    showCloseButton
-    onClickCloseButton={() => $goto("../")}
-    borderLeft
-    wide
-  >
-    <Layout paddingX="L" paddingY="XL" gap="S">
-      <Search
-        placeholder="Search"
-        value={searchString}
-        on:change={e => (searchString = e.detail)}
-        bind:inputRef={searchRef}
-      />
-      {#if filteredStructure.length}
-        {#each filteredStructure as category}
-          <Layout noPadding gap="XS">
-            <div class="category-label">{category.name}</div>
-            {#each category.children as component}
-              <div
-                draggable="true"
-                on:dragstart={e => onDragStart(e, component.component)}
-                on:dragend={onDragEnd}
-                class="component"
-                class:selected={selectedIndex === orderMap[component.component]}
-                on:click={() => addComponent(component.component)}
-                on:mouseenter={() => (selectedIndex = null)}
-              >
-                <div class="icon-container">
-                  <Icon
-                    size="M"
-                    color="var(--spectrum-global-color-static-gray-50)"
-                    name={component.icon}
-                  />
-                </div>
-                <div class="component-name">
-                  <Body
-                    size="S"
-                    weight="500"
-                    color="var(--spectrum-global-color-gray-900)"
-                    >{component.name}</Body
-                  >
-                  {#if component.new}
-                    <NewPill />
-                  {/if}
-                </div>
+<Panel
+  title="Add component"
+  showCloseButton
+  onClickCloseButton={() => $goto("../")}
+  borderLeft
+  wide
+>
+  <Layout paddingX="L" paddingY="XL" gap="S">
+    <Search
+      placeholder="Search"
+      value={searchString}
+      on:change={e => (searchString = e.detail)}
+      bind:inputRef={searchRef}
+    />
+    {#if filteredStructure.length}
+      {#each filteredStructure as category}
+        <Layout noPadding gap="XS">
+          <div class="category-label">{category.name}</div>
+          {#each category.children as component}
+            <div
+              draggable="true"
+              on:dragstart={e => onDragStart(e, component.component)}
+              on:dragend={onDragEnd}
+              class="component"
+              class:selected={selectedIndex === orderMap[component.component]}
+              on:click={() => addComponent(component.component)}
+              on:mouseenter={() => (selectedIndex = null)}
+            >
+              <div class="icon-container">
+                <Icon
+                  size="M"
+                  color="var(--spectrum-global-color-static-gray-50)"
+                  name={component.icon}
+                />
               </div>
-            {/each}
-          </Layout>
-        {/each}
-      {:else}
-        <Body size="S">
-          There aren't any components matching the current filter
-        </Body>
-      {/if}
-    </Layout>
-  </Panel>
-</div>
+              <div class="component-name">
+                <Body
+                  size="S"
+                  weight="500"
+                  color="var(--spectrum-global-color-gray-900)"
+                  >{component.name}</Body
+                >
+                {#if component.new}
+                  <NewPill />
+                {/if}
+              </div>
+            </div>
+          {/each}
+        </Layout>
+      {/each}
+    {:else}
+      <Body size="S">
+        There aren't any components matching the current filter
+      </Body>
+    {/if}
+  </Layout>
+</Panel>
 
 <style>
-  .container {
-    position: fixed;
-    right: 0;
-    z-index: 1;
-    height: calc(100% - 60px);
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-  }
   .category-label {
     color: var(--spectrum-global-color-gray-600);
     text-transform: uppercase;
