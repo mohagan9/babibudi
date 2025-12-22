@@ -628,45 +628,6 @@ export async function deleteFiles(bucketName: string, filepaths: string[]) {
   return objectStore.deleteObjects(params)
 }
 
-/**
- * Delete a path, including everything within.
- */
-export async function deleteFolder(
-  bucketName: string,
-  folder: string
-): Promise<any> {
-  bucketName = sanitizeBucket(bucketName)
-  folder = sanitizeKey(folder)
-  const client = ObjectStore()
-  const listParams = {
-    Bucket: bucketName,
-    Prefix: folder,
-  }
-
-  const existingObjectsResponse = await client.listObjects(listParams)
-  if (existingObjectsResponse.Contents?.length === 0) {
-    return
-  }
-  const deleteParams: { Bucket: string; Delete: { Objects: any[] } } = {
-    Bucket: bucketName,
-    Delete: {
-      Objects: [],
-    },
-  }
-
-  existingObjectsResponse.Contents?.forEach((content: any) => {
-    deleteParams.Delete.Objects.push({ Key: content.Key })
-  })
-
-  if (deleteParams.Delete.Objects.length) {
-    const deleteResponse = await client.deleteObjects(deleteParams)
-    // can only empty 1000 items at once
-    if (deleteResponse.Deleted?.length === 1000) {
-      return deleteFolder(bucketName, folder)
-    }
-  }
-}
-
 export async function uploadDirectory(
   bucketName: string,
   localPath: string,

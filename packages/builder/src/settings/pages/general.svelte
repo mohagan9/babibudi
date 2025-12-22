@@ -1,7 +1,6 @@
 <script lang="ts">
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
   import UpdateAppForm from "@/components/common/UpdateAppForm.svelte"
-  import DeleteModal from "@/components/deploy/DeleteModal.svelte"
   import RevertModal from "@/components/deploy/RevertModal.svelte"
   import VersionModal from "@/components/deploy/VersionModal.svelte"
   import ExportAppModal from "@/components/start/ExportAppModal.svelte"
@@ -24,7 +23,6 @@
   let exportPublishedVersion: boolean = false
   let unpublishModal: ConfirmDialog
   let revertModal: RevertModal
-  let deleteModal: DeleteModal
 
   $: updateAvailable = $appStore.upgradableVersion !== $appStore.version
   $: revertAvailable = $appStore.revertableVersion != null
@@ -177,22 +175,6 @@
   <div class="row">
     <Button secondary on:click={importModal?.show}>Import workspace</Button>
   </div>
-  <Divider noMargin />
-  <Heading size="XS">Danger zone</Heading>
-  <div class="row">
-    <Button
-      warning
-      disabled={!$isOnlyUser}
-      on:click={() => {
-        deleteModal.show()
-      }}
-      tooltip={$isOnlyUser
-        ? undefined
-        : "Unavailable - another user is editing this workspace"}
-    >
-      Delete workspace
-    </Button>
-  </div>
 </Layout>
 
 <VersionModal bind:this={versionModal} hideIcon={true} />
@@ -218,12 +200,6 @@
 </ConfirmDialog>
 
 <RevertModal bind:this={revertModal} />
-
-<DeleteModal
-  bind:this={deleteModal}
-  appId={$appStore.appId}
-  appName={$appStore.name}
-/>
 
 <style>
   .row {

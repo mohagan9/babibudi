@@ -4,7 +4,6 @@ import {
   ClearDevLockResponse,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
-  DeleteWorkspaceResponse,
   DuplicateWorkspaceRequest,
   DuplicateWorkspaceResponse,
   FetchAppDefinitionResponse,
@@ -45,7 +44,6 @@ export interface AppEndpoints {
   createApp: (
     app: CreateWorkspaceRequest | FormData
   ) => Promise<CreateWorkspaceResponse>
-  deleteApp: (appId: string) => Promise<DeleteWorkspaceResponse>
   duplicateApp: (
     appId: string,
     app: DuplicateWorkspaceRequest
@@ -209,16 +207,6 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
   unpublishApp: async appId => {
     return await API.post({
       url: `/api/applications/${appId}/unpublish`,
-    })
-  },
-
-  /**
-   * Deletes a dev app.
-   * @param appId the dev app ID to delete
-   */
-  deleteApp: async appId => {
-    return await API.delete({
-      url: `/api/applications/${appId}`,
     })
   },
 

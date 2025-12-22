@@ -1,4 +1,3 @@
-import { Header } from "@budibase/shared-core"
 import { UserCtx } from "@budibase/types"
 import type { Middleware, Next } from "koa"
 import env from "../environment"
@@ -19,13 +18,3 @@ export const workspaceMigrations = (async (ctx: UserCtx, next: Next) => {
 
   return checkMissingMigrations(ctx, next, appId)
 }) as Middleware
-
-export async function skipMigrationRedirect(ctx: UserCtx, next: Next) {
-  const result = await next()
-  if (ctx.response.get(Header.MIGRATING_APP)) {
-    console.log("Skipping migration redirect")
-    ctx.response.remove(Header.MIGRATING_APP)
-  }
-
-  return result
-}

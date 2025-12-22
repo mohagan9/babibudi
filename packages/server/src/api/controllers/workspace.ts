@@ -19,7 +19,6 @@ import {
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
   Database,
-  DeleteWorkspaceResponse,
   DuplicateWorkspaceRequest,
   DuplicateWorkspaceResponse,
   FetchAppDefinitionResponse,
@@ -66,14 +65,11 @@ import env from "../../environment"
 import sdk from "../../sdk"
 import {
   backupClientLibrary,
-  deleteAppFiles,
   revertClientLibrary,
   updateClientLibrary,
   uploadAppFiles,
 } from "../../utilities/fileSystem"
 import { doesUserHaveLock } from "../../utilities/redis"
-import { getUniqueRows } from "../../utilities/usageQuota/rows"
-import { removeWorkspaceFromUserRoles } from "../../utilities/workerRequests"
 import { builderSocket } from "../../websockets"
 import * as workspaceMigrations from "../../workspaceMigrations"
 import { processMigrations } from "../../workspaceMigrations/migrationsProcessor"
@@ -747,62 +743,6 @@ async function unpublishWorkspace() {
   })
 
   await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
-}
-
-async function invalidateWorkspaceCache(workspaceId: string) {
-  await cache.workspace.invalidateWorkspaceMetadata(
-    dbCore.getDevWorkspaceID(workspaceId)
-  )
-  await cache.workspace.invalidateWorkspaceMetadata(
-    dbCore.getProdWorkspaceID(workspaceId)
-  )
-}
-
-async function destroyWorkspace(ctx: UserCtx) {
-  const prodWorkspaceId = dbCore.getProdWorkspaceID(ctx.params.appId)
-  const devWorkspaceId = dbCore.getDevWorkspaceID(ctx.params.appId)
-
-  const app = await sdk.workspaces.metadata.tryGet()
-  if (!app) {
-    ctx.throw(404, "Workspace not found")
-  }
-
-  // check if we need to unpublish first
-  if (await dbCore.dbExists(prodWorkspaceId)) {
-    // app is deployed, run through unpublish flow
-    await sdk.workspaces.syncWorkspace(devWorkspaceId, {
-      automationOnly: true,
-    })
-    const prodDb = dbCore.getDB(prodWorkspaceId, { skip_setup: true })
-    await prodDb.destroy()
-    await cache.workspace.invalidateWorkspaceMetadata(prodWorkspaceId)
-  }
-
-  const db = dbCore.getDB(devWorkspaceId)
-  // standard app deletion flow
-  const result = await db.destroy()
-
-  await deleteAppFiles(prodWorkspaceId)
-
-  await removeWorkspaceFromUserRoles(ctx, ctx.params.appId)
-  await invalidateWorkspaceCache(prodWorkspaceId)
-
-  return result
-}
-
-async function preDestroyWorkspace(ctx: UserCtx) {
-  // invalidate the cache immediately in-case they are leading to
-  // zombie appearing apps
-  const appId = ctx.params.appId
-  await invalidateWorkspaceCache(appId)
-  const { rows } = await getUniqueRows([appId])
-  ctx.rowCount = rows.length
-}
-
-export async function destroy(ctx: UserCtx<void, DeleteWorkspaceResponse>) {
-  await preDestroyWorkspace(ctx)
-  const result = await destroyWorkspace(ctx)
-  ctx.body = result
 }
 
 export async function unpublish(

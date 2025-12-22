@@ -1,4 +1,3 @@
-import { skipMigrationRedirect } from "../../middleware/workspaceMigrations"
 import * as deploymentController from "../controllers/deploy"
 import * as controller from "../controllers/workspace"
 import { builderRoutes, creatorRoutes, publicRoutes } from "./endpointGroups"
@@ -20,7 +19,6 @@ builderRoutes
     deploymentController.publishWorkspace
   )
   .post("/api/applications/:appId/unpublish", controller.unpublish)
-  .delete("/api/applications/:appId", skipMigrationRedirect, controller.destroy)
   .post("/api/applications/:appId/duplicate", controller.duplicateWorkspace)
   .post("/api/applications/:appId/import", controller.importToWorkspace)
 

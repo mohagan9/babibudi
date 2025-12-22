@@ -69,10 +69,6 @@ export interface UpdateWorkspaceResponse extends Workspace {}
 export interface UpdateAppClientResponse extends Workspace {}
 export interface RevertAppClientResponse extends Workspace {}
 
-export interface DeleteWorkspaceResponse {
-  ok: boolean
-}
-
 export interface UnpublishWorkspaceResponse {
   message: string
 }

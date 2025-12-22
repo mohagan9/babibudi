@@ -23,15 +23,6 @@ export const uploadAppFiles = async (appId: string) => {
 }
 
 /**
- * Removes all of the assets created for an app in the object store.
- * @param appId The ID of the app which is being deleted.
- * @return once promise completes the app resources will be removed from object store.
- */
-export const deleteAppFiles = async (appId: string) => {
-  await objectStore.deleteFolder(ObjectStoreBuckets.APPS, `${appId}/`)
-}
-
-/**
  * Retrieves component libraries from object store (or tmp symlink if in local)
  */
 export const getComponentLibraryManifest = async (library: string) => {
