@@ -1,64 +1,49 @@
-<script>
-  import { syncURLToState } from "@/helpers/urlStateSync"
+<script lang="ts">
   import {
     builderStore,
     screenStore,
     selectedScreen,
     componentStore,
   } from "@/stores/builder"
-  import * as routify from "@roxi/routify"
-  import { onDestroy } from "svelte"
   import { findComponent } from "@/helpers/components"
   import ComponentSettingsPanel from "./_components/Component/ComponentSettingsPanel.svelte"
   import NavigationPanel from "./_components/Navigation/index.svelte"
   import ScreenSettingsPanel from "./_components/Screen/index.svelte"
-
-  // Extract stores from namespace for Svelte 5 compatibility
-  const { goto, params, url, isActive, page, layout } = routify
+  import { goto, params } from "@roxi/routify"
+  import { onMount } from "svelte"
+  import NewComponentPanel from "./new/_components/NewComponentPanel.svelte"
 
   $goto
   $params
-  $url
-  $goto
-  $isActive
-  $page
-  $layout
 
   $: componentId = $componentStore.selectedComponentId
-  $: builderStore.selectResource(componentId)
   $: routeComponentId = $params.componentId
 
-  // Hide new component panel whenever component ID changes
-  const closeNewComponentPanel = url => {
-    if (url?.endsWith("/new")) {
-      url = url.replace("/new", "")
-    }
-    return { url }
+  $: if (componentId) {
+    builderStore.selectResource(componentId)
   }
 
-  const validate = id => {
+  const validate = (id: string) => {
     if (id === `${$screenStore.selectedScreenId}-screen`) return true
     if (id === `${$screenStore.selectedScreenId}-navigation`) return true
 
     return !!findComponent($selectedScreen?.props, id)
   }
 
-  // Keep URL and state in sync for selected component ID
-  const stopSyncing = syncURLToState({
-    urlParam: "componentId",
-    stateKey: "selectedComponentId",
-    validate,
-    fallbackUrl: "../",
-    store: componentStore,
-    update: componentStore.select,
-    routify,
-    beforeNavigate: closeNewComponentPanel,
+  onMount(() => {
+    if (routeComponentId === "new") {
+      return
+    } else if (validate(routeComponentId)) {
+      componentStore.select(routeComponentId)
+    } else {
+      $goto("../")
+    }
   })
-
-  onDestroy(stopSyncing)
 </script>
 
-{#if routeComponentId === `${$screenStore.selectedScreenId}-screen`}
+{#if routeComponentId === "new"}
+  <NewComponentPanel />
+{:else if routeComponentId === `${$screenStore.selectedScreenId}-screen`}
   <ScreenSettingsPanel />
 {:else if routeComponentId === `${$screenStore.selectedScreenId}-navigation`}
   <NavigationPanel />

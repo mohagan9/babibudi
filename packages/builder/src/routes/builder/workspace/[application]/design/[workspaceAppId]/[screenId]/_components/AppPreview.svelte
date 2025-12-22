@@ -80,8 +80,8 @@
   $: refreshContent(json)
 
   // Determine if the add component menu is active
-  $: isAddingComponent = $isActive(`../[componentId]/new`, {
-    componentId: selectedComponentId,
+  $: isAddingComponent = $isActive(`./[componentId]`, {
+    componentId: "new",
   })
 
   // Register handler to send custom to the preview
@@ -233,10 +233,10 @@
   }
 
   const toggleAddComponent = () => {
-    if ($isActive(`./:componentId/new`)) {
-      $goto(`./:componentId`)
+    if ($isActive(`./[componentId]`, { componentId: "new" })) {
+      $goto(`./[componentId]`, { componentId: selectedComponentId })
     } else {
-      $goto(`./:componentId/new`)
+      $goto(`./[componentId]`, { componentId: "new" })
     }
   }
 

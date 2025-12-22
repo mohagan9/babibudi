@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
   import ScreenList from "./ScreenList/index.svelte"
   import ComponentList from "./ComponentList/index.svelte"
   import { getHorizontalResizeActions } from "@/components/common/resizable"
