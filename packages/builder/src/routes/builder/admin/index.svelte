@@ -39,7 +39,7 @@
       notifications.success("Admin user created")
       await admin.init()
       await auth.login(formData?.email.trim(), formData?.password)
-      $goto(BUILDER_URLS.WORKSPACES)
+      $goto("/builder")
     } catch (error) {
       submitted = false
       notifications.error(error.message || "Failed to create admin user")

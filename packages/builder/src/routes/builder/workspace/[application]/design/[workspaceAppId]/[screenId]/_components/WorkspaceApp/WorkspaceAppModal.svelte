@@ -124,7 +124,10 @@
           workspaceAppId: workspaceApp._id,
         })
         notifications.success("App created successfully")
-        $goto(`./${newScreen._id}`)
+        $goto("../[workspaceAppId]/[screenId]", {
+          workspaceAppId: workspaceApp._id,
+          screenId: newScreen._id!,
+        })
       } else {
         await workspaceAppStore.edit({
           ...workspaceAppData,
