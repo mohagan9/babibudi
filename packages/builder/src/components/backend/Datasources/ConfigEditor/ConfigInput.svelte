@@ -4,7 +4,6 @@
   import LongFormField from "./fields/LongForm.svelte"
   import SensitiveLongFormField from "./fields/SensitiveLongForm.svelte"
   import FieldGroupField from "./fields/FieldGroup.svelte"
-  import StringField from "./fields/String.svelte"
   import SelectField from "./fields/Select.svelte"
   import { DatasourceFieldType } from "@budibase/types"
 
@@ -34,8 +33,6 @@
       return FieldGroupField
     } else if (type === "select") {
       return SelectField
-    } else {
-      return StringField
     }
   }
 

@@ -180,11 +180,6 @@ export const appRoutes = (
       path: "general",
       routes: [
         { path: "info", comp: Pages.get("general_info"), title: "Info" },
-        {
-          title: "OAuth2",
-          path: "oauth2",
-          comp: Pages.get("oauth2"),
-        },
       ],
     },
     {

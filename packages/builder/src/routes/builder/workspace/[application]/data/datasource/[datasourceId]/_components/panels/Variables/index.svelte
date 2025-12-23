@@ -1,11 +1,10 @@
 <script>
-  import { Heading, Layout, notifications } from "@budibase/bbui"
+  import { Heading, Layout } from "@budibase/bbui"
   import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
   import ViewDynamicVariables from "./ViewDynamicVariables.svelte"
   import { queries } from "@/stores/builder"
   import { cloneDeep, isEqual } from "lodash/fp"
   import Panel from "../Panel.svelte"
-  import { onMount } from "svelte"
 
   export let datasource
   export let updatedDatasource
@@ -55,14 +54,6 @@
   }
 
   $: templateStaticVariableKeys = getTemplateStaticVariableKeys(datasource)
-
-  onMount(async () => {
-    try {
-      await environment.loadVariables()
-    } catch (error) {
-      notifications.error(`Error getting environment variables - ${error}`)
-    }
-  })
 </script>
 
 <Panel>
