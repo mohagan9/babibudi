@@ -19,7 +19,6 @@ import SystemLogsPage from "@/settings/pages/systemLogs.svelte"
 import GeneralInfoPage from "@/settings/pages/general.svelte"
 import AutomationsPage from "@/settings/pages/automations/automations.svelte"
 import EmbedPage from "@/settings/pages/embed.svelte"
-import OAuth2Page from "@/settings/pages/oauth2/index.svelte"
 
 const componentMap = {
   profile: ProfilePage,
@@ -38,7 +37,6 @@ const componentMap = {
   general_info: GeneralInfoPage,
   automations: AutomationsPage,
   embed: EmbedPage,
-  oauth2: OAuth2Page,
 } satisfies Record<string, Component<any>>
 
 export const Pages = {
