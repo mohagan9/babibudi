@@ -4,7 +4,6 @@
   import { AUTH_TYPE_LABELS, AUTH_TYPES } from "./authTypes"
   import { BindableCombobox } from "@/components/common/bindings"
   import { getAuthBindings } from "@/dataBinding"
-  import EnvVariableInput from "@/components/portal/environment/EnvVariableInput.svelte"
 
   interface FormData {
     name?: string
@@ -211,24 +210,6 @@
       on:blur={() => (blurred.type = true)}
       error={blurred.type ? errors.type : undefined}
     />
-    {#if form.type === AUTH_TYPES.BASIC}
-      <EnvVariableInput
-        label="Username"
-        bind:value={form.basic.username}
-        on:change={onFieldChange}
-        on:blur={() => (blurred.basic.username = true)}
-        error={blurred.basic.username ? errors.basic.username : undefined}
-      />
-
-      <EnvVariableInput
-        label="Password"
-        type="password"
-        bind:value={form.basic.password}
-        on:change={onFieldChange}
-        on:blur={() => (blurred.basic.password = true)}
-        error={blurred.basic.password ? errors.basic.password : undefined}
-      />
-    {/if}
     {#if form.type === AUTH_TYPES.BEARER}
       <BindableCombobox
         label="Token"
