@@ -194,13 +194,6 @@ export class WorkspaceAPI extends TestAPI {
     })
   }
 
-  addSampleData = async (
-    appId: string,
-    expectations?: Expectations
-  ): Promise<void> => {
-    await this._post(`/api/applications/${appId}/sample`, { expectations })
-  }
-
   fetchClientApps = async (
     expectations?: Expectations
   ): Promise<FetchPublishedAppsResponse> => {

@@ -1,4 +1,3 @@
-import { DEFAULT_TABLES } from "../../../db/defaultData/datasource_bb_default"
 import { USERS_TABLE_SCHEMA } from "../../../constants"
 import { setEnv, withEnv } from "../../../environment"
 
@@ -1243,20 +1242,6 @@ describe("/applications", () => {
         },
         { body: { message: "App URL is already in use." }, status: 400 }
       )
-    })
-  })
-
-  describe("POST /api/applications/:appId/sample", () => {
-    it("should be able to add sample data", async () => {
-      await config.api.workspace.addSampleData(config.getDevWorkspaceId())
-      for (let table of DEFAULT_TABLES) {
-        const res = await config.api.row.search(
-          table._id!,
-          { query: {} },
-          { status: 200 }
-        )
-        expect(res.rows.length).not.toEqual(0)
-      }
     })
   })
 

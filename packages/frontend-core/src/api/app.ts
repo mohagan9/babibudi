@@ -1,6 +1,5 @@
 import { sdk } from "@budibase/shared-core"
 import {
-  AddWorkspaceSampleDataResponse,
   ClearDevLockResponse,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
@@ -58,7 +57,6 @@ export interface AppEndpoints {
   fetchComponentLibDefinitions: (
     workspaceId: string
   ) => Promise<FetchAppDefinitionResponse>
-  addSampleData: (appId: string) => Promise<AddWorkspaceSampleDataResponse>
   getPublishedApps: () => Promise<FetchPublishedAppsResponse["apps"]>
 
   // Missing request or response types
@@ -246,16 +244,6 @@ export const buildAppEndpoints = (API: BaseAPIClient): AppEndpoints => ({
   fetchComponentLibDefinitions: async appId => {
     return await API.get({
       url: `/api/${appId}/components/definitions`,
-    })
-  },
-
-  /**
-   * Adds sample data to an app
-   * @param appId the app ID
-   */
-  addSampleData: async appId => {
-    return await API.post({
-      url: `/api/applications/${appId}/sample`,
     })
   },
 

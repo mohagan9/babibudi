@@ -11,7 +11,7 @@ import {
 import { datasourceDescribe } from "../../../integrations/tests/utils"
 import { tableForDatasource } from "../../../tests/utilities/structures"
 
-import { generator, mocks, structures } from "@budibase/backend-core/tests"
+import { generator, structures } from "@budibase/backend-core/tests"
 import { dataFilters, isViewId } from "@budibase/shared-core"
 import { encodeJSBinding } from "@budibase/string-templates"
 import {
@@ -40,7 +40,6 @@ import { Knex } from "knex"
 import _ from "lodash"
 import { cloneDeep } from "lodash/fp"
 import tk from "timekeeper"
-import { DEFAULT_EMPLOYEE_TABLE_SCHEMA } from "../../../db/defaultData/datasource_bb_default"
 import { generateRowIdField } from "../../../integrations/utils"
 
 const descriptions = datasourceDescribe({ plus: true })
@@ -3312,27 +3311,6 @@ if (descriptions.length) {
                 }).toContainExactly([{ [column]: "a" }])
               })
             })
-
-            isInternal &&
-              describe("sample data", () => {
-                beforeAll(async () => {
-                  await config.api.workspace.addSampleData(
-                    config.devWorkspaceId!
-                  )
-                  tableOrViewId = DEFAULT_EMPLOYEE_TABLE_SCHEMA._id!
-                  rows = await config.api.row.fetch(tableOrViewId)
-                })
-
-                it("should be able to search sample data", async () => {
-                  await expectSearch({
-                    query: {},
-                  }).toContain([
-                    {
-                      "First Name": "Mandy",
-                    },
-                  ])
-                })
-              })
 
             describe.each([
               {

@@ -1,12 +1,7 @@
 /**
  * Operator options for lucene queries
  */
-export {
-  DEFAULT_BB_DATASOURCE_ID,
-  OperatorOptions,
-  SqlNumberTypeRangeMap,
-} from "@budibase/shared-core"
-import { BpmCorrelationKey } from "@budibase/shared-core"
+export { OperatorOptions, SqlNumberTypeRangeMap } from "@budibase/shared-core"
 import { BBReferenceFieldSubType, FieldType } from "@budibase/types"
 
 export const BannedSearchTypes = [
@@ -26,8 +21,6 @@ export const Cookies = {
   Auth: "budibase:auth",
   CurrentApp: "budibase:currentapp",
   ReturnUrl: "budibase:returnurl",
-  AccountReturnUrl: "budibase:account:returnurl",
-  OnboardingProcessCorrelationKey: BpmCorrelationKey.ONBOARDING,
 }
 
 // Table names

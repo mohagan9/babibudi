@@ -14,7 +14,6 @@ import {
 import { DefaultAppTheme, sdk as sharedCoreSDK } from "@budibase/shared-core"
 import type { File, Files } from "formidable"
 import {
-  AddWorkspaceSampleDataResponse,
   BBReferenceFieldSubType,
   CreateWorkspaceRequest,
   CreateWorkspaceResponse,
@@ -40,11 +39,10 @@ import {
   UserCtx,
   Workspace,
 } from "@budibase/types"
-import { DEFAULT_BB_DATASOURCE_ID, USERS_TABLE_SCHEMA } from "../../constants"
+import { USERS_TABLE_SCHEMA } from "../../constants"
 import { defaultAppNavigator } from "../../constants/definitions"
 import { BASE_LAYOUT_PROP_IDS } from "../../constants/layouts"
 import { createOnboardingWelcomeScreen } from "../../constants/screens"
-import { buildDefaultDocs } from "../../db/defaultData/datasource_bb_default"
 import {
   DocumentType,
   InternalTables,
@@ -206,19 +204,6 @@ async function addCreatorToUsersTable(ctx: UserCtx) {
   await db.put(metadata)
 }
 
-async function addSampleDataDocs() {
-  const db = context.getWorkspaceDB()
-  try {
-    // Check if default datasource exists before creating it
-    await sdk.datasources.get(DEFAULT_BB_DATASOURCE_ID)
-  } catch (err: any) {
-    const defaultDbDocs = await buildDefaultDocs()
-
-    // add in the default db data docs - tables, datasource, rows and links
-    await db.bulkDocs([...defaultDbDocs])
-  }
-}
-
 async function createOnboardingDefaultWorkspaceApp(
   name: string
 ): Promise<string> {
@@ -246,13 +231,6 @@ async function addOnboardingWelcomeScreen() {
 
   const screen = createOnboardingWelcomeScreen(workspaceApp._id!)
   await sdk.screens.create(screen)
-}
-
-export const addSampleData = async (
-  ctx: UserCtx<void, AddWorkspaceSampleDataResponse>
-) => {
-  await addSampleDataDocs()
-  ctx.body = { message: "Sample tables added." }
 }
 
 export async function fetch(ctx: UserCtx<void, FetchWorkspacesResponse>) {
@@ -499,7 +477,6 @@ async function performWorkspaceCreate(
     // Add sample datasource and example screen for non-templates/non-imports, or onboarding welcome screen for onboarding flow
     if (isOnboarding) {
       try {
-        await addSampleDataDocs()
         await createOnboardingDefaultWorkspaceApp("Welcome app")
         await addOnboardingWelcomeScreen()
 

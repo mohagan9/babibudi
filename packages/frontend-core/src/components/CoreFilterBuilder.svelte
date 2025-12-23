@@ -20,13 +20,8 @@
   import { utils } from "@budibase/shared-core"
 
   const dispatch = createEventDispatcher()
-  const {
-    OperatorOptions,
-    DEFAULT_BB_DATASOURCE_ID,
-    FilterOperator,
-    OnEmptyFilter,
-    FilterValueType,
-  } = Constants
+  const { OperatorOptions, FilterOperator, OnEmptyFilter, FilterValueType } =
+    Constants
 
   export let schemaFields
   export let filters
@@ -47,11 +42,7 @@
   $: editableFilters = migrateFilters(filters)
   $: {
     if (
-      tables.find(
-        table =>
-          table._id === datasource?.tableId &&
-          table.sourceId === DEFAULT_BB_DATASOURCE_ID
-      ) &&
+      tables.find(table => table._id === datasource?.tableId) &&
       !schemaFields.some(field => field.name === "_id")
     ) {
       schemaFields = [...schemaFields, { name: "_id", type: "string" }]

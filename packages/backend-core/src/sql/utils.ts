@@ -7,7 +7,6 @@ import {
   TableSourceType,
   SEPARATOR,
 } from "@budibase/types"
-import { DEFAULT_BB_DATASOURCE_ID } from "../constants"
 import { Knex } from "knex"
 import environment from "../environment"
 
@@ -50,8 +49,7 @@ export function getNativeSql(
 export function isExternalTable(table: Table) {
   if (
     table?.sourceId &&
-    table.sourceId.includes(DocumentType.DATASOURCE + SEPARATOR) &&
-    table?.sourceId !== DEFAULT_BB_DATASOURCE_ID
+    table.sourceId.includes(DocumentType.DATASOURCE + SEPARATOR)
   ) {
     return true
   } else if (table?.sourceType === TableSourceType.EXTERNAL) {

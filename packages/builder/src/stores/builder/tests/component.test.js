@@ -20,17 +20,12 @@ import {
   getScreenFixture,
   pluginDefinitionMap,
   clientFeaturesResp,
-  sampleTableDoc,
   internalTableDoc,
   userTableDoc,
   externalTableDoc,
   componentsToNested,
 } from "./fixtures"
-import {
-  DB_TYPE_INTERNAL,
-  DB_TYPE_EXTERNAL,
-  DEFAULT_BB_DATASOURCE_ID,
-} from "@/constants/backend"
+import { DB_TYPE_INTERNAL, DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { makePropSafe as safe } from "@budibase/string-templates"
 import { Utils } from "@budibase/frontend-core"
 
@@ -97,7 +92,7 @@ const baseInitialisation = ctx => {
   // Add datasources
   tables.update(state => ({
     ...state,
-    list: [sampleTableDoc, internalTableDoc, userTableDoc, externalTableDoc],
+    list: [internalTableDoc, userTableDoc, externalTableDoc],
   }))
 }
 
@@ -264,23 +259,11 @@ describe("Component store", () => {
   it("Select an appropriate default datasource - Internal Table ", ctx => {
     tables.update(state => ({
       ...state,
-      list: [sampleTableDoc, internalTableDoc, userTableDoc, externalTableDoc],
+      list: [internalTableDoc, userTableDoc, externalTableDoc],
     }))
 
     const table = ctx.test.componentStore.getDefaultDatasource()
     expect(table.sourceType).toBe(DB_TYPE_INTERNAL)
-    expect(table.sourceId).not.toBe(DEFAULT_BB_DATASOURCE_ID)
-  })
-
-  it("Select an appropriate default datasource - Sample Table ", ctx => {
-    tables.update(state => ({
-      ...state,
-      list: [sampleTableDoc, userTableDoc, externalTableDoc],
-    }))
-
-    const table = ctx.test.componentStore.getDefaultDatasource()
-    expect(table.sourceType).toBe(DB_TYPE_INTERNAL)
-    expect(table.sourceId).toBe(DEFAULT_BB_DATASOURCE_ID)
   })
 
   it("Select an appropriate default datasource - External Table ", ctx => {

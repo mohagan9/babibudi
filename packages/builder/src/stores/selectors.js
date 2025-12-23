@@ -1,4 +1,3 @@
-import { DEFAULT_BB_DATASOURCE_ID } from "@/constants/backend"
 import { DatasourceFeature } from "@budibase/types"
 import { cloneDeep } from "lodash/fp"
 
@@ -9,11 +8,6 @@ export const integrationForDatasource = (integrations, datasource) => ({
 
 export const hasData = (datasources, tables) =>
   datasources.list.length > 1 || tables.list.length > 1
-
-export const hasDefaultData = datasources =>
-  datasources.list.some(
-    datasource => datasource._id === DEFAULT_BB_DATASOURCE_ID
-  )
 
 export const configFromIntegration = integration => {
   const config = {}

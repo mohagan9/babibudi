@@ -13,7 +13,6 @@ builderRoutes
   )
   .post("/api/applications/:appId/client/update", controller.updateClient)
   .post("/api/applications/:appId/client/revert", controller.revertClient)
-  .post("/api/applications/:appId/sample", controller.addSampleData)
   .post(
     "/api/applications/:appId/publish",
     deploymentController.publishWorkspace

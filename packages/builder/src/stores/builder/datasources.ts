@@ -1,9 +1,6 @@
 import { API } from "@/api"
 import { TableNames } from "@/constants"
-import {
-  BUDIBASE_INTERNAL_DB_ID,
-  DEFAULT_BB_DATASOURCE_ID,
-} from "@/constants/backend"
+import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 import { DerivedBudiStore } from "@/stores/BudiStore"
 import {
   Datasource,
@@ -46,7 +43,6 @@ interface BuilderDatasourceStore {
 interface DerivedDatasourceStore extends BuilderDatasourceStore {
   list: (Datasource | UIInternalDatasource)[]
   selected?: Datasource | UIInternalDatasource
-  hasDefaultData: boolean
   hasData: boolean
 }
 
@@ -94,7 +90,6 @@ export class DatasourceStore extends DerivedBudiStore<
           ...$store,
           list,
           selected: list?.find(ds => ds._id === $store.selectedDatasourceId),
-          hasDefaultData: list?.some(ds => ds._id === DEFAULT_BB_DATASOURCE_ID),
           hasData: list?.length > 0,
         }
       })

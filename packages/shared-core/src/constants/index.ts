@@ -166,28 +166,3 @@ export const InvalidFileExtensions = [
   "wsh",
   "zip",
 ]
-
-export enum BpmCorrelationKey {
-  ONBOARDING = "budibase:onboarding:correlationkey",
-  VERIFY_SSO_LOGIN = "budibase:verify_sso_login:correlationkey",
-}
-
-export enum BpmInstanceKey {
-  ONBOARDING = "budibase:onboarding:instancekey",
-  VERIFY_SSO_LOGIN = "budibase:verify_sso_login:instancekey",
-}
-
-export enum BpmStatusKey {
-  ONBOARDING = "budibase:onboarding:status",
-  VERIFY_SSO_LOGIN = "budibase:verify_sso_login:status",
-}
-
-export enum BpmStatusValue {
-  STARTED = "started",
-  COMPLETING_ACCOUNT_INFO = "completing_account_info",
-  VERIFYING_EMAIL = "verifying_email",
-  COMPLETED = "completed",
-  FAILED = "failed",
-}
-
-export const DEFAULT_BB_DATASOURCE_ID = "datasource_internal_bb_default"

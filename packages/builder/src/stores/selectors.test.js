@@ -1,6 +1,5 @@
 import { it, expect, describe, beforeEach, vi } from "vitest"
-import { DEFAULT_BB_DATASOURCE_ID } from "@/constants/backend"
-import { integrationForDatasource, hasData, hasDefaultData } from "./selectors"
+import { integrationForDatasource, hasData } from "./selectors"
 
 describe("selectors", () => {
   beforeEach(() => {
@@ -34,22 +33,6 @@ describe("selectors", () => {
     describe("when the user doesn't have data", () => {
       it("returns false", () => {
         expect(hasData({ list: [] }, { list: [] })).toBe(false)
-      })
-    })
-  })
-
-  describe("hasDefaultData", () => {
-    describe("when the user has default data", () => {
-      it("returns true", () => {
-        expect(
-          hasDefaultData({ list: [{ _id: DEFAULT_BB_DATASOURCE_ID }] })
-        ).toBe(true)
-      })
-    })
-
-    describe("when the user doesn't have default data", () => {
-      it("returns false", () => {
-        expect(hasDefaultData({ list: [{ _id: "some other id" }] })).toBe(false)
       })
     })
   })

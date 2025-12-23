@@ -44,10 +44,6 @@ export interface FetchAppPackageResponse {
   clientCacheKey?: string
 }
 
-export interface AddWorkspaceSampleDataResponse {
-  message: string
-}
-
 export type FetchWorkspacesResponse = (Workspace & {
   defaultWorkspaceAppUrl: string
 })[]

@@ -28,7 +28,6 @@ import {
 import { buildFormSchema, getSchemaForDatasource } from "@/dataBinding"
 import {
   BUDIBASE_INTERNAL_DB_ID,
-  DEFAULT_BB_DATASOURCE_ID,
   DB_TYPE_INTERNAL,
   DB_TYPE_EXTERNAL,
 } from "@/constants/backend"
@@ -161,10 +160,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
 
     // Then try sample data
     table = validTables.find(table => {
-      return (
-        table.sourceId === DEFAULT_BB_DATASOURCE_ID &&
-        table.sourceType === DB_TYPE_INTERNAL
-      )
+      return table.sourceType === DB_TYPE_INTERNAL
     })
     if (table) {
       return table

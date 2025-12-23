@@ -6,7 +6,6 @@ import {
   BUDIBASE_INTERNAL_DB_ID,
   DB_TYPE_INTERNAL,
   DB_TYPE_EXTERNAL,
-  DEFAULT_BB_DATASOURCE_ID,
 } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
 import manifest from "@budibase/client/manifest.json"
@@ -181,25 +180,6 @@ export const userTableDoc = {
   type: "table",
   name: "Users",
   schema: {},
-}
-
-export const sampleTableDoc = {
-  _id: "ta_bb_employee",
-  type: "table",
-  name: "Employees",
-  sourceId: DEFAULT_BB_DATASOURCE_ID,
-  sourceType: DB_TYPE_INTERNAL,
-  primaryDisplay: "First Name",
-  schema: {
-    "First Name": {
-      name: "First Name",
-      type: "string",
-    },
-    "Last Name": {
-      name: "Last Name",
-      type: "string",
-    },
-  },
 }
 
 export const internalTableDoc = {
