@@ -1,5 +1,5 @@
 import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
-import { tick } from "svelte"
+import { mount, tick } from "svelte"
 
 export enum ConfirmOutput {}
 
@@ -15,7 +15,7 @@ export async function confirm(props: {
   warning?: boolean
 }) {
   return await new Promise(resolve => {
-    const dialog = new ConfirmDialog({
+    const dialog = mount(ConfirmDialog, {
       target: document.body,
       props: {
         title: props.title,
@@ -27,17 +27,14 @@ export async function confirm(props: {
         onOk: async () => {
           await tick()
           const result = await props.onConfirm?.()
-          dialog.$destroy()
           resolve(result || true)
         },
         onCancel: () => {
           const result = props.onCancel?.()
-          dialog.$destroy()
           resolve(result || false)
         },
         onClose: () => {
           const result = props.onClose?.()
-          dialog.$destroy()
           resolve(result || false)
         },
       },
