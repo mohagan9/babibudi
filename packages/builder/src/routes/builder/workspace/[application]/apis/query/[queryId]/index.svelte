@@ -11,7 +11,7 @@
 
   $: {
     if (query && !isRestSource) {
-      $goto(`../../data/query/${query._id}`)
+      $goto(`../../data/query/[queryId]`, { queryId: query._id })
     }
   }
 </script>

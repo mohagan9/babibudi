@@ -55,7 +55,7 @@
         callback: async () => {
           try {
             const newQuery = await queries.duplicate(query)
-            goto(`./query/${newQuery._id}`)
+            goto("./query/[queryId]", { queryId: newQuery._id })
           } catch (error) {
             notifications.error("Error duplicating query")
           }
@@ -80,10 +80,10 @@
   iconText={iconVerb}
   {iconColor}
   text={customQueryText(datasource, query)}
-  selected={$isActive("./query/:queryId") &&
+  selected={$isActive("./query/[queryId]", { queryId: query._id }) &&
     $queries.selectedQueryId === query._id}
   hovering={query._id === $contextMenuStore.id}
-  on:click={() => goto(`./query/${query._id}`)}
+  on:click={() => goto("./query/[queryId]", { queryId: query._id })}
   selectedBy={$userSelectedResourceMap[query._id]}
 >
   <div class="buttons">

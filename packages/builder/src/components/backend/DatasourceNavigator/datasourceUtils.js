@@ -41,14 +41,8 @@ const containsActiveEntity = (
 
   // Check for hardcoded datasource edge cases
   if (
-    isActive("./datasource/bb_internal") &&
+    isActive("./datasource/[datasourceId]", { datasourceId: "bb_internal" }) &&
     datasource._id === INTERNAL_TABLE_SOURCE_ID
-  ) {
-    return true
-  }
-  if (
-    isActive("./datasource/datasource_internal_bb_default") &&
-    datasource._id === "datasource_internal_bb_default"
   ) {
     return true
   }

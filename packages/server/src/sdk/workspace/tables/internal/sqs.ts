@@ -12,7 +12,6 @@ import {
 } from "@budibase/types"
 import { isEqual } from "lodash"
 import tablesSdk from ".."
-import { DEFAULT_TABLES } from "../../../../db/defaultData/datasource_bb_default"
 import { generateJunctionTableID } from "../../../../db/utils"
 
 const FieldTypeMap: Record<FieldType, SQLiteType> = {
@@ -115,12 +114,6 @@ function mapTable(table: Table): SQLiteTables {
 // nothing exists, need to iterate though existing tables
 async function buildBaseDefinition(): Promise<PreSaveSQLiteDefinition> {
   const tables = await tablesSdk.getAllInternalTables()
-  for (const defaultTable of DEFAULT_TABLES) {
-    // the default table doesn't exist in Couch, use the in-memory representation
-    if (!tables.find(table => table._id === defaultTable._id)) {
-      tables.push(defaultTable)
-    }
-  }
   const definition = sql.designDoc.base("tableId")
   for (let table of tables) {
     definition.sql.tables = {

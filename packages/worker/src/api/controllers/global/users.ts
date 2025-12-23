@@ -8,7 +8,7 @@ import {
   tenancy,
   users,
 } from "@budibase/backend-core"
-import { BpmStatusKey, BpmStatusValue, utils } from "@budibase/shared-core"
+import { utils } from "@budibase/shared-core"
 import {
   AcceptUserInviteRequest,
   AcceptUserInviteResponse,
@@ -588,11 +588,6 @@ export const inviteAccept = async (
         })
 
         await cache.invite.deleteCode(inviteCode)
-
-        // make sure onboarding flow is cleared
-        ctx.cookies.set(BpmStatusKey.ONBOARDING, BpmStatusValue.COMPLETED, {
-          expires: new Date(0),
-        })
 
         ctx.body = {
           _id: user._id!,

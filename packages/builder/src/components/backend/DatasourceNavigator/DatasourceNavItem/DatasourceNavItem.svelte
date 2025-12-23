@@ -33,10 +33,13 @@
     disabled: false,
     callback: () => {
       const section = datasource?.source === "REST" ? "apis" : "data"
-      $goto(`/builder/workspace/:application/${section}/query/new/:id`, {
-        application: $params.application,
-        id: datasource._id,
-      })
+      $goto(
+        `/builder/workspace/[application]/${section}/query/new/[datasourceId]`,
+        {
+          application: $params.application,
+          datasourceId: datasource._id,
+        }
+      )
     },
   }
 
