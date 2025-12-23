@@ -1,35 +1,9 @@
-<script>
-  import { syncURLToState } from "@/helpers/urlStateSync"
+<script lang="ts">
   import { builderStore, datasources } from "@/stores/builder"
-  import * as routify from "@roxi/routify"
   import { params } from "@roxi/routify"
-  import { onDestroy } from "svelte"
-
-  // Extract stores from namespace for Svelte 5 compatibility
-  const { goto, url, isActive, page, layout } = routify
-
-  $goto
-  $params
-  $url
-  $goto
-  $isActive
-  $page
-  $layout
 
   $: datasourceId = $datasources.selectedDatasourceId
-  $: builderStore.selectResource(datasourceId)
-
-  const stopSyncing = syncURLToState({
-    urlParam: "datasourceId",
-    stateKey: "selectedDatasourceId",
-    validate: id => $datasources.list?.some(ds => ds._id === id),
-    update: datasources.select,
-    fallbackUrl: "../",
-    store: datasources,
-    routify,
-  })
-
-  onDestroy(stopSyncing)
+  $: builderStore.selectResource(datasourceId!)
 </script>
 
 {#key $params.datasourceId}

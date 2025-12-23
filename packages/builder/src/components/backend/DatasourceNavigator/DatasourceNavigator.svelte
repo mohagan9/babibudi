@@ -50,7 +50,7 @@
 
   function selectDatasource(datasource) {
     openNode(datasource)
-    $goto(`./datasource/${datasource._id}`)
+    $goto("./datasource/[datasourceId]", { datasourceId: datasource._id })
   }
 
   const selectTable = tableId => {
@@ -59,7 +59,7 @@
       dataEnvironmentStore.setMode(DataEnvironmentMode.DEVELOPMENT)
     }
     tables.select(tableId)
-    $goto(`./table/${tableId}`)
+    $goto("./table/[tableId]", { tableId })
   }
 
   function openNode(datasource) {

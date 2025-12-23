@@ -27,7 +27,9 @@
         store.datasource.plus || store.datasource.source === "REST"
           ? ""
           : "?promptQuery=true"
-      goto(`./datasource/${store.datasource._id}${queryString}`)
+      goto("../datasource/[datasourceId]", {
+        datasourceId: `${store.datasource._id}${queryString}`,
+      })
     }
   }
 
