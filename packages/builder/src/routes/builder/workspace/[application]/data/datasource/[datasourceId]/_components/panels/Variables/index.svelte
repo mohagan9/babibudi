@@ -2,7 +2,6 @@
   import { Heading, Layout, notifications } from "@budibase/bbui"
   import KeyValueBuilder from "@/components/integration/KeyValueBuilder.svelte"
   import ViewDynamicVariables from "./ViewDynamicVariables.svelte"
-  import { environment } from "@/stores/portal"
   import { queries } from "@/stores/builder"
   import { cloneDeep, isEqual } from "lodash/fp"
   import Panel from "../Panel.svelte"

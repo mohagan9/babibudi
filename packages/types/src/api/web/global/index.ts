@@ -1,4 +1,3 @@
-export * from "./environmentVariables"
 export * from "./configs"
 export * from "./oldMigration"
 export * from "./email"

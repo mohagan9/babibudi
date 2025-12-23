@@ -28,7 +28,6 @@ import {
 import { TableNames } from "./constants"
 import { JSONUtils, Constants, SchemaUtils } from "@budibase/frontend-core"
 import ActionDefinitions from "@/components/design/settings/controls/ButtonActionEditor/manifest.json"
-import { environment } from "@/stores/portal"
 import { convertOldFieldFormat } from "@/components/design/settings/controls/FieldConfiguration/utils"
 import { FIELDS, DB_TYPE_INTERNAL } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
@@ -109,23 +108,6 @@ export const getAuthBindings = () => {
     }
   })
   return bindings
-}
-
-/**
- * Gets all bindings for environment variables
- */
-export const getEnvironmentBindings = () => {
-  let envVars = get(environment).variables
-  return envVars.map(variable => {
-    return {
-      type: "context",
-      runtimeBinding: `env.${makePropSafe(variable.name)}`,
-      readableBinding: `env.${variable.name}`,
-      category: "Environment",
-      icon: "key",
-      display: { type: "string", name: variable.name },
-    }
-  })
 }
 
 /**

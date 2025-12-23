@@ -4,7 +4,6 @@ import { AttachmentAPI } from "./attachment"
 import { BackupAPI } from "./backup"
 import { DatasourceAPI } from "./datasource"
 import { DeployAPI } from "./deploy"
-import { EnvironmentAPI } from "./environment"
 import { LegacyViewAPI } from "./legacyView"
 import { MiscAPI } from "./misc"
 import { NavigationAPI } from "./navigation"
@@ -35,7 +34,6 @@ export default class API {
   backup: BackupAPI
   datasource: DatasourceAPI
   deploy: DeployAPI
-  environment: EnvironmentAPI
   legacyView: LegacyViewAPI
   misc: MiscAPI
   oauth2: OAuth2API
@@ -69,7 +67,6 @@ export default class API {
     this.backup = new BackupAPI(config)
     this.datasource = new DatasourceAPI(config)
     this.deploy = new DeployAPI(config)
-    this.environment = new EnvironmentAPI(config)
     this.legacyView = new LegacyViewAPI(config)
     this.misc = new MiscAPI(config)
     this.oauth2 = new OAuth2API(config)
