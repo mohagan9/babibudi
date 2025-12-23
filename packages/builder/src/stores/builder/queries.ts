@@ -176,29 +176,3 @@ export class QueryStore extends DerivedBudiStore<
 }
 
 export const queries = new QueryStore()
-
-export const markSkipUnsavedPrompt = (queryId?: string | null) => {
-  skipNextUnsavedPrompt = true
-  if (!queryId) {
-    return
-  }
-  skipUnsavedPromptIds.add(queryId)
-}
-
-export const consumeSkipUnsavedPrompt = (queryId?: string | null) => {
-  if (skipNextUnsavedPrompt) {
-    skipNextUnsavedPrompt = false
-    if (queryId) {
-      skipUnsavedPromptIds.delete(queryId)
-    }
-    return true
-  }
-  if (!queryId) {
-    return false
-  }
-  const shouldSkip = skipUnsavedPromptIds.has(queryId)
-  if (shouldSkip) {
-    skipUnsavedPromptIds.delete(queryId)
-  }
-  return shouldSkip
-}

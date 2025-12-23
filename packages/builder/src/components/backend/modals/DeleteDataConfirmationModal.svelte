@@ -9,7 +9,6 @@
     views,
     viewsV2,
   } from "@/stores/builder"
-  import { markSkipUnsavedPrompt } from "@/stores/builder/queries"
   import ConfirmDialog from "@/components/common/ConfirmDialog.svelte"
   import { helpers, utils } from "@budibase/shared-core"
   import { SourceType } from "@budibase/types"
@@ -103,10 +102,6 @@
 
   async function deleteDatasource(datasource: Datasource) {
     try {
-      const activeQuery = $queries.selected
-      if (activeQuery?._id && activeQuery.datasourceId === datasource._id) {
-        markSkipUnsavedPrompt(activeQuery._id)
-      }
       await datasources.delete(datasource)
       notifications.success("Datasource deleted")
       const isSelected =
@@ -123,8 +118,9 @@
     try {
       // Go back to the datasource if we are deleting the active query
       if ($queries.selectedQueryId === query._id) {
-        markSkipUnsavedPrompt(query._id)
-        $goto(`./datasource/${query.datasourceId}`)
+        $goto(`./datasource/[datasourceId]`, {
+          datasourceId: query.datasourceId,
+        })
       }
       await queries.delete(query)
       await datasources.fetch()

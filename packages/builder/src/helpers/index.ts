@@ -10,6 +10,5 @@ export {
   isBuilderInputFocused,
 } from "./helpers"
 export * as bindings from "./bindings"
-export * from "./confirm"
 export * from "./date"
 export * from "./csv"

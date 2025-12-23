@@ -1,7 +1,6 @@
 <script>
-  import { beforeUrlChange, goto, params } from "@roxi/routify"
+  import { goto, params } from "@roxi/routify"
   import { datasources, flags, integrations, queries } from "@/stores/builder"
-  import { consumeSkipUnsavedPrompt } from "@/stores/builder/queries"
 
   import {
     Banner,
@@ -26,7 +25,7 @@
     EditorModes,
   } from "@/components/common/CodeMirrorEditor.svelte"
   import RestBodyInput from "./RestBodyInput.svelte"
-  import { capitalise, confirm } from "@/helpers"
+  import { capitalise } from "@/helpers"
   import { onMount } from "svelte"
   import restUtils, { customQueryIconColor } from "@/helpers/data/utils"
   import {
@@ -57,7 +56,6 @@
     keyValueArrayToRecord,
   } from "./query"
 
-  $beforeUrlChange
   $goto
   $params
 
@@ -492,36 +490,6 @@
     query.fields.requestBody = prettifyQueryRequestBody(query, mergedBindings)
 
     mounted = true
-  })
-
-  $beforeUrlChange(async () => {
-    if (!isModified || consumeSkipUnsavedPrompt(lastViewedQueryId)) {
-      return true
-    }
-
-    return await confirm({
-      title: "Some updates are not saved",
-      body: "Some of your changes are not yet saved. Do you want to save them before leaving?",
-      okText: "Save and continue",
-      cancelText: "Discard and continue",
-      size: "M",
-      onConfirm: async () => {
-        const saveResult = await saveQuery(false)
-        if (!saveResult.ok) {
-          // We can't leave as the query was not properly saved
-          return false
-        }
-
-        return true
-      },
-      onCancel: () => {
-        // Leave without saving anything
-        return true
-      },
-      onClose: () => {
-        return false
-      },
-    })
   })
 </script>
 
