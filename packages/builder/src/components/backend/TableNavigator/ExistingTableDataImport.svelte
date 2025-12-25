@@ -4,8 +4,7 @@
     BBReferenceFieldSubType,
     SourceName,
   } from "@budibase/types"
-  import { Select, Toggle, Multiselect, Label, Layout } from "@budibase/bbui"
-  import { DB_TYPE_INTERNAL } from "@/constants/backend"
+  import { Select, Toggle, Label, Layout } from "@budibase/bbui"
   import { API } from "@/api"
   import { parseFile } from "./utils"
   import { tables, datasources } from "@/stores/builder"
@@ -21,7 +20,6 @@
   let invalidColumns = []
 
   export let tableId = null
-  export let tableType
   export let rows = []
   export let allValid = false
   export let identifierFields = []
@@ -196,15 +194,7 @@
       />
     {/if}
     {#if updateExistingRows}
-      {#if tableType === DB_TYPE_INTERNAL}
-        <Multiselect
-          label="Identifier field(s)"
-          options={Object.keys(validation)}
-          bind:value={identifierFields}
-        />
-      {:else}
-        <div>Rows will be updated based on the table's primary key.</div>
-      {/if}
+      <div>Rows will be updated based on the table's primary key.</div>
     {/if}
     {#if invalidColumns.length > 0}
       <Layout noPadding gap="XS">

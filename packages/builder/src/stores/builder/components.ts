@@ -26,11 +26,7 @@ import {
   screenComponentsList,
 } from "@/stores/builder"
 import { buildFormSchema, getSchemaForDatasource } from "@/dataBinding"
-import {
-  BUDIBASE_INTERNAL_DB_ID,
-  DB_TYPE_INTERNAL,
-  DB_TYPE_EXTERNAL,
-} from "@/constants/backend"
+import { BUDIBASE_INTERNAL_DB_ID, DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { BudiStore } from "../BudiStore"
 import { Utils } from "@budibase/frontend-core"
 import {
@@ -149,18 +145,7 @@ export class ComponentStore extends BudiStore<ComponentState> {
 
     // Try to use their own internal table first
     let table = validTables.find(table => {
-      return (
-        table.sourceId === BUDIBASE_INTERNAL_DB_ID &&
-        table.sourceType === DB_TYPE_INTERNAL
-      )
-    })
-    if (table) {
-      return table
-    }
-
-    // Then try sample data
-    table = validTables.find(table => {
-      return table.sourceType === DB_TYPE_INTERNAL
+      return table.sourceId === BUDIBASE_INTERNAL_DB_ID
     })
     if (table) {
       return table

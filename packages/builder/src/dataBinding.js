@@ -29,7 +29,7 @@ import { TableNames } from "./constants"
 import { JSONUtils, Constants, SchemaUtils } from "@budibase/frontend-core"
 import ActionDefinitions from "@/components/design/settings/controls/ButtonActionEditor/manifest.json"
 import { convertOldFieldFormat } from "@/components/design/settings/controls/FieldConfiguration/utils"
-import { FIELDS, DB_TYPE_INTERNAL } from "@/constants/backend"
+import { FIELDS } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
 import { getTableIdFromViewId } from "@budibase/shared-core"
 
@@ -1017,13 +1017,12 @@ export const getSchemaForDatasource = (asset, datasource, options) => {
     }
 
     // Determine if we should add ID and rev to the schema
-    const isInternal = table && table?.sourceType === DB_TYPE_INTERNAL
     const isDSPlus = ["table", "link", "viewV2"].includes(datasource.type)
 
     // ID is part of the readable schema for all tables
     // Rev is part of the readable schema for internal tables only
     let addId = isDSPlus
-    let addRev = isDSPlus && isInternal
+    let addRev = isDSPlus
 
     // Don't add ID or rev for form schemas
     if (options.formSchema) {
@@ -1033,7 +1032,7 @@ export const getSchemaForDatasource = (asset, datasource, options) => {
 
     // ID is only searchable for internal tables
     else if (options.searchableSchema) {
-      addId = isDSPlus && isInternal
+      addId = isDSPlus
     }
 
     // Add schema properties if required

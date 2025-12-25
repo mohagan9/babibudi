@@ -2,11 +2,7 @@ import { v4 } from "uuid"
 import { Component } from "@/templates/Component"
 import { Screen } from "@/templates/screenTemplating/Screen"
 import { get } from "svelte/store"
-import {
-  BUDIBASE_INTERNAL_DB_ID,
-  DB_TYPE_INTERNAL,
-  DB_TYPE_EXTERNAL,
-} from "@/constants/backend"
+import { DB_TYPE_EXTERNAL } from "@/constants/backend"
 import { FieldType } from "@budibase/types"
 import manifest from "@budibase/client/manifest.json"
 
@@ -180,34 +176,6 @@ export const userTableDoc = {
   type: "table",
   name: "Users",
   schema: {},
-}
-
-export const internalTableDoc = {
-  _id: "ta_db5ac9e254da415899adcec21a025b3f",
-  tableId: "ta_db5ac9e254da415899adcec21a025b3f",
-  type: "table",
-  name: "Media",
-  sourceId: BUDIBASE_INTERNAL_DB_ID,
-  sourceType: DB_TYPE_INTERNAL,
-  primaryDisplay: "MediaTitle",
-  schema: {
-    MediaTitle: {
-      name: "MediaTitle",
-      type: FieldType.STRING,
-    },
-    MediaVersion: {
-      name: "MediaVersion",
-      type: FieldType.STRING,
-    },
-    MediaDescription: {
-      name: "MediaDescription",
-      type: FieldType.LONGFORM,
-    },
-    MediaImage: {
-      name: "MediaImage",
-      type: FieldType.ATTACHMENT_SINGLE,
-    },
-  },
 }
 
 export const externalTableDoc = {

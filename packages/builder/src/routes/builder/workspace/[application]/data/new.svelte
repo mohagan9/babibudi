@@ -6,28 +6,23 @@
   } from "@/stores/builder"
 
   import { hasData } from "@/stores/selectors"
-  import { Body, Icon, AbsTooltip } from "@budibase/bbui"
+  import { Body } from "@budibase/bbui"
   import { params, goto } from "@roxi/routify"
   import CreateExternalDatasourceModal from "./_components/CreateExternalDatasourceModal/index.svelte"
-  import CreateInternalTableModal from "./_components/CreateInternalTableModal.svelte"
   import DatasourceOption from "./_components/DatasourceOption.svelte"
   import IntegrationIcon from "@/components/backend/DatasourceNavigator/IntegrationIcon.svelte"
   import CreationPage from "@/components/common/CreationPage.svelte"
-  import ICONS from "@/components/backend/DatasourceNavigator/icons/index.js"
   import { IntegrationTypes } from "@/constants/backend"
 
   $goto
   $params
 
-  let internalTableModal: CreateInternalTableModal
   let externalDatasourceModal: CreateExternalDatasourceModal
 
   let externalDatasourceLoading = false
 
   $: disabled = externalDatasourceLoading
 </script>
-
-<CreateInternalTableModal bind:this={internalTableModal} />
 
 <CreateExternalDatasourceModal
   bind:loading={externalDatasourceLoading}
@@ -40,35 +35,8 @@
   heading="Add new data source"
 >
   <div class="subHeading">
-    <Body>Get started with our Budibase DB</Body>
-    <AbsTooltip text="Budibase DB is built with CouchDB">
-      <Icon name="info" size="S" />
-    </AbsTooltip>
+    <Body>Connect to an external datasource</Body>
   </div>
-
-  <div class="options bb-options">
-    <DatasourceOption
-      on:click={() => internalTableModal.show()}
-      title="Create new table"
-      description="Non-relational"
-      {disabled}
-    >
-      <svelte:component this={ICONS.BUDIBASE} height="20" width="20" />
-    </DatasourceOption>
-    <DatasourceOption
-      on:click={() => internalTableModal.show({ promptUpload: true })}
-      title="Upload CSV / JSON"
-      description="Non-relational"
-      {disabled}
-    >
-      <svelte:component this={ICONS.BUDIBASE} height="20" width="20" />
-    </DatasourceOption>
-  </div>
-
-  <div class="subHeading">
-    <Body>Or connect to an external datasource</Body>
-  </div>
-
   <div class="options">
     {#each $integrations.filter(integration => integration.name !== IntegrationTypes.REST) as integration}
       <DatasourceOption
@@ -106,9 +74,6 @@
     justify-content: center;
     margin-bottom: 48px;
     max-width: 1050px;
-  }
-  .bb-options {
-    max-width: calc(3 * 235px + 2 * 24px); /* 3 columns + 2 gaps */
   }
   .options {
     grid-column: 1 / -1;

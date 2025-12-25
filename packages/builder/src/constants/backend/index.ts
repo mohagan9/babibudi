@@ -213,8 +213,6 @@ export const PrettyRelationshipDefinitions = {
 }
 
 export const BUDIBASE_INTERNAL_DB_ID = INTERNAL_TABLE_SOURCE_ID
-export const BUDIBASE_DATASOURCE_TYPE = "budibase"
-export const DB_TYPE_INTERNAL = "internal"
 export const DB_TYPE_EXTERNAL = "external"
 
 export const IntegrationTypes = {
