@@ -2,8 +2,8 @@
   import { Layout } from "@budibase/bbui"
   import DatasourceNavigator from "@/components/backend/DatasourceNavigator/DatasourceNavigator.svelte"
   import Panel from "@/components/design/Panel.svelte"
-  import { isActive, goto, params } from "@roxi/routify"
-  import { datasources, builderStore } from "@/stores/builder"
+  import { isActive, goto } from "@roxi/routify"
+  import { builderStore } from "@/stores/builder"
   import NavHeader from "@/components/common/NavHeader.svelte"
   import TopBar from "@/components/common/TopBar.svelte"
   import { getHorizontalResizeActions } from "@/components/common/resizable"
@@ -70,15 +70,6 @@
   onDestroy(() => {
     window.removeEventListener("resize", updateMaxWidth)
   })
-
-  $: {
-    // If we ever don't have any data other than the users table, prompt the
-    // user to add some
-    // Don't redirect if setting up google sheets, or we lose the query parameter
-    if (!$datasources.hasData && !$params["?continue_google_setup"]) {
-      $goto("./new")
-    }
-  }
 </script>
 
 <!-- routify:options index=1 -->

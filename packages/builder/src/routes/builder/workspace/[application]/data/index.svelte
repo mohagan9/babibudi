@@ -26,7 +26,7 @@
     if ($datasources.hasData) {
       $goto(`../table/[tableId]`, { tableId })
     } else {
-      $goto("../new")
+      $goto(`../table/[tableId]`, { tableId: TableNames.USERS })
     }
   })
 </script>

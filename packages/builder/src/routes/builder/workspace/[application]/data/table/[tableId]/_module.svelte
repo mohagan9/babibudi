@@ -1,35 +1,19 @@
-<script>
-  import { syncURLToState } from "@/helpers/urlStateSync"
+<script lang="ts">
   import { tables, builderStore } from "@/stores/builder"
-  import * as routify from "@roxi/routify"
-  import { onDestroy } from "svelte"
   import ViewNavBar from "./_components/ViewNavBar.svelte"
 
-  // Extract stores from namespace for Svelte 5 compatibility
-  const { goto, params, url, isActive, page, layout } = routify
-
-  $goto
-  $params
-  $url
-  $goto
-  $isActive
-  $page
-  $layout
-
   $: tableId = $tables.selectedTableId
-  $: builderStore.selectResource(tableId)
+  $: builderStore.selectResource(tableId!)
 
-  const stopSyncing = syncURLToState({
-    urlParam: "tableId",
-    stateKey: "selectedTableId",
-    validate: id => $tables.list?.some(table => table._id === id),
-    update: tables.select,
-    fallbackUrl: "../",
-    store: tables,
-    routify,
-  })
-
-  onDestroy(stopSyncing)
+  // const stopSyncing = syncURLToState({
+  //   urlParam: "tableId",
+  //   stateKey: "selectedTableId",
+  //   validate: id => $tables.list?.some(table => table._id === id),
+  //   update: tables.select,
+  //   fallbackUrl: "../",
+  //   store: tables,
+  //   routify,
+  // })
 </script>
 
 <div class="wrapper">

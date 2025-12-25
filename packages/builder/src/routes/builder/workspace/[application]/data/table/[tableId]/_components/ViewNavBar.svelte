@@ -65,12 +65,8 @@
     .filter(x => x.version === 2)
     .slice()
     .sort(alphabetical)
-  $: v1Views = Object.values(table?.views || {})
-    .filter(x => x.version !== 2)
-    .slice()
-    .sort(alphabetical)
   $: setUpObserver(views)
-  $: hasViews = v1Views.length || views.length
+  $: hasViews = views.length
 
   $: overflowedViews = views.filter(view => !viewVisibiltyMap[view.id])
   $: viewHidden = viewVisibiltyMap[activeId] === false
@@ -78,14 +74,16 @@
     table?._id === TableNames.USERS ? "App users" : table?.name || ""
 
   const viewUrl = derived([url, params], ([$url, $params]) => viewId => {
-    return $url(`../${$params.tableId}/${encodeURIComponent(viewId)}`)
+    return $url(`../[tableId]/[viewId]`, {
+      tableId: $params.tableId,
+      viewId: encodeURIComponent(viewId),
+    })
   })
 
-  const viewV1Url = derived([url, params], ([$url, $params]) => viewName => {
-    return $url(`../${$params.tableId}/v1/${encodeURIComponent(viewName)}`)
-  })
-
-  const tableUrl = derived(url, $url => tableId => $url(`../${tableId}`))
+  const tableUrl = derived(
+    url,
+    $url => tableId => $url(`../[tableId]`, { tableId })
+  )
 
   const openTableContextMenu = e => {
     if (!tableEditable) {
@@ -272,34 +270,6 @@
   </a>
   {#if hasViews}
     <div class="nav__views" bind:this={viewContainer}>
-      {#each v1Views as view (view.name)}
-        {@const selectedBy = $userSelectedResourceMap[view.name]}
-        <a
-          href={$viewV1Url(view.name)}
-          class="nav-item"
-          class:active={view.name === activeId}
-          on:contextmenu={e => openViewContextMenu(e, view)}
-          data-id={view.name}
-        >
-          <div class="nav-item__title">
-            {view.name}
-          </div>
-          {#if selectedBy}
-            <UserAvatars size="XS" users={selectedBy} />
-          {/if}
-          {#if isDevMode}
-            <Icon
-              on:click={e => openViewContextMenu(e, view)}
-              hoverable
-              size="M"
-              weight="bold"
-              name="dots-three"
-              color="var(--spectrum-global-color-gray-600)"
-              hoverColor="var(--spectrum-global-color-gray-900)"
-            />
-          {/if}
-        </a>
-      {/each}
       {#each views as view (view.id)}
         {@const selectedBy = $userSelectedResourceMap[view.id]}
         <a
