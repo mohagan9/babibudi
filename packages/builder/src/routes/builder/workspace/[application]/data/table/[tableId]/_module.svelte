@@ -1,19 +1,20 @@
 <script lang="ts">
   import { tables, builderStore } from "@/stores/builder"
   import ViewNavBar from "./_components/ViewNavBar.svelte"
+  import { params } from "@roxi/routify"
+  import { onMount } from "svelte"
 
   $: tableId = $tables.selectedTableId
   $: builderStore.selectResource(tableId!)
 
-  // const stopSyncing = syncURLToState({
-  //   urlParam: "tableId",
-  //   stateKey: "selectedTableId",
-  //   validate: id => $tables.list?.some(table => table._id === id),
-  //   update: tables.select,
-  //   fallbackUrl: "../",
-  //   store: tables,
-  //   routify,
-  // })
+  const validate = (id: string) => $tables.list?.some(table => table._id === id)
+
+  onMount(() => {
+    const tableId = $params.tableId
+    if (validate(tableId)) {
+      tables.select(tableId)
+    }
+  })
 </script>
 
 <div class="wrapper">

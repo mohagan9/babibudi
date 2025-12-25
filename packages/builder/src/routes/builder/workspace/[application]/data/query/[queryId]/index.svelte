@@ -12,7 +12,7 @@
   $: isRestQuery = datasource?.source === IntegrationTypes.REST
   $: {
     if (query && isRestQuery) {
-      $goto(`../../../apis/query/${query._id}`)
+      $goto(`../../../apis/query/[queryId]`, { queryId: query._id })
     }
   }
 </script>
