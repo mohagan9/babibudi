@@ -368,7 +368,6 @@ export class DatabaseImpl implements Database {
     return this.performCall(db => {
       return async () => {
         try {
-          // @ts-expect-error - TODO(mel): fix
           return (await db.list(params)) as AllDocsResponse<T>
         } catch (err: any) {
           if (err.reason === DATABASE_NOT_FOUND) {

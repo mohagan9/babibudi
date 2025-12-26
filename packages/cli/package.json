@@ -30,7 +30,6 @@
     "lookpath": "1.1.0",
     "node-fetch": "2.6.7",
     "open": "8.4.2",
-    "posthog-node": "4.0.1",
     "pouchdb": "7.3.0",
     "randomstring": "1.1.5",
     "tar": "6.2.1",

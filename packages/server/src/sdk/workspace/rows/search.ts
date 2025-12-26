@@ -163,7 +163,10 @@ export async function search(
       result = await external.search(options, source)
     } else {
       span?.addTags({ searchType: "lucene" })
-      result = await internal.lucene.search(options, source)
+      const rows = await internal.fetch(options.tableId)
+      result = {
+        rows,
+      }
     }
 
     span.addTags({

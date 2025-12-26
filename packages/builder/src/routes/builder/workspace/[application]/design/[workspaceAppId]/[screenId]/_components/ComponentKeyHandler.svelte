@@ -140,12 +140,8 @@
     const activeTag = document.activeElement?.tagName.toLowerCase()
     const inCodeEditor =
       document.activeElement?.classList?.contains("cm-content")
-    const inPosthogSurvey =
-      document.activeElement?.classList?.[0]?.startsWith("PostHogSurvey")
     if (
-      (inCodeEditor ||
-        inPosthogSurvey ||
-        ["input", "textarea"].indexOf(activeTag) !== -1) &&
+      (inCodeEditor || ["input", "textarea"].indexOf(activeTag) !== -1) &&
       e.key !== "Escape"
     ) {
       return
