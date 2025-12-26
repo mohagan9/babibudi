@@ -3,7 +3,7 @@ import Nano, {
   DocumentInsertResponse,
   DocumentBulkResponse,
   OkResponse,
-} from "@budibase/nano"
+} from "nano"
 import {
   AllDocsResponse,
   AnyDocument,

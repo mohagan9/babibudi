@@ -2,8 +2,8 @@ import {
   context,
   locks,
   sql,
+  BUDIBASE_DATASOURCE_TYPE,
   SQLITE_DESIGN_DOC_ID,
-  SQS_DATASOURCE_INTERNAL,
 } from "@budibase/backend-core"
 import {
   dataFilters,
@@ -399,7 +399,7 @@ export async function search(
   const request: QueryJson = {
     endpoint: {
       // not important, we query ourselves
-      datasourceId: SQS_DATASOURCE_INTERNAL,
+      datasourceId: BUDIBASE_DATASOURCE_TYPE,
       entityId: table._id!,
       operation: Operation.READ,
     },

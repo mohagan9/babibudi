@@ -1,7 +1,7 @@
 import { FieldType, Table, Row } from "@budibase/types"
 import { db as dbCore } from "@budibase/backend-core"
 import { DocumentType, SEPARATOR } from "../../../db/utils"
-import Nano from "@budibase/nano"
+import Nano from "nano"
 
 // default limit - seems to work well for performance
 export const FIND_LIMIT = 25

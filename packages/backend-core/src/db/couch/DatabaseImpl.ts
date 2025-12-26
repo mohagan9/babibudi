@@ -1,4 +1,4 @@
-import Nano from "@budibase/nano"
+import Nano from "nano"
 import {
   AllDocsResponse,
   AnyDocument,
@@ -32,12 +32,9 @@ const DATABASE_NOT_FOUND = "Database does not exist."
 function buildNano(couchInfo: { url: string; cookie: string }) {
   return Nano({
     url: couchInfo.url,
-    requestDefaults: {
-      headers: {
-        Authorization: couchInfo.cookie,
-      },
+    headers: {
+      Authorization: couchInfo.cookie,
     },
-    parseUrl: false,
   })
 }
 
@@ -371,6 +368,7 @@ export class DatabaseImpl implements Database {
     return this.performCall(db => {
       return async () => {
         try {
+          // @ts-expect-error - TODO(mel): fix
           return (await db.list(params)) as AllDocsResponse<T>
         } catch (err: any) {
           if (err.reason === DATABASE_NOT_FOUND) {

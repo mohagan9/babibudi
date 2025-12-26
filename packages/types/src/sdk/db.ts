@@ -1,4 +1,4 @@
-import type Nano from "@budibase/nano"
+import type Nano from "nano"
 import { ReadStream } from "fs"
 import { Writable } from "stream"
 import {

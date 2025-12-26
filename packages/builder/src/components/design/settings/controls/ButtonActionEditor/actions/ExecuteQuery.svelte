@@ -4,10 +4,7 @@
   import { datasources, integrations, queries } from "@/stores/builder"
   import BindingBuilder from "@/components/integration/QueryBindingBuilder.svelte"
   import IntegrationQueryEditor from "@/components/integration/index.svelte"
-  import {
-    BUDIBASE_INTERNAL_DB_ID,
-    BUDIBASE_DATASOURCE_TYPE,
-  } from "@/constants/backend"
+  import { BUDIBASE_INTERNAL_DB_ID } from "@/constants/backend"
 
   export let parameters
   export let bindings = []
@@ -18,8 +15,7 @@
   )
   // Executequery must exclude budibase datasource
   $: executeQueryDatasources = $datasources.list.filter(
-    x =>
-      x._id !== BUDIBASE_INTERNAL_DB_ID && x.type !== BUDIBASE_DATASOURCE_TYPE
+    x => x._id !== BUDIBASE_INTERNAL_DB_ID
   )
   // Ensure query params exist so they can be bound
   $: {

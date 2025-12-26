@@ -20,7 +20,7 @@ import { Format } from "../../../api/controllers/view/exporters"
 import sdk from "../.."
 import { isRelationshipColumn } from "../../../db/utils"
 import { isSQL } from "../../../integrations/utils"
-import { sql, SQS_DATASOURCE_INTERNAL } from "@budibase/backend-core"
+import { sql, BUDIBASE_DATASOURCE_TYPE } from "@budibase/backend-core"
 import { getTableFromSource } from "../../../api/controllers/row/utils"
 import env from "../../../environment"
 import {
@@ -95,7 +95,7 @@ export async function enrichQueryJson(
   let datasource: Datasource | undefined = undefined
 
   if (typeof json.endpoint.datasourceId === "string") {
-    if (json.endpoint.datasourceId !== SQS_DATASOURCE_INTERNAL) {
+    if (json.endpoint.datasourceId !== BUDIBASE_DATASOURCE_TYPE) {
       datasource = await sdk.datasources.get(json.endpoint.datasourceId, {
         enriched: true,
       })

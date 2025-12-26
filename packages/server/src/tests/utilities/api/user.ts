@@ -5,7 +5,7 @@ import {
   UserMetadata,
 } from "@budibase/types"
 import { Expectations, TestAPI } from "./base"
-import { DocumentInsertResponse } from "@budibase/nano"
+import { DocumentInsertResponse } from "nano"
 
 export class UserAPI extends TestAPI {
   fetch = async (

@@ -1,5 +1,5 @@
 import { Webhook } from "../../../documents"
-import { DocumentDestroyResponse, DocumentInsertResponse } from "@budibase/nano"
+import { DocumentDestroyResponse, DocumentInsertResponse } from "nano"
 
 export type FetchWebhooksResponse = Webhook[]
 

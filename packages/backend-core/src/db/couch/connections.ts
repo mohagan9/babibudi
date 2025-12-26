@@ -38,8 +38,8 @@ export const getCouchInfo = (connection?: string | null) => {
     // clean out any auth credentials
     sqlUrl: getUrlInfo(sqlUrl).url,
     auth: {
-      username: username,
-      password: password,
+      username,
+      password,
     },
     cookie: `Basic ${authCookie}`,
   }

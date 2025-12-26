@@ -1,10 +1,7 @@
 import { context, db, roles, tenancy } from "@budibase/backend-core"
-import Nano from "@budibase/nano"
-import { WorkspaceStatus } from "../../../../db/utils"
 import env from "../../../../environment"
 import TestConfiguration from "../../../../tests/utilities/TestConfiguration"
 import * as rowController from "../../../controllers/row"
-import * as workspaceController from "../../../controllers/workspace"
 
 class Request {
   appId: any
@@ -31,48 +28,6 @@ export const getAllTableRows = async (config: TestConfiguration) => {
   })
   await runRequest(config.getDevWorkspaceId(), rowController.fetch, req)
   return req.body
-}
-
-export const clearAllWorkspaces = async (
-  tenantId: string,
-  exceptions: Array<string> = []
-) => {
-  await tenancy.doInTenant(tenantId, async () => {
-    const req: any = {
-      query: { status: WorkspaceStatus.DEV },
-      user: { tenantId, builder: { global: true } },
-    }
-    await workspaceController.fetch(req)
-    const workspaces = req.body
-    if (!workspaces || workspaces.length <= 0) {
-      return
-    }
-    for (let workspace of workspaces.filter(
-      (x: any) => !exceptions.includes(x.appId)
-    )) {
-      const { appId } = workspace
-      const req = new Request(null, { appId })
-      await runRequest(appId, workspaceController.destroy, req)
-    }
-  })
-}
-
-export const wipeDb = async () => {
-  const couchInfo = db.getCouchInfo()
-  const nano = Nano({
-    url: couchInfo.url,
-    requestDefaults: {
-      headers: {
-        Authorization: couchInfo.cookie,
-      },
-    },
-    parseUrl: false,
-  })
-  let dbs
-  do {
-    dbs = await nano.db.list()
-    await Promise.all(dbs.map(x => nano.db.destroy(x)))
-  } while (dbs.length)
 }
 
 export const createRequest = (

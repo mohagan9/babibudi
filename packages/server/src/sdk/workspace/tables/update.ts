@@ -1,5 +1,5 @@
 import { context } from "@budibase/backend-core"
-import { DocumentInsertResponse } from "@budibase/nano"
+import { DocumentInsertResponse } from "nano"
 import { RenameColumn, Table } from "@budibase/types"
 import { isExternalTableID } from "../../../integrations/utils"
 import sdk from "../../index"

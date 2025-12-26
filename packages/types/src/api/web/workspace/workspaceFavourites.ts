@@ -1,4 +1,4 @@
-import { DocumentDestroyResponse } from "@budibase/nano"
+import { DocumentDestroyResponse } from "nano"
 import { WorkspaceFavourite } from "../../../documents"
 
 export enum WorkspaceResource {
