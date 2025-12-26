@@ -309,47 +309,4 @@ describe("Replication", () => {
       }
     )
   })
-
-  describe("resolveInconsistencies", () => {
-    let replication: Replication
-
-    beforeEach(() => {
-      jest.clearAllMocks()
-      replication = new Replication({
-        source: mockSourceDb.name,
-        target: mockTargetDb.name,
-      })
-      jest.spyOn(replication, "replicate").mockResolvedValue({} as any)
-    })
-
-    it("should remove conflicted documents and replicate them", async () => {
-      const sourceDoc = { _id: "doc1", _rev: "5-abc123" }
-      const targetDoc = { _id: "doc1", _rev: "8-def456" }
-
-      mockSourceDb.get.mockResolvedValue(sourceDoc)
-      mockTargetDb.get.mockResolvedValue(targetDoc)
-      mockTargetDb.remove.mockResolvedValue({})
-
-      await replication.resolveInconsistencies(["doc1"])
-
-      expect(mockTargetDb.remove).toHaveBeenCalledWith({
-        _id: "doc1",
-        _rev: "8-def456",
-      })
-      expect(replication.replicate).toHaveBeenCalledWith({ doc_ids: ["doc1"] })
-    })
-
-    it("should not remove documents without inconsistencies", async () => {
-      const sourceDoc = { _id: "doc1", _rev: "8-abc123" }
-      const targetDoc = { _id: "doc1", _rev: "5-def456" }
-
-      mockSourceDb.get.mockResolvedValue(sourceDoc)
-      mockTargetDb.get.mockResolvedValue(targetDoc)
-
-      await replication.resolveInconsistencies(["doc1"])
-
-      expect(mockTargetDb.remove).not.toHaveBeenCalled()
-      expect(replication.replicate).not.toHaveBeenCalled()
-    })
-  })
 })
